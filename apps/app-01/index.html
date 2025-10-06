@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application 01 - MIT Lecture Apps</title>
+    <link rel="stylesheet" href="../../shared/css/app-template.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🚀 Application 01</h1>
+            <a href="../../index.html" class="back-button">← Back to Home</a>
+        </header>
+
+        <main class="app-content">
+            <h2>Welcome to Application 01</h2>
+            <p>This is an example application demonstrating the structure.</p>
+
+            <div style="margin-top: 30px;">
+                <h3>Interactive Demo</h3>
+                <input type="text" id="nameInput" placeholder="Enter your name" style="margin-bottom: 15px;">
+                <button id="greetButton">Greet Me</button>
+                <div id="output"></div>
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 8px;">
+                <h3>Development Notes</h3>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Each app is completely independent</li>
+                    <li>Shared utilities available in /shared/js/app-utils.js</li>
+                    <li>Shared styles available in /shared/css/app-template.css</li>
+                    <li>Each app has its own storage namespace</li>
+                    <li>Copy this structure for apps 02-21</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../shared/js/app-utils.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
