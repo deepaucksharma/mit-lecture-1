@@ -1,0 +1,130 @@
+{
+  "version": "1.0",
+  "title": "GFS Visual Learning System",
+  "description": "Interactive visual learning system for understanding Google File System architecture",
+  "diagrams": [
+    {
+      "id": "00-legend",
+      "title": "Master Legend & System Contracts",
+      "description": "Foundation diagram showing symbols, components, and system-wide invariants",
+      "difficulty": "beginner",
+      "prerequisites": []
+    },
+    {
+      "id": "01-triangle",
+      "title": "The Impossible Triangle",
+      "description": "Trade-offs between Performance, Reliability, and Consistency",
+      "difficulty": "intermediate",
+      "prerequisites": ["00-legend"]
+    },
+    {
+      "id": "02-scale",
+      "title": "Scale Reality Dashboard",
+      "description": "Comparing traditional NFS with GFS at Google scale",
+      "difficulty": "intermediate",
+      "prerequisites": ["00-legend"]
+    },
+    {
+      "id": "03-chunk-size",
+      "title": "The 64MB Decision Tree",
+      "description": "Understanding chunk size trade-offs with RAM economics",
+      "difficulty": "intermediate",
+      "prerequisites": ["00-legend"]
+    },
+    {
+      "id": "04-architecture",
+      "title": "Complete Architecture",
+      "description": "Full system architecture with failure blast radius analysis",
+      "difficulty": "advanced",
+      "prerequisites": ["00-legend", "02-scale"]
+    },
+    {
+      "id": "05-planes",
+      "title": "Control vs Data Plane",
+      "description": "Separation of control and data traffic highways",
+      "difficulty": "intermediate",
+      "prerequisites": ["00-legend", "04-architecture"]
+    },
+    {
+      "id": "06-read-path",
+      "title": "Read Path with Cache",
+      "description": "Complete read operation with cache lifecycle and latencies",
+      "difficulty": "intermediate",
+      "prerequisites": ["05-planes"]
+    },
+    {
+      "id": "07-write-path",
+      "title": "Write Path Ballet",
+      "description": "Two-stage write operation with pipeline and commit phases",
+      "difficulty": "advanced",
+      "prerequisites": ["05-planes"]
+    },
+    {
+      "id": "08-lease",
+      "title": "Lease State Machine",
+      "description": "Primary lease mechanism preventing split-brain scenarios",
+      "difficulty": "advanced",
+      "prerequisites": ["07-write-path"]
+    },
+    {
+      "id": "09-consistency",
+      "title": "Consistency Reality",
+      "description": "Understanding weak consistency and application-level fixes",
+      "difficulty": "advanced",
+      "prerequisites": ["07-write-path", "08-lease"]
+    },
+    {
+      "id": "10-recovery",
+      "title": "Failure Recovery Matrix",
+      "description": "Complete failure types and recovery mechanisms",
+      "difficulty": "advanced",
+      "prerequisites": ["04-architecture", "09-consistency"]
+    },
+    {
+      "id": "11-evolution",
+      "title": "Single Master Evolution",
+      "description": "Timeline showing system evolution and breaking points",
+      "difficulty": "intermediate",
+      "prerequisites": ["04-architecture"]
+    },
+    {
+      "id": "12-dna",
+      "title": "GFS DNA in Modern Systems",
+      "description": "Ideas that survived, evolved, or died in modern systems",
+      "difficulty": "intermediate",
+      "prerequisites": ["11-evolution"]
+    }
+  ],
+  "learningPaths": [
+    {
+      "id": "quickstart",
+      "title": "Quick Start",
+      "description": "Essential concepts in 30 minutes",
+      "diagrams": ["00-legend", "04-architecture", "06-read-path"]
+    },
+    {
+      "id": "fundamentals",
+      "title": "Fundamentals",
+      "description": "Core GFS concepts and trade-offs",
+      "diagrams": ["00-legend", "01-triangle", "02-scale", "03-chunk-size", "04-architecture"]
+    },
+    {
+      "id": "operations",
+      "title": "Operations Deep Dive",
+      "description": "Understanding read/write operations in detail",
+      "diagrams": ["05-planes", "06-read-path", "07-write-path", "08-lease", "09-consistency"]
+    },
+    {
+      "id": "reliability",
+      "title": "Reliability & Evolution",
+      "description": "Failure handling and system evolution",
+      "diagrams": ["10-recovery", "11-evolution", "12-dna"]
+    }
+  ],
+  "metadata": {
+    "author": "GFS Learning Team",
+    "created": "2024-01-01",
+    "basedOn": "The Google File System - Ghemawat, Gobioff, and Leung (2003)",
+    "license": "MIT"
+  }
+}

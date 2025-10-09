@@ -1,245 +1,141 @@
-# MIT Lecture Apps Collection
+# GFS Visual Learning System
 
-A collection of 21 independent web applications hosted on GitHub Pages with a unified landing page.
+An interactive visual learning system for understanding the Google File System architecture through diagrams, drills, and step-through animations.
 
-## 🏗️ Architecture
+## Features
 
-```
-/
-├── index.html              # Main landing page
-├── config.json             # App metadata and navigation
-├── shared/                 # Shared resources
-│   ├── css/
-│   │   ├── main.css       # Landing page styles
-│   │   └── app-template.css  # Reusable app styles
-│   └── js/
-│       ├── main.js        # Landing page logic
-│       └── app-utils.js   # Shared utilities for apps
-├── apps/                   # Individual applications
-│   ├── app-01/
-│   │   ├── index.html
-│   │   ├── styles.css
-│   │   └── app.js
-│   ├── app-02/
-│   └── ... (app-21)
-├── app-template/           # Template for new apps
-│   ├── index.html
-│   ├── styles.css
-│   └── app.js
-└── .github/
-    └── workflows/
-        └── deploy.yml      # GitHub Pages deployment
-```
+- **13 Interactive Diagrams**: From basic concepts to advanced architecture
+- **Overlay System**: Toggle different views to understand complex interactions
+- **Step-Through Mode**: Animate through operations step by step
+- **Interactive Drills**: Test your understanding with recall, apply, analyze, and create exercises
+- **Progress Tracking**: Monitor your learning journey with persistent progress tracking
+- **Export Capabilities**: Export diagrams as SVG, PNG, or Mermaid code
 
-## 🚀 Getting Started
+## Quick Start
 
 ### Local Development
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/mit-lecture-1.git
-cd mit-lecture-1
+git clone https://github.com/yourusername/gfs-visual-learning.git
+cd gfs-visual-learning
 ```
 
-2. Serve locally using Python:
+2. Serve the application locally:
 ```bash
+# Using Python
 python -m http.server 8000
-```
 
-Or using Node.js:
-```bash
+# Or using Node.js
 npx http-server
 ```
 
-3. Open `http://localhost:8000` in your browser
+3. Open your browser to `http://localhost:8000/docs`
 
-### Creating a New App
+### GitHub Pages Deployment
 
-1. Copy the template:
+The application automatically deploys to GitHub Pages when you push to the main branch.
+
+## Project Structure
+
+```
+gfs-visual-learning/
+├── docs/                   # GitHub Pages deployment
+│   ├── index.html         # Main application
+│   ├── style.css          # Styling
+│   ├── app.js             # Bundled JavaScript
+│   └── data/              # Runtime data
+├── src/                    # Source code
+│   ├── core/              # Core engines
+│   ├── learning/          # Learning system
+│   └── ui/                # UI components
+├── data/                   # Data specifications
+│   ├── specs/             # Diagram JSON specs
+│   ├── schema.json        # JSON Schema
+│   └── manifest.json      # Diagram manifest
+└── .github/workflows/      # CI/CD pipeline
+```
+
+## Creating New Diagrams
+
+1. Create a JSON specification in `data/specs/`
+2. Follow the schema defined in `data/schema.json`
+3. Add the diagram to `data/manifest.json`
+4. Run validation: `node scripts/validate-all.js`
+
+## Keyboard Shortcuts
+
+- **1-9**: Toggle overlays
+- **←/→**: Step navigation
+- **Ctrl+←/→**: Diagram navigation
+- **Space**: Play/Pause steps
+- **L**: Go to Legend
+- **T**: Toggle theme
+- **E**: Export diagram
+- **?**: Show help
+
+## Learning Paths
+
+### Quick Start (30 minutes)
+- Master Legend & System Contracts
+- Complete Architecture
+- Read Path with Cache
+
+### Fundamentals (2 hours)
+- All basic concepts and trade-offs
+- Understanding scale and chunk sizes
+- System architecture
+
+### Operations Deep Dive (3 hours)
+- Control vs Data plane separation
+- Read and Write operations
+- Lease mechanisms
+- Consistency models
+
+### Reliability & Evolution (2 hours)
+- Failure recovery mechanisms
+- System evolution timeline
+- GFS influence on modern systems
+
+## Development
+
+### Adding New Features
+
+1. **New Overlay Type**: Modify `src/ui/overlays.js`
+2. **New Drill Type**: Update `src/learning/drills.js`
+3. **New Diagram Layout**: Extend `src/core/renderer.js`
+
+### Running Tests
+
 ```bash
-cp -r app-template apps/app-XX
+npm test
 ```
 
-2. Update `config.json` with your app's metadata:
-```json
-{
-  "id": "app-XX",
-  "title": "Your App Title",
-  "description": "Your app description",
-  "path": "apps/app-XX",
-  "category": "utility|tool|game|visualization|education",
-  "icon": "🚀"
-}
-```
+### Building for Production
 
-3. Customize your app:
-   - Edit `apps/app-XX/index.html` - Main HTML structure
-   - Edit `apps/app-XX/styles.css` - App-specific styles
-   - Edit `apps/app-XX/app.js` - App logic
+The build process is automated via GitHub Actions. On push to main:
+1. Validates all JSON specs
+2. Bundles JavaScript files
+3. Deploys to GitHub Pages
 
-## 📦 Shared Utilities
+## Contributing
 
-Apps can use shared utilities from `shared/js/app-utils.js`:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Ensure all specs validate
+5. Submit a pull request
 
-### Navigation
-```javascript
-// Navigate back to home
-navigateToHome();
+## Based On
 
-// Get base path
-const path = getBasePath();
-```
+"The Google File System" by Sanjay Ghemawat, Howard Gobioff, and Shun-Tak Leung (SOSP 2003)
 
-### App Info
-```javascript
-// Get current app configuration
-const appInfo = await getCurrentAppInfo();
-console.log(appInfo.title, appInfo.description);
+## License
 
-// Load all app config
-const config = await loadAppConfig();
-```
+MIT License - See LICENSE file for details
 
-### State Management
-```javascript
-// Create app state
-const appState = new AppState({ counter: 0 });
+## Acknowledgments
 
-// Get state
-const state = appState.getState();
-
-// Update state
-appState.setState({ counter: 1 });
-
-// Subscribe to changes
-appState.subscribe((state) => {
-  console.log('State changed:', state);
-});
-```
-
-### Local Storage
-```javascript
-// Initialize storage for your app
-const storage = new AppStorage('app-XX');
-
-// Save data
-storage.set('key', { data: 'value' });
-
-// Load data
-const data = storage.get('key', defaultValue);
-
-// Remove data
-storage.remove('key');
-
-// Clear all app data
-storage.clear();
-```
-
-## 🎨 Styling
-
-Each app can:
-- Use shared template styles: `<link rel="stylesheet" href="../../shared/css/app-template.css">`
-- Add custom styles in their own `styles.css`
-- Override CSS variables:
-
-```css
-:root {
-    --primary-color: #a31f34;
-    --secondary-color: #8a8b8c;
-    --background: #ffffff;
-    --text-color: #212121;
-}
-```
-
-## 🌐 GitHub Pages Deployment
-
-### Setup
-
-1. Go to your repository settings
-2. Navigate to **Pages** section
-3. Under **Source**, select **GitHub Actions**
-4. Push to `main` branch to trigger automatic deployment
-
-### Deployment Workflow
-
-The `.github/workflows/deploy.yml` workflow automatically:
-- Triggers on push to `main` branch
-- Deploys all files to GitHub Pages
-- Makes site available at `https://yourusername.github.io/mit-lecture-1/`
-
-### URL Structure
-
-- Landing page: `https://yourusername.github.io/mit-lecture-1/`
-- Individual apps: `https://yourusername.github.io/mit-lecture-1/apps/app-01/`
-
-## 📝 App Categories
-
-Apps are organized by category:
-- **utility** - General utilities
-- **tool** - Development tools
-- **game** - Interactive games
-- **visualization** - Data visualizations
-- **education** - Educational apps
-
-## 🔧 Development Best Practices
-
-1. **Keep apps independent** - Each app should be self-contained
-2. **Use shared utilities** - Leverage `app-utils.js` for common functionality
-3. **Namespace storage** - Each app has its own storage namespace automatically
-4. **Test locally** - Always test before pushing to main
-5. **Update config.json** - Keep app metadata current
-6. **Mobile-friendly** - All apps should be responsive
-
-## 📱 Mobile Support
-
-The landing page and app template are fully responsive:
-- Desktop: Grid layout with multiple columns
-- Tablet: Adaptive grid
-- Mobile: Single column layout
-
-## 🐛 Troubleshooting
-
-### Apps not loading
-- Check browser console for errors
-- Verify `config.json` is valid JSON
-- Ensure all file paths are correct
-
-### Styles not applying
-- Check CSS file paths (relative to HTML)
-- Verify CSS link tags in HTML
-- Clear browser cache
-
-### GitHub Pages not updating
-- Check Actions tab for deployment status
-- Verify repository Pages settings
-- May take 1-2 minutes to propagate
-
-## 📚 Example App Structure
-
-See `apps/app-01/` for a complete working example demonstrating:
-- State management
-- Local storage
-- Shared utilities
-- Custom styling
-- User interaction
-
-## 🤝 Contributing
-
-1. Create new app from template
-2. Test locally
-3. Update config.json
-4. Commit and push to main
-5. Verify deployment on GitHub Pages
-
-## 📄 License
-
-MIT License - feel free to use for your own projects.
-
-## 🔗 Links
-
-- [GitHub Pages Documentation](https://docs.github.com/en/pages)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-
----
-
-Built for MIT Lecture demonstrations
+- Google File System paper authors
+- MIT distributed systems course materials
+- Open source visualization libraries (Mermaid.js)

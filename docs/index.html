@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GFS Visual Learning System</title>
+  <meta name="description" content="Interactive visual learning system for understanding Google File System architecture">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Mermaid for diagram rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <!-- AJV for JSON Schema validation -->
+  <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv7.min.js"></script>
+</head>
+<body class="theme-light">
+  <!-- Loading Screen -->
+  <div id="loading" class="loading-screen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading GFS Learning System...</div>
+  </div>
+
+  <!-- Main Application -->
+  <div id="app" class="app">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">🎯 GFS Visual Learning</h1>
+        <span id="diagram-title" class="diagram-title"></span>
+      </div>
+      <div class="header-right">
+        <div id="progress-summary" class="progress-summary"></div>
+        <button id="theme-toggle" class="icon-btn" title="Toggle Theme">🌙</button>
+        <button id="export-btn" class="icon-btn" title="Export">💾</button>
+        <button id="help-btn" class="icon-btn" title="Help">❓</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="app-body">
+      <!-- Left Sidebar - Navigation -->
+      <aside class="sidebar sidebar-left">
+        <nav id="diagram-nav" class="diagram-nav">
+          <!-- Navigation will be populated here -->
+        </nav>
+      </aside>
+
+      <!-- Center - Main Diagram Area -->
+      <main class="main-content">
+        <!-- Diagram Container -->
+        <div class="diagram-section">
+          <div id="diagram-container" class="diagram-container">
+            <!-- Mermaid diagram will render here -->
+          </div>
+
+          <!-- Overlay Chips -->
+          <div id="overlay-chips" class="overlay-chips">
+            <!-- Overlay controls will be populated here -->
+          </div>
+        </div>
+
+        <!-- Bottom Panels -->
+        <div class="bottom-panels">
+          <!-- Narrative Panel -->
+          <div class="panel narrative-panel">
+            <div class="panel-header">
+              <h3>📖 Narrative</h3>
+            </div>
+            <div id="narrative-panel" class="panel-content">
+              <!-- Narrative content will be populated here -->
+            </div>
+          </div>
+
+          <!-- Contracts Panel -->
+          <div class="panel contracts-panel">
+            <div class="panel-header">
+              <h3>📋 Contracts</h3>
+            </div>
+            <div id="contracts-panel" class="panel-content">
+              <!-- Contracts will be populated here -->
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Sidebar - Learning Tools -->
+      <aside class="sidebar sidebar-right">
+        <!-- Step Controls -->
+        <section id="step-controls" class="step-controls">
+          <!-- Step-through controls will be populated here -->
+        </section>
+
+        <!-- Drills Container -->
+        <section id="drills-container" class="drills-container">
+          <!-- Drills will be populated here -->
+        </section>
+      </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span>GFS Learning System v1.0</span>
+        <span class="separator">|</span>
+        <a href="https://github.com/yourusername/gfs-visual-learning" target="_blank">GitHub</a>
+      </div>
+      <div class="footer-right">
+        <span>Based on the Google File System paper (2003)</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Application JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>

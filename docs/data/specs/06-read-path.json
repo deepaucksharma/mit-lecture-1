@@ -1,0 +1,190 @@
+{
+  "id": "06-read-path",
+  "title": "Read Path with Cache Lifecycle",
+  "layout": {
+    "type": "sequence",
+    "numbered": true
+  },
+  "nodes": [
+    {
+      "id": "C",
+      "type": "client",
+      "label": "Client",
+      "metadata": {
+        "cacheSize": "100MB"
+      }
+    },
+    {
+      "id": "M",
+      "type": "master",
+      "label": "Master",
+      "metadata": {
+        "ram": "64GB",
+        "qps": "10K"
+      }
+    },
+    {
+      "id": "CS4",
+      "type": "chunkserver",
+      "label": "Chunkserver 4",
+      "metadata": {
+        "version": 7,
+        "chunks": 15000
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "lookup-req",
+      "from": "C",
+      "to": "M",
+      "kind": "control",
+      "label": "lookup(file, chunk#3)",
+      "metrics": {
+        "size": "200B",
+        "latency": "2-5ms"
+      }
+    },
+    {
+      "id": "lookup-resp",
+      "from": "M",
+      "to": "C",
+      "kind": "control",
+      "label": "locations: [CS1, CS4, CS9]",
+      "metrics": {
+        "size": "300B",
+        "latency": "0.1ms"
+      }
+    },
+    {
+      "id": "data-req",
+      "from": "C",
+      "to": "CS4",
+      "kind": "data",
+      "label": "read(handle, 150M-150.1M)",
+      "metrics": {
+        "size": "100B",
+        "latency": "5ms"
+      }
+    },
+    {
+      "id": "data-resp",
+      "from": "CS4",
+      "to": "C",
+      "kind": "data",
+      "label": "data[100KB]",
+      "metrics": {
+        "size": "100KB",
+        "latency": "105ms",
+        "throughput": "10MB/s"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "cold-cache",
+      "name": "Cold Cache",
+      "overlays": [],
+      "narrative": "First read requires Master lookup for chunk location"
+    },
+    {
+      "id": "warm-cache",
+      "name": "Warm Cache",
+      "overlays": ["cache-hit"],
+      "narrative": "Subsequent reads skip Master using cached locations"
+    },
+    {
+      "id": "stale-cache",
+      "name": "Expired Cache",
+      "overlays": ["cache-expired"],
+      "narrative": "After TTL expires, client must refresh location info"
+    }
+  ],
+  "overlays": [
+    {
+      "id": "cache-hit",
+      "caption": "Using cached chunk location",
+      "diff": {
+        "remove": {
+          "edgeIds": ["lookup-req", "lookup-resp"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "cache",
+              "type": "note",
+              "label": "Cache: chunk#3→[CS1,CS4,CS9]"
+            }
+          ]
+        },
+        "highlight": {
+          "edgeIds": ["data-req", "data-resp"]
+        }
+      }
+    },
+    {
+      "id": "cache-expired",
+      "caption": "Cache TTL expired",
+      "diff": {
+        "modify": {
+          "edges": [
+            {
+              "id": "lookup-req",
+              "label": "lookup(file, chunk#3) [CACHE MISS]"
+            }
+          ]
+        },
+        "highlight": {
+          "edgeIds": ["lookup-req", "lookup-resp"]
+        }
+      }
+    }
+  ],
+  "contracts": {
+    "invariants": [
+      "Master never transfers file data",
+      "Client always validates chunk version",
+      "Cache entries have bounded TTL"
+    ],
+    "guarantees": [
+      "Master returns only current-version replicas",
+      "Read will succeed if any replica is available",
+      "Cached locations valid within TTL window"
+    ],
+    "caveats": [
+      "Stale reads possible from lagging replicas",
+      "Cache invalidation is not immediate",
+      "Network partitions may prevent reaching all replicas"
+    ]
+  },
+  "drills": [
+    {
+      "id": "drill-cache-impact",
+      "type": "recall",
+      "prompt": "Why is the cache miss penalty only 2-5ms?",
+      "answer": "Master metadata lookup is entirely in-RAM, so only network RTT matters. The actual data read (105ms) dominates total latency."
+    },
+    {
+      "id": "drill-calculate-load",
+      "type": "apply",
+      "prompt": "Calculate Master load for 1000 clients reading different files with 90% cache hit rate",
+      "scenario": "Each client reads 10 chunks/second",
+      "rubric": [
+        "Total requests without cache: 10,000 req/s",
+        "With 90% cache hits: 1,000 req/s to Master",
+        "Each request ~500B total traffic",
+        "Total Master bandwidth: ~500KB/s (easily handled)"
+      ]
+    },
+    {
+      "id": "drill-cache-design",
+      "type": "create",
+      "prompt": "Design a cache eviction policy for memory-constrained clients",
+      "rubric": [
+        "Consider: LRU, frequency, chunk size",
+        "Account for: Locality patterns, available memory",
+        "Include: TTL respect, version checking"
+      ]
+    }
+  ]
+}

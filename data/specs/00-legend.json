@@ -1,0 +1,89 @@
+{
+  "id": "00-legend",
+  "title": "Master Legend & System Contracts",
+  "layout": {
+    "type": "flow"
+  },
+  "nodes": [
+    {
+      "id": "M",
+      "type": "master",
+      "label": "Master (Metadata)"
+    },
+    {
+      "id": "CS",
+      "type": "chunkserver",
+      "label": "Chunkserver (Storage)"
+    },
+    {
+      "id": "C",
+      "type": "client",
+      "label": "Client (Application)"
+    }
+  ],
+  "edges": [
+    {
+      "id": "control",
+      "from": "C",
+      "to": "M",
+      "kind": "control",
+      "label": "Control Path",
+      "metrics": {
+        "size": "~200B"
+      }
+    },
+    {
+      "id": "data",
+      "from": "C",
+      "to": "CS",
+      "kind": "data",
+      "label": "Data Path",
+      "metrics": {
+        "size": "64MB chunks"
+      }
+    }
+  ],
+  "contracts": {
+    "invariants": [
+      "Master never touches file data",
+      "Version numbers only increase",
+      "At most one primary per chunk at any time",
+      "Chunks have exactly 3 replicas (eventually)"
+    ],
+    "guarantees": [
+      "Metadata operations are atomic",
+      "All chunks are replicated for fault tolerance",
+      "System continues operating with node failures"
+    ],
+    "caveats": [
+      "Weak consistency between replicas",
+      "Possible stale reads",
+      "No immediate visibility of changes"
+    ]
+  },
+  "drills": [
+    {
+      "id": "drill-master-data",
+      "type": "recall",
+      "prompt": "Why must the Master never be on the data path?",
+      "answer": "The Master would become a bottleneck. At 64MB chunks and hundreds of clients, even 10 clients reading at 100MB/s would require 1GB/s through the Master."
+    },
+    {
+      "id": "drill-version-decrease",
+      "type": "recall",
+      "prompt": "What breaks if version numbers could decrease?",
+      "answer": "Version ordering ensures causality. If versions could decrease, clients couldn't determine which replica has the latest data, breaking consistency guarantees."
+    },
+    {
+      "id": "drill-failure-rate",
+      "type": "apply",
+      "prompt": "Calculate daily failure rate for 1000 machines with MTBF of 1 year each",
+      "scenario": "Each machine has independent failure probability",
+      "rubric": [
+        "Daily failure rate per machine: 1/365 ≈ 0.27%",
+        "Expected failures per day: 1000 × (1/365) ≈ 2.74",
+        "Probability of at least one failure: 1 - (364/365)^1000 ≈ 93.6%"
+      ]
+    }
+  ]
+}

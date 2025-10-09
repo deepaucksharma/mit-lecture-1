@@ -1,38 +1,126 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  validate-and-build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          path: '.'
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm init -y
+          npm install ajv@8
+          npm install @mermaid-js/mermaid-cli
+
+      - name: Create validation script
+        run: |
+          cat << 'EOF' > scripts/validate-all.js
+          const fs = require('fs');
+          const path = require('path');
+          const Ajv = require('ajv');
+
+          // Load schema
+          const schemaPath = path.join(__dirname, '..', 'data', 'schema.json');
+          const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+
+          // Initialize validator
+          const ajv = new Ajv({ allErrors: true });
+          const validate = ajv.compile(schema);
+
+          // Validate all specs
+          const specsDir = path.join(__dirname, '..', 'data', 'specs');
+          const files = fs.readdirSync(specsDir).filter(f => f.endsWith('.json'));
+
+          let hasErrors = false;
+
+          files.forEach(file => {
+            const filePath = path.join(specsDir, file);
+            const spec = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+            if (!validate(spec)) {
+              console.error(`Validation failed for ${file}:`);
+              console.error(validate.errors);
+              hasErrors = true;
+            } else {
+              console.log(`✓ ${file} is valid`);
+            }
+          });
+
+          if (hasErrors) {
+            process.exit(1);
+          }
+
+          console.log('\n✓ All specs validated successfully');
+          EOF
+
+      - name: Validate all specs
+        run: |
+          mkdir -p scripts
+          node scripts/validate-all.js
+
+      - name: Bundle application
+        run: |
+          cat src/core/*.js src/learning/*.js src/ui/*.js > docs/app.js
+          echo "// Bundle created: $(date)" >> docs/app.js
+
+      - name: Copy data files
+        run: |
+          mkdir -p docs/data
+          cp -r data/specs docs/data/
+          cp data/manifest.json docs/data/
+          cp data/schema.json docs/data/
+
+      - name: Create deployment info
+        run: |
+          cat << EOF > docs/deployment.json
+          {
+            "version": "1.0.0",
+            "buildTime": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}"
+          }
+          EOF
 
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: docs/
+
+  test:
+    runs-on: ubuntu-latest
+    needs: validate-and-build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Run tests
+        run: |
+          echo "Tests would run here"
+          # Add actual tests when available

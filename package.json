@@ -1,0 +1,32 @@
+{
+  "name": "gfs-visual-learning",
+  "version": "1.0.0",
+  "description": "Interactive visual learning system for Google File System",
+  "main": "docs/app.js",
+  "scripts": {
+    "start": "npx http-server docs -p 8000",
+    "build": "npm run bundle && npm run copy-data",
+    "bundle": "cat src/core/*.js src/learning/*.js src/ui/*.js > docs/app.js",
+    "copy-data": "cp -r data/specs docs/data/ && cp data/manifest.json docs/data/ && cp data/schema.json docs/data/",
+    "validate": "node scripts/validate-all.js",
+    "test": "echo 'No tests configured yet'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/gfs-visual-learning.git"
+  },
+  "keywords": [
+    "gfs",
+    "distributed-systems",
+    "learning",
+    "visualization",
+    "education"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "ajv": "^8.12.0",
+    "@mermaid-js/mermaid-cli": "^10.6.0",
+    "http-server": "^14.1.1"
+  }
+}
