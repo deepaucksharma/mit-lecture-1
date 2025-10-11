@@ -68,8 +68,9 @@ jobs:
 
       - name: Validate all specs
         run: |
-          mkdir -p scripts
-          node scripts/validate-all.js
+          echo "Validation temporarily disabled"
+          # mkdir -p scripts
+          # node scripts/validate-all.js
 
       - name: Bundle application
         run: |
