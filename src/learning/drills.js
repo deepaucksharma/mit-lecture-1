@@ -63,6 +63,40 @@ class DrillSystem {
     this.progress = new ProgressTracker();
     this.currentDrill = null;
     this.currentDiagramId = null;
+    this.stateManager = null;
+    this.stateDrills = new Map(); // Maps state IDs to relevant drills
+  }
+
+  // Set reference to state manager for state-aware drills
+  setStateManager(stateManager) {
+    this.stateManager = stateManager;
+
+    // Listen for state changes to highlight relevant drills
+    if (this.stateManager) {
+      document.addEventListener('stateChange', (e) => {
+        this.onStateChange(e.detail);
+      });
+    }
+  }
+
+  // Handle state changes - highlight drills relevant to current state
+  onStateChange(stateDetail) {
+    const currentState = stateDetail.state;
+    if (!currentState) return;
+
+    // Update drill visibility based on state
+    const drillElements = document.querySelectorAll('.drill');
+    drillElements.forEach(element => {
+      const drillId = element.dataset.drillId;
+      const stateId = element.dataset.stateId;
+
+      // Highlight drills associated with current state
+      if (stateId && stateId === currentState.id) {
+        element.classList.add('state-relevant');
+      } else {
+        element.classList.remove('state-relevant');
+      }
+    });
   }
 
   renderDrills(spec, containerId = 'drills-container') {
@@ -105,7 +139,7 @@ class DrillSystem {
         <div class="progress-fill" style="width: ${percentage}%"></div>
       </div>
       <div class="progress-text">${progress.completed} of ${totalDrills} completed (${percentage}%)</div>
-      <button class="reset-btn" onclick="drillSystem.resetDiagramProgress()">Reset Progress</button>
+      <button class="reset-btn" onclick="window.viewer.drillSystem.resetDiagramProgress()">Reset Progress</button>
     `;
 
     return header;
@@ -223,10 +257,10 @@ class DrillSystem {
           class="drill-answer"
         ></textarea>
         <div class="drill-actions">
-          <button onclick="drillSystem.checkRecall('${drill.id}')">
+          <button onclick="window.viewer.drillSystem.checkRecall('${drill.id}')">
             Check Answer
           </button>
-          <button onclick="drillSystem.revealAnswer('${drill.id}')" class="secondary">
+          <button onclick="window.viewer.drillSystem.revealAnswer('${drill.id}')" class="secondary">
             Show Answer
           </button>
         </div>
@@ -254,10 +288,10 @@ class DrillSystem {
           class="drill-solution"
         ></textarea>
         <div class="drill-actions">
-          <button onclick="drillSystem.checkApply('${drill.id}')">
+          <button onclick="window.viewer.drillSystem.checkApply('${drill.id}')">
             Check Approach
           </button>
-          <button onclick="drillSystem.revealRubric('${drill.id}')" class="secondary">
+          <button onclick="window.viewer.drillSystem.revealRubric('${drill.id}')" class="secondary">
             Show Rubric
           </button>
         </div>
@@ -306,10 +340,10 @@ class DrillSystem {
           </div>
         </div>
         <div class="drill-actions">
-          <button onclick="drillSystem.checkAnalysis('${drill.id}')">
+          <button onclick="window.viewer.drillSystem.checkAnalysis('${drill.id}')">
             Check Analysis
           </button>
-          <button onclick="drillSystem.revealAnalysis('${drill.id}')" class="secondary">
+          <button onclick="window.viewer.drillSystem.revealAnalysis('${drill.id}')" class="secondary">
             Show Analysis Points
           </button>
         </div>
@@ -336,10 +370,10 @@ class DrillSystem {
           class="drill-design"
         ></textarea>
         <div class="drill-actions">
-          <button onclick="drillSystem.evaluateDesign('${drill.id}')">
+          <button onclick="window.viewer.drillSystem.evaluateDesign('${drill.id}')">
             Self-Evaluate
           </button>
-          <button onclick="drillSystem.showDesignCriteria('${drill.id}')" class="secondary">
+          <button onclick="window.viewer.drillSystem.showDesignCriteria('${drill.id}')" class="secondary">
             Show Design Criteria
           </button>
         </div>
@@ -353,7 +387,7 @@ class DrillSystem {
               </li>`
             ).join('')}
           </ul>
-          <button onclick="drillSystem.markComplete('${drill.id}')" class="primary">
+          <button onclick="window.viewer.drillSystem.markComplete('${drill.id}')" class="primary">
             Mark as Complete
           </button>
         </div>
@@ -438,7 +472,34 @@ class DrillSystem {
   markComplete(drillId) {
     this.progress.markDrillComplete(this.currentDiagramId, drillId);
     this.updateDrillStatus(drillId);
+
+    // Check if all drills for current state are complete and auto-advance
+    if (this.stateManager && this.shouldAdvanceState()) {
+      setTimeout(() => {
+        this.stateManager.next();
+      }, 1500); // Small delay to let user see completion
+    }
+
     alert('Well done! Design drill marked as complete.');
+  }
+
+  // Check if we should advance to next state based on drill completion
+  shouldAdvanceState() {
+    const currentState = this.stateManager.getCurrentState();
+    if (!currentState) return false;
+
+    // Get all drills associated with current state
+    const stateDrills = document.querySelectorAll(`.drill[data-state-id="${currentState.id}"]`);
+    if (stateDrills.length === 0) return false;
+
+    // Check if all state drills are complete
+    for (const drill of stateDrills) {
+      if (!drill.classList.contains('completed')) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   updateDrillStatus(drillId) {

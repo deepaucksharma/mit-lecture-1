@@ -1,42 +1,47 @@
 {
-  "version": "1.0",
-  "title": "GFS Visual Learning System",
-  "description": "Interactive visual learning system for understanding Google File System architecture",
+  "version": "2.0",
+  "title": "GFS Visual Learning System - Enhanced with First Principles",
+  "description": "Interactive visual learning system for understanding Google File System architecture through deep distributed systems theory, mathematical foundations, and advanced concepts",
   "diagrams": [
     {
       "id": "00-legend",
       "title": "Master Legend & System Contracts",
-      "description": "Foundation diagram showing symbols, components, and system-wide invariants",
+      "description": "Foundation diagram with FLP Impossibility, Amdahl's Law, end-to-end arguments, and alternative architectures",
       "difficulty": "beginner",
-      "prerequisites": []
+      "prerequisites": [],
+      "enhancements": ["firstPrinciples", "advancedConcepts"]
     },
     {
       "id": "01-triangle",
       "title": "The Impossible Triangle",
-      "description": "Trade-offs between Performance, Reliability, and Consistency",
+      "description": "CAP theorem, PACELC extension, FLP impossibility, and modern consistency models (CRDTs, Spanner)",
       "difficulty": "intermediate",
-      "prerequisites": ["00-legend"]
+      "prerequisites": ["00-legend"],
+      "enhancements": ["firstPrinciples", "advancedConcepts"]
     },
     {
       "id": "02-scale",
       "title": "Scale Reality Dashboard",
-      "description": "Comparing traditional NFS with GFS at Google scale",
+      "description": "Failure models, reliability mathematics, Markov chains, erasure coding, and cost analysis",
       "difficulty": "intermediate",
-      "prerequisites": ["00-legend"]
+      "prerequisites": ["00-legend"],
+      "enhancements": ["firstPrinciples", "advancedConcepts"]
     },
     {
       "id": "03-chunk-size",
       "title": "The 64MB Decision Tree",
-      "description": "Understanding chunk size trade-offs with RAM economics",
+      "description": "Amdahl's Law analysis, optimal chunk derivation, content-defined chunking, and modern system comparisons",
       "difficulty": "intermediate",
-      "prerequisites": ["00-legend"]
+      "prerequisites": ["00-legend"],
+      "enhancements": ["firstPrinciples", "advancedConcepts"]
     },
     {
       "id": "04-architecture",
       "title": "Complete Architecture",
-      "description": "Full system architecture with failure blast radius analysis",
+      "description": "End-to-end arguments, Little's Law, queueing theory, alternative architectures, and modern evolutions",
       "difficulty": "advanced",
-      "prerequisites": ["00-legend", "02-scale"]
+      "prerequisites": ["00-legend", "02-scale"],
+      "enhancements": ["firstPrinciples", "advancedConcepts", "prerequisites"]
     },
     {
       "id": "05-planes",
@@ -119,6 +124,20 @@
       "title": "Reliability & Evolution",
       "description": "Failure handling and system evolution",
       "diagrams": ["10-recovery", "11-evolution", "12-dna"]
+    },
+    {
+      "id": "theoretical-foundations",
+      "title": "Theoretical Foundations",
+      "description": "Deep dive into distributed systems theory, mathematical models, and first principles",
+      "diagrams": ["00-legend", "01-triangle", "02-scale", "03-chunk-size"],
+      "focus": "firstPrinciples"
+    },
+    {
+      "id": "advanced-concepts",
+      "title": "Advanced & Alternative Approaches",
+      "description": "Modern evolutions, alternative architectures, and open research problems",
+      "diagrams": ["00-legend", "01-triangle", "02-scale", "03-chunk-size"],
+      "focus": "advancedConcepts"
     }
   ],
   "metadata": {

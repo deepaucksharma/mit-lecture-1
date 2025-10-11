@@ -1,0 +1,111 @@
+{
+  "timestamp": "2025-10-09T15:55:23.827Z",
+  "totalChecks": 0,
+  "passed": 0,
+  "failed": 0,
+  "warnings": 0,
+  "screenshots": 0,
+  "specs": {
+    "00-legend": {
+      "id": "00-legend",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 00-legend"
+    },
+    "01-triangle": {
+      "id": "01-triangle",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 01-triangle"
+    },
+    "02-scale": {
+      "id": "02-scale",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 02-scale"
+    },
+    "03-chunk-size": {
+      "id": "03-chunk-size",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 03-chunk-size"
+    },
+    "04-architecture": {
+      "id": "04-architecture",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 04-architecture"
+    },
+    "05-planes": {
+      "id": "05-planes",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 05-planes"
+    },
+    "06-read-path": {
+      "id": "06-read-path",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 06-read-path"
+    },
+    "07-write-path": {
+      "id": "07-write-path",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 07-write-path"
+    },
+    "08-lease": {
+      "id": "08-lease",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 08-lease"
+    },
+    "09-consistency": {
+      "id": "09-consistency",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 09-consistency"
+    },
+    "10-recovery": {
+      "id": "10-recovery",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 10-recovery"
+    },
+    "11-evolution": {
+      "id": "11-evolution",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 11-evolution"
+    },
+    "12-dna": {
+      "id": "12-dna",
+      "checks": [],
+      "screenshots": [],
+      "states": [],
+      "error": "Could not navigate to 12-dna"
+    }
+  },
+  "summary": {
+    "diagrams": 13,
+    "totalChecks": 0,
+    "passed": 0,
+    "failed": 0,
+    "warnings": 0,
+    "screenshots": 0,
+    "passRate": null,
+    "status": "NEEDS WORK"
+  }
+}

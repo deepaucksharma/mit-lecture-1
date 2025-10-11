@@ -1,0 +1,275 @@
+{
+  "id": "02-scale",
+  "title": "Scale Reality Dashboard",
+  "narrative": "The moment everything you knew about storage broke. At 100 machines, failures are events. At 1000 machines, failure is continuous—something is always dying, always being reborn. This isn't a bigger version of the old world. This is a new physics where the old laws don't apply. The mathematics are brutal: MTBF_system = MTBF_component / N. With N=10,000, even reliable components fail constantly.",
+  "crystallizedInsight": "At scale, failure isn't a problem to solve—it's a property to embrace. Design for continuous partial failure.",
+  "firstPrinciples": {
+    "failureModels": {
+      "crashStop": "Nodes fail by halting—detectable via timeouts. GFS assumes this model.",
+      "crashRecovery": "Nodes fail and may recover with persistent state intact. Requires WAL for consistency.",
+      "byzantine": "Nodes fail arbitrarily (malicious/buggy). Requires 3f+1 nodes to tolerate f failures. Too expensive for GFS scale.",
+      "omission": "Messages lost but nodes correct. Reality in networks. Requires retries and idempotence."
+    },
+    "reliabilityMath": {
+      "singleNode": "P(node survives year) = 0.99 → MTBF ≈ 365 days",
+      "system": "P(all N nodes survive) = 0.99^N → at N=1000, P ≈ 0.00004 (essentially zero)",
+      "replication": "P(lose all k replicas) = (1-p)^k → for k=3, p=0.99: P(loss) ≈ 10^-6",
+      "repairWindow": "P(lose data) = P(k failures in repair time T_repair) = (λT)^k/k! where λ=failure rate"
+    },
+    "scaleLaws": {
+      "littlesLaw": "L = λW → Queue length = arrival rate × wait time. At scale, queues explode without flow control.",
+      "amdahlRevisited": "Even 0.1% serialization limits speedup to 1000x regardless of nodes",
+      "universalScalability": "Throughput(N) = N / (1 + σ(N-1) + κN(N-1)/2) where σ=contention, κ=coherency"
+    }
+  },
+  "layout": {
+    "type": "sequence"
+  },
+  "nodes": [
+    {
+      "id": "NFS",
+      "type": "note",
+      "label": "Traditional NFS"
+    },
+    {
+      "id": "GFS",
+      "type": "master",
+      "label": "GFS Master"
+    },
+    {
+      "id": "Cluster",
+      "type": "chunkserver",
+      "label": "1000s of Servers"
+    }
+  ],
+  "edges": [
+    {
+      "id": "scale-diff",
+      "from": "NFS",
+      "to": "GFS",
+      "kind": "control",
+      "label": "Scale Jump",
+      "metrics": {
+        "size": "100x clients"
+      }
+    },
+    {
+      "id": "cluster-size",
+      "from": "GFS",
+      "to": "Cluster",
+      "kind": "data",
+      "label": "Manages",
+      "metrics": {
+        "size": "PB scale"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "scale-evolution",
+      "name": "Evolution of Scale",
+      "overlays": [],
+      "narrative": "Understanding how failure models change fundamentally as systems grow from hundreds to thousands to millions of machines"
+    },
+    {
+      "id": "old-world-thinking",
+      "name": "Traditional Failure Assumptions",
+      "overlays": ["old-world"],
+      "narrative": "In smaller systems, failures were exceptional events. Systems were designed to prevent failures through high-quality hardware and careful maintenance"
+    },
+    {
+      "id": "new-physics-reality",
+      "name": "The New Physics of Scale",
+      "overlays": ["new-physics"],
+      "narrative": "At Google scale, failure is continuous and normal. The question isn't 'if' but 'how many per hour'. Design must embrace failure as a constant"
+    },
+    {
+      "id": "continuous-failure-mode",
+      "name": "Living with Continuous Failure",
+      "overlays": ["continuous-failure"],
+      "narrative": "With 10,000+ machines, something is always failing. Success means the system continues operating normally despite constant component failures"
+    }
+  ],
+  "overlays": [
+    {
+      "id": "old-world",
+      "caption": "The Old World - Where Failures Were Events",
+      "diff": {
+        "highlight": {
+          "nodeIds": ["NFS"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "old-metrics",
+              "type": "note",
+              "label": "• 10 machines\\n• Failure = panic\\n• RAID for protection\\n• Expensive hardware"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "new-physics",
+      "caption": "The New Physics - Where Failure Is Constant",
+      "diff": {
+        "highlight": {
+          "nodeIds": ["GFS", "Cluster"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "new-metrics",
+              "type": "note",
+              "label": "• 1000+ machines\\n• 3 failures/day average\\n• Replication for survival\\n• Commodity hardware"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "continuous-failure",
+      "caption": "The Reality at 10,000 Machines",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "failure-math",
+              "type": "note",
+              "label": "If each disk has 1% annual failure:\\n10,000 disks = 100 failures/year\\n= 2 failures/week\\n= Always something broken"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "contracts": {
+    "invariants": [
+      "Component failures are the norm, not exception",
+      "Scale requires different architecture"
+    ],
+    "guarantees": [
+      "System continues operating despite failures",
+      "Performance scales with cluster size"
+    ],
+    "caveats": [
+      "Commodity hardware has higher failure rates",
+      "Network partitions are common at scale"
+    ]
+  },
+  "drills": [
+    {
+      "id": "drill-failure-mindset",
+      "type": "analyze",
+      "prompt": "Your monitoring dashboard shows 3 disk failures today. In the old world, this is a crisis. In GFS's world, what is it?",
+      "thoughtProcess": [
+        "Old world reaction: 'RED ALERT! Three failures! Call everyone!'",
+        "GFS world reaction: 'Tuesday.'",
+        "But think deeper - what's really different?",
+        "In the old world, we prevented failures",
+        "In GFS's world, we expect and embrace them",
+        "The system doesn't avoid failure - it dances with it",
+        "Every component assumes every other component will fail",
+        "This isn't pessimism - it's realism at scale"
+      ],
+      "insight": "When failure becomes constant, resilience becomes architecture"
+    },
+    {
+      "id": "drill-scale-transition",
+      "type": "create",
+      "prompt": "You're scaling from 100 to 10,000 machines. At what point does your old approach break? What changes first?",
+      "thoughtProcess": [
+        "At 100 machines: Maybe 1 failure per month. Your on-call handles it.",
+        "At 500 machines: 1 failure per week. Getting annoying.",
+        "At 1000 machines: Multiple failures per week. On-call is exhausted.",
+        "At 2000 machines: Daily failures. Manual intervention impossible.",
+        "The breaking point isn't technical - it's human",
+        "Somewhere around 500-1000 machines, humans can't keep up",
+        "You must automate recovery before you hit this wall",
+        "The system must heal itself while you sleep"
+      ],
+      "insight": "Scale doesn't break gradually - it hits a cliff where human intervention becomes impossible"
+    },
+    {
+      "id": "drill-commodity-genius",
+      "type": "apply",
+      "prompt": "Your CFO wants to buy expensive 'enterprise' hardware to reduce failures. Walk them through why GFS chose commodity hardware instead.",
+      "scenario": "Enterprise disk: $10,000, 0.1% failure rate. Commodity disk: $1,000, 1% failure rate.",
+      "thoughtProcess": [
+        "Enterprise: 10x more expensive, 10x more reliable",
+        "Seems like a wash? Look deeper...",
+        "With commodity: Buy 3 disks for $3,000, replicate everything",
+        "Failure of all 3: (0.01)³ = 0.000001 = 0.0001%",
+        "You're now MORE reliable than enterprise for 1/3 the cost",
+        "Plus: When commodity disk fails, replace it. No stress.",
+        "When enterprise disk fails, it's a $10,000 crisis",
+        "The genius: Use software to make cheap hardware reliable"
+      ],
+      "insight": "Redundancy with cheap hardware beats expensive hardware every time"
+    }
+  ],
+  "assessmentCheckpoints": [
+    {
+      "id": "understand-scale-physics",
+      "competency": "I understand how scale fundamentally changes system design",
+      "checkYourself": "Can you explain why 'just add more servers' stops working?",
+      "mastery": "You see the phase transition where old approaches break"
+    },
+    {
+      "id": "embrace-failure",
+      "competency": "I've shifted from preventing failure to expecting it",
+      "checkYourself": "Does continuous failure still feel wrong, or natural?",
+      "mastery": "You design systems that thrive on failure, not despite it"
+    },
+    {
+      "id": "commodity-thinking",
+      "competency": "I understand why cheap + replicated beats expensive + reliable",
+      "checkYourself": "Can you explain this to someone who insists on enterprise hardware?",
+      "mastery": "You see redundancy as the ultimate reliability strategy"
+    }
+  ],
+  "advancedConcepts": {
+    "failureDomains": {
+      "hierarchical": "Node → Rack → Power → Datacenter → Region. Failures correlate within domains.",
+      "blastRadius": "Single node: 1 chunk. Rack: 40 nodes. Power: 200 nodes. DC: 10K nodes.",
+      "placementStrategy": "Replicas across failure domains: P(correlated failure) drops exponentially",
+      "antiAffinity": "Never place all replicas in same domain. Cost: cross-domain bandwidth."
+    },
+    "detectionVsRecovery": {
+      "detectLatency": "Heartbeat interval + timeout. Tradeoff: false positives vs detection speed",
+      "phiAccrual": "Adaptive failure detection using probability rather than binary timeout—reduces false positives",
+      "recoveryBudget": "Repair bandwidth = DataLost / MTTR. At 1PB scale, need 10Gbps for 1-day recovery",
+      "prioritization": "Repair under-replicated first (RF=1), then RF=2, then rebalance"
+    },
+    "mathematicalModels": {
+      "markovChains": "State transitions for replica count: healthy→degraded→critical→lost. Solve for steady state.",
+      "queueingTheory": "M/M/c model for repair queue. At high load, wait time → infinity",
+      "reliabilityTheory": "Weibull distribution for disk failures. Bathtub curve: infant mortality + wear-out",
+      "percolationTheory": "Network stays connected until critical fraction fails. Phase transition at p_c ≈ 0.5"
+    },
+    "modernApproaches": {
+      "erasureCoding": "(k,m) Reed-Solomon: store k+m fragments, reconstruct from any k. Storage overhead: (k+m)/k",
+      "localReconstruction": "Azure's LRC: add local parity for single failures, global for multiple",
+      "adaptiveReplication": "Hot data gets more replicas. Cold data uses erasure coding. Tier based on access patterns",
+      "mlPrediction": "Predict failures using SMART data + ML. Proactive migration before failure"
+    },
+    "scaleEvolution": {
+      "hyperscale": "Million+ nodes. Hierarchical coordination required. Multiple tiers of aggregation",
+      "edgeComputing": "Distributed across geography. WAN latencies. Eventual consistency mandatory",
+      "disaggregation": "Separate compute/storage/memory. Each scales independently. Network becomes bottleneck",
+      "serverless": "No visible nodes. Infinite scale illusion. Provider handles all failure transparently"
+    },
+    "openChallenges": [
+      "Optimal replication factor as function of scale, cost, and workload?",
+      "Can we predict and prevent correlated failures (power, cooling, bugs)?",
+      "How to handle gray failures (slow but not dead)?",
+      "Optimal repair parallelism without impacting foreground traffic?"
+    ],
+    "costAnalysis": {
+      "replicationCost": "Storage: 3x. Bandwidth: 3x writes + repair traffic. Worth it for availability",
+      "enterpriseVsCommodity": "Enterprise: $10K/node × 0.1% failure. Commodity: $1K/node × 1% failure × 3 replicas = same reliability, 70% cheaper",
+      "operationalCost": "Manual intervention: $200/incident. At 1000 nodes: $200 × 365 failures = $73K/year. Automation mandatory",
+      "downTimeCost": "1 hour downtime = $1M lost revenue. 3-replica availability = 99.999%. Worth every penny"
+    }
+  }
+}

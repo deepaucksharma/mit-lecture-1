@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GFS Test Page</title>
+  <script>
+    async function testApp() {
+      const log = document.getElementById('log');
+
+      // Test 1: Load manifest
+      try {
+        const manifestResp = await fetch('/data/manifest.json');
+        const manifest = await manifestResp.json();
+        log.innerHTML += `✓ Manifest loaded: ${manifest.diagrams.length} diagrams<br>`;
+      } catch (e) {
+        log.innerHTML += `✗ Manifest error: ${e.message}<br>`;
+      }
+
+      // Test 2: Load first spec
+      try {
+        const specResp = await fetch('/data/specs/00-legend.json');
+        const spec = await specResp.json();
+        log.innerHTML += `✓ Spec loaded: ${spec.title}<br>`;
+        log.innerHTML += `  - Has crystallizedInsight: ${!!spec.crystallizedInsight}<br>`;
+        log.innerHTML += `  - Has firstPrinciples: ${!!spec.firstPrinciples}<br>`;
+        log.innerHTML += `  - Has advancedConcepts: ${!!spec.advancedConcepts}<br>`;
+        log.innerHTML += `  - Has assessmentCheckpoints: ${!!spec.assessmentCheckpoints}<br>`;
+        log.innerHTML += `  - Scenes: ${(spec.scenes || []).length}<br>`;
+        log.innerHTML += `  - Overlays: ${(spec.overlays || []).length}<br>`;
+      } catch (e) {
+        log.innerHTML += `✗ Spec error: ${e.message}<br>`;
+      }
+
+      // Test 3: Check if viewer object exists
+      setTimeout(() => {
+        if (window.viewer) {
+          log.innerHTML += `✓ Viewer object exists<br>`;
+          log.innerHTML += `  - Has renderCrystallizedInsight: ${!!window.viewer.renderCrystallizedInsight}<br>`;
+          log.innerHTML += `  - Has renderFirstPrinciples: ${!!window.viewer.renderFirstPrinciples}<br>`;
+          log.innerHTML += `  - Has renderAssessmentCheckpoints: ${!!window.viewer.renderAssessmentCheckpoints}<br>`;
+        } else {
+          log.innerHTML += `✗ Viewer object not found<br>`;
+        }
+      }, 1000);
+    }
+  </script>
+</head>
+<body onload="testApp()">
+  <h1>GFS App Test</h1>
+  <div id="log" style="font-family: monospace; line-height: 1.8;"></div>
+  <hr>
+  <h2>Open Console</h2>
+  <p>Open browser console (F12) to see any JavaScript errors</p>
+  <hr>
+  <p><a href="/">Back to Main App</a></p>
+</body>
+</html>

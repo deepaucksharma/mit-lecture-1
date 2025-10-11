@@ -1,6 +1,35 @@
 {
   "id": "06-read-path",
   "title": "Read Path with Cache Lifecycle",
+  "prerequisites": {
+    "concepts": [
+      "Control/data plane separation (Spec 00, 05)",
+      "Master holds metadata, chunkservers hold data (Spec 04)",
+      "Why Master bottleneck must be avoided (Spec 00, 04)"
+    ],
+    "checkYourself": "Can you explain why the Master never touches file data? Do you understand what happens when a single component becomes a bottleneck?"
+  },
+  "narrative": "Watch how caching transforms the system. Not for speed—the time saved is trivial. But for survival—without it, the Master drowns in requests. This is the dance between memory and scalability. Caching is load shedding, not optimization—it's about system survival, not user experience.",
+  "crystallizedInsight": "Cache for load reduction, not latency. The Master is precious—protect it. This is Little's Law in action: L = λW",
+  "firstPrinciples": {
+    "cachingTheory": {
+      "hitRatio": "h = cache_hits / total_requests. Master load = (1-h) × request_rate",
+      "workingSet": "Temporal locality: 90% of requests access 10% of data (Pareto principle)",
+      "optimalCache": "Bélády's algorithm: evict item with longest reuse distance (theoretical optimum)",
+      "practicalCache": "LRU approximation: O(1) operations, near-optimal for temporal locality"
+    },
+    "littlesLawApplication": {
+      "formula": "L = λW where L = requests in system, λ = arrival rate, W = service time",
+      "withoutCache": "L_master = 10K/s × 5ms = 50 concurrent requests",
+      "withCache": "L_master = 1K/s × 5ms = 5 concurrent requests (90% cache hit)",
+      "implication": "10x reduction in Master queue depth → 10x headroom for growth"
+    },
+    "probabilisticAnalysis": {
+      "cacheInvalidation": "P(stale) = 1 - e^(-λt) where λ = change rate, t = TTL",
+      "optimalTTL": "TTL* = argmin(miss_cost × P(miss) + stale_cost × P(stale))",
+      "gfsChoice": "60s TTL: balances Master protection (high) vs staleness (acceptable)"
+    }
+  },
   "layout": {
     "type": "sequence",
     "numbered": true
@@ -83,19 +112,19 @@
   "scenes": [
     {
       "id": "cold-cache",
-      "name": "Cold Cache",
+      "title": "Cold Cache",
       "overlays": [],
       "narrative": "First read requires Master lookup for chunk location"
     },
     {
       "id": "warm-cache",
-      "name": "Warm Cache",
+      "title": "Warm Cache",
       "overlays": ["cache-hit"],
       "narrative": "Subsequent reads skip Master using cached locations"
     },
     {
       "id": "stale-cache",
-      "name": "Expired Cache",
+      "title": "Expired Cache",
       "overlays": ["cache-expired"],
       "narrative": "After TTL expires, client must refresh location info"
     }
@@ -159,32 +188,121 @@
   },
   "drills": [
     {
-      "id": "drill-cache-impact",
-      "type": "recall",
-      "prompt": "Why is the cache miss penalty only 2-5ms?",
-      "answer": "Master metadata lookup is entirely in-RAM, so only network RTT matters. The actual data read (105ms) dominates total latency."
+      "id": "drill-cache-paradox",
+      "type": "analyze",
+      "prompt": "The cache saves only 2ms out of 107ms total. Why is this tiny improvement critical?",
+      "thoughtProcess": [
+        "2ms seems insignificant - less than 2% improvement",
+        "But that's the wrong metric entirely",
+        "Without cache: Every read hits the Master",
+        "1000 clients = 1000 requests/second to Master",
+        "With 90% cache: Only 100 requests/second",
+        "The Master survives because most clients never talk to it",
+        "Insight: It's not about the client's time, it's about the Master's life"
+      ],
+      "insight": "Small optimizations can have system-changing effects when multiplied"
     },
     {
-      "id": "drill-calculate-load",
+      "id": "drill-master-death",
       "type": "apply",
-      "prompt": "Calculate Master load for 1000 clients reading different files with 90% cache hit rate",
-      "scenario": "Each client reads 10 chunks/second",
-      "rubric": [
-        "Total requests without cache: 10,000 req/s",
-        "With 90% cache hits: 1,000 req/s to Master",
-        "Each request ~500B total traffic",
-        "Total Master bandwidth: ~500KB/s (easily handled)"
-      ]
+      "prompt": "All client caches just expired simultaneously (maybe a time sync issue). What happens?",
+      "scenario": "1000 clients, all caches invalid, all need metadata",
+      "thoughtProcess": [
+        "Instant thundering herd - 1000 simultaneous requests",
+        "Master queue explodes",
+        "Some clients timeout and retry - making it worse",
+        "Master becomes unresponsive",
+        "But wait - the data still flows! Chunkservers are fine",
+        "Only new operations fail, existing transfers continue",
+        "This is the beauty of separation"
+      ],
+      "insight": "Cache expiry must be staggered. Synchronized behavior kills distributed systems."
     },
     {
-      "id": "drill-cache-design",
+      "id": "drill-cache-philosophy",
       "type": "create",
-      "prompt": "Design a cache eviction policy for memory-constrained clients",
-      "rubric": [
-        "Consider: LRU, frequency, chunk size",
-        "Account for: Locality patterns, available memory",
-        "Include: TTL respect, version checking"
-      ]
+      "prompt": "You need to decide: How long should cache entries live? What are you optimizing for?",
+      "thoughtProcess": [
+        "Too short (1 second): Might as well not cache",
+        "Too long (1 hour): Stale data everywhere",
+        "Just right (60 seconds): Why this number?",
+        "- Long enough to help during bursts",
+        "- Short enough to see changes reasonably soon",
+        "- Matches human attention spans",
+        "But really: Different data needs different TTLs",
+        "Hot data: cache longer. Cold data: cache shorter."
+      ],
+      "insight": "There's no perfect cache duration, only good-enough for your use case"
     }
-  ]
+  ],
+  "assessmentCheckpoints": [
+    {
+      "id": "understand-cache-purpose",
+      "competency": "I understand caching is about protecting the Master, not speed",
+      "checkYourself": "Could you explain why a 2% speed improvement is worth the complexity?",
+      "mastery": "You see caching as load distribution, not optimization"
+    },
+    {
+      "id": "understand-cache-lifecycle",
+      "competency": "I can trace the three states: cold, warm, expired",
+      "checkYourself": "Can you draw what happens in each state without looking?",
+      "mastery": "You understand the rhythm of cache-based systems"
+    },
+    {
+      "id": "understand-failure-isolation",
+      "competency": "I see how Master failure doesn't stop data flow",
+      "checkYourself": "What continues working when the Master dies?",
+      "mastery": "You appreciate the power of separation"
+    }
+  ],
+  "advancedConcepts": {
+    "cachingStrategies": {
+      "writeThrough": "Write to cache and backing store. GFS doesn't use—no Master data writes",
+      "writeBack": "Write to cache, lazy flush. Too complex for metadata",
+      "readThrough": "Cache fetches on miss. GFS uses for metadata",
+      "sideCache": "Application manages cache. GFS client caches chunk locations"
+    },
+    "cacheCoherence": {
+      "strongCoherence": "All caches see same value instantly. Too expensive at scale",
+      "weakCoherence": "Caches may diverge temporarily. GFS uses with TTL bounds",
+      "releaseConsistency": "Coherence at synchronization points. Not applicable to GFS",
+      "eventualConsistency": "All caches converge eventually. GFS via TTL expiry"
+    },
+    "mathematicalModels": {
+      "zipfDistribution": "P(rank k) ∝ 1/k^s. File access follows Zipf → caching very effective",
+      "cachePartitioning": "Dedicated cache per workload vs shared. GFS uses per-client caches",
+      "arcAlgorithm": "Adaptive Replacement Cache: balances recency and frequency",
+      "scan-resistant": "Prevent sequential scans from polluting cache. GFS doesn't need—metadata small"
+    },
+    "modernEvolutions": {
+      "distributedCaches": "Redis, Memcached: shared cache tier. Higher complexity",
+      "cdnCaching": "Geographic distribution. Similar to GFS: metadata lookup → edge serve",
+      "smartNics": "Cache in network cards. Bypasses CPU for common paths",
+      "persistentMemory": "Intel Optane: cache survives restarts. Would help Master recovery"
+    },
+    "performanceAnalysis": {
+      "amdahlImpact": "Cache reduces serial fraction: f = (1-h)×f_original",
+      "queuingTheory": "M/M/1: Wait time = ρ/(1-ρ)/μ. Cache reduces ρ by factor of (1-h)",
+      "costBenefit": "Cache value = miss_cost × hit_rate × request_rate - cache_maintenance_cost",
+      "breakEvenPoint": "Min hit rate = cache_cost / (miss_cost × request_rate)"
+    },
+    "cacheInvalidation": {
+      "ttlBased": "GFS approach: simple, predictable, but may serve stale",
+      "eventBased": "Invalidate on change. Requires back-channel, complex at scale",
+      "versionBased": "Include version in cache. Client validates. GFS uses for chunk versions",
+      "leaseExtension": "Extend TTL on use. Keeps hot data cached longer"
+    },
+    "antiPatterns": {
+      "cacheStampede": "Many clients miss simultaneously, overload backend. Use jittered TTL",
+      "cacheChurn": "Constant eviction/refill. Size cache for working set",
+      "negativeCaching": "Cache failures. GFS could cache 'file not found' to reduce Master load",
+      "overCaching": "Cache everything. Complexity exceeds benefit. GFS caches only critical metadata"
+    },
+    "theoreticalLimits": {
+      "idealCacheSize": "Working set size + ε. Beyond this, diminishing returns",
+      "maxHitRate": "Limited by temporal locality. Typically 90-95% for metadata",
+      "informationTheory": "Cache compression bounded by entropy of access pattern",
+      "capTheorem": "Can't have consistent, available cache with partition tolerance"
+    }
+  }
 }

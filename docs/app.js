@@ -545,8 +545,16 @@ if (typeof module !== 'undefined' && module.exports) {
       const shape = this.getNodeShape(node);
       const style = node._highlighted ? ':::highlight' :
                    node._added ? ':::added' : '';
-      const icon = this.getNodeIcon(node);
-      lines.push(`  ${node.id}${shape.open}${icon}${node.label}${shape.close}${style}`);
+      // Sanitize node labels to avoid Mermaid parsing conflicts
+      // Parentheses inside special shapes like [()] cause parse errors
+      const sanitizedLabel = node.label
+        .replace(/\(/g, '')  // Remove parentheses
+        .replace(/\)/g, '')
+        .replace(/\[/g, '')  // Remove brackets
+        .replace(/\]/g, '')
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+      lines.push(`  ${node.id}${shape.open}${sanitizedLabel}${shape.close}${style}`);
     }
 
     // Define edges
@@ -705,29 +713,34 @@ if (typeof module !== 'undefined' && module.exports) {
   formatEdgeLabel(edge) {
     const parts = [];
 
-    // Add kind indicator
-    const kindEmoji = {
-      'control': '⚡',
-      'data': '📦',
-      'cache': '💾',
-      'heartbeat': '💓'
-    };
+    // For flowchart labels, avoid emojis and special chars that break Mermaid parser
+    // when used inside pipe delimiters |label|
+    const isFlowchart = true; // Currently all non-sequence diagrams use flowchart
 
-    if (kindEmoji[edge.kind]) {
-      parts.push(kindEmoji[edge.kind]);
+    // Add basic label (sanitized for flowcharts)
+    if (edge.label) {
+      let label = edge.label;
+      if (isFlowchart) {
+        // Remove problematic characters for Mermaid parsing
+        label = label
+          .replace(/\(/g, '')  // Remove parentheses
+          .replace(/\)/g, '')
+          .replace(/\[/g, '')  // Remove brackets
+          .replace(/\]/g, '')
+          .replace(/\s+/g, ' ') // Normalize whitespace
+          .trim();
+      }
+      parts.push(label);
     }
 
-    parts.push(edge.label || '');
-
-    // Add metrics if available
-    if (edge.metrics) {
+    // Add metrics if available (keep these simple too)
+    if (edge.metrics && isFlowchart) {
       const metrics = [];
-      if (edge.metrics.size) metrics.push(edge.metrics.size);
-      if (edge.metrics.latency) metrics.push(edge.metrics.latency);
-      if (edge.metrics.throughput) metrics.push(`@${edge.metrics.throughput}`);
+      if (edge.metrics.size) metrics.push(edge.metrics.size.replace(/[()[\]]/g, ''));
+      if (edge.metrics.latency) metrics.push(edge.metrics.latency.replace(/[()[\]]/g, ''));
 
       if (metrics.length > 0) {
-        parts.push(`[${metrics.join(', ')}]`);
+        parts.push(metrics.join(' '));
       }
     }
 
@@ -1732,426 +1745,10 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = StepThroughEngine;
 } else {
   window.StepThroughEngine = StepThroughEngine;
-}class LearningProgress {
-  constructor() {
-    this.storageKey = 'gfs-learning-overall-progress';
-    this.sessionKey = 'gfs-learning-session';
-    this.data = this.load();
-    this.session = this.loadSession();
-    this.initSession();
-  }
-
-  load() {
-    try {
-      const saved = localStorage.getItem(this.storageKey);
-      return saved ? JSON.parse(saved) : {
-        diagrams: {},
-        achievements: [],
-        totalTime: 0,
-        startDate: Date.now(),
-        lastActive: Date.now()
-      };
-    } catch (error) {
-      console.error('Failed to load progress:', error);
-      return this.getDefaultData();
-    }
-  }
-
-  loadSession() {
-    try {
-      const saved = sessionStorage.getItem(this.sessionKey);
-      return saved ? JSON.parse(saved) : this.getDefaultSession();
-    } catch (error) {
-      return this.getDefaultSession();
-    }
-  }
-
-  getDefaultData() {
-    return {
-      diagrams: {},
-      achievements: [],
-      totalTime: 0,
-      startDate: Date.now(),
-      lastActive: Date.now()
-    };
-  }
-
-  getDefaultSession() {
-    return {
-      startTime: Date.now(),
-      diagramsViewed: [],
-      drillsCompleted: 0,
-      stepsViewed: 0
-    };
-  }
-
-  initSession() {
-    // Track page visibility for accurate time tracking
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        this.pauseSession();
-      } else {
-        this.resumeSession();
-      }
-    });
-
-    // Save on page unload
-    window.addEventListener('beforeunload', () => {
-      this.saveSession();
-      this.save();
-    });
-
-    // Auto-save every minute
-    setInterval(() => {
-      this.save();
-    }, 60000);
-  }
-
-  save() {
-    try {
-      this.data.lastActive = Date.now();
-      localStorage.setItem(this.storageKey, JSON.stringify(this.data));
-    } catch (error) {
-      console.error('Failed to save progress:', error);
-    }
-  }
-
-  saveSession() {
-    try {
-      sessionStorage.setItem(this.sessionKey, JSON.stringify(this.session));
-    } catch (error) {
-      console.error('Failed to save session:', error);
-    }
-  }
-
-  pauseSession() {
-    if (this.session.pauseTime) return;
-    this.session.pauseTime = Date.now();
-  }
-
-  resumeSession() {
-    if (!this.session.pauseTime) return;
-    const pauseDuration = Date.now() - this.session.pauseTime;
-    this.session.startTime += pauseDuration; // Adjust start time to exclude pause
-    delete this.session.pauseTime;
-  }
-
-  // Diagram progress tracking
-  markDiagramViewed(diagramId) {
-    if (!this.data.diagrams[diagramId]) {
-      this.data.diagrams[diagramId] = {
-        firstViewed: Date.now(),
-        lastViewed: Date.now(),
-        viewCount: 0,
-        timeSpent: 0,
-        drillsCompleted: 0,
-        totalDrills: 0,
-        stepsCompleted: 0,
-        totalSteps: 0
-      };
-    }
-
-    this.data.diagrams[diagramId].viewCount++;
-    this.data.diagrams[diagramId].lastViewed = Date.now();
-
-    if (!this.session.diagramsViewed.includes(diagramId)) {
-      this.session.diagramsViewed.push(diagramId);
-    }
-
-    this.save();
-  }
-
-  updateDiagramTime(diagramId, seconds) {
-    if (!this.data.diagrams[diagramId]) {
-      this.markDiagramViewed(diagramId);
-    }
-
-    this.data.diagrams[diagramId].timeSpent += seconds;
-    this.data.totalTime += seconds;
-    this.save();
-  }
-
-  updateDrillProgress(diagramId, completed, total) {
-    if (!this.data.diagrams[diagramId]) {
-      this.markDiagramViewed(diagramId);
-    }
-
-    this.data.diagrams[diagramId].drillsCompleted = completed;
-    this.data.diagrams[diagramId].totalDrills = total;
-
-    // Check for achievements
-    this.checkDrillAchievements(diagramId, completed, total);
-
-    this.save();
-  }
-
-  updateStepProgress(diagramId, currentStep, totalSteps) {
-    if (!this.data.diagrams[diagramId]) {
-      this.markDiagramViewed(diagramId);
-    }
-
-    this.data.diagrams[diagramId].stepsCompleted = Math.max(
-      currentStep,
-      this.data.diagrams[diagramId].stepsCompleted || 0
-    );
-    this.data.diagrams[diagramId].totalSteps = totalSteps;
-
-    this.session.stepsViewed++;
-    this.saveSession();
-    this.save();
-  }
-
-  // Achievement system
-  checkDrillAchievements(diagramId, completed, total) {
-    const achievements = [];
-
-    // First drill completed
-    if (completed === 1 && !this.hasAchievement('first-drill')) {
-      achievements.push({
-        id: 'first-drill',
-        title: 'First Steps',
-        description: 'Completed your first drill',
-        icon: '🎯',
-        timestamp: Date.now()
-      });
-    }
-
-    // Complete all drills for a diagram
-    if (completed === total && total > 0 && !this.hasAchievement(`master-${diagramId}`)) {
-      achievements.push({
-        id: `master-${diagramId}`,
-        title: 'Diagram Master',
-        description: `Completed all drills for ${diagramId}`,
-        icon: '🏆',
-        timestamp: Date.now()
-      });
-    }
-
-    // Speed learner (complete 5 drills in one session)
-    if (this.session.drillsCompleted >= 5 && !this.hasAchievement('speed-learner')) {
-      achievements.push({
-        id: 'speed-learner',
-        title: 'Speed Learner',
-        description: 'Completed 5 drills in one session',
-        icon: '⚡',
-        timestamp: Date.now()
-      });
-    }
-
-    // Add new achievements
-    achievements.forEach(achievement => {
-      this.addAchievement(achievement);
-    });
-
-    return achievements;
-  }
-
-  hasAchievement(id) {
-    return this.data.achievements.some(a => a.id === id);
-  }
-
-  addAchievement(achievement) {
-    if (!this.hasAchievement(achievement.id)) {
-      this.data.achievements.push(achievement);
-      this.save();
-      this.notifyAchievement(achievement);
-    }
-  }
-
-  notifyAchievement(achievement) {
-    // Emit event for UI to handle
-    const event = new CustomEvent('achievement', {
-      detail: achievement
-    });
-    document.dispatchEvent(event);
-  }
-
-  // Statistics and reporting
-  getOverallProgress() {
-    const stats = {
-      totalDiagrams: 0,
-      completedDiagrams: 0,
-      totalDrills: 0,
-      completedDrills: 0,
-      totalTime: this.data.totalTime,
-      achievements: this.data.achievements.length,
-      daysActive: this.getDaysActive()
-    };
-
-    Object.values(this.data.diagrams).forEach(diagram => {
-      stats.totalDiagrams++;
-      stats.totalDrills += diagram.totalDrills || 0;
-      stats.completedDrills += diagram.drillsCompleted || 0;
-
-      if (diagram.totalDrills > 0 && diagram.drillsCompleted === diagram.totalDrills) {
-        stats.completedDiagrams++;
-      }
-    });
-
-    stats.completionPercentage = stats.totalDrills > 0
-      ? Math.round((stats.completedDrills / stats.totalDrills) * 100)
-      : 0;
-
-    return stats;
-  }
-
-  getDiagramStats(diagramId) {
-    const diagram = this.data.diagrams[diagramId] || {
-      viewCount: 0,
-      timeSpent: 0,
-      drillsCompleted: 0,
-      totalDrills: 0,
-      stepsCompleted: 0,
-      totalSteps: 0
-    };
-
-    return {
-      ...diagram,
-      completionPercentage: diagram.totalDrills > 0
-        ? Math.round((diagram.drillsCompleted / diagram.totalDrills) * 100)
-        : 0,
-      formattedTime: this.formatTime(diagram.timeSpent)
-    };
-  }
-
-  getSessionStats() {
-    const duration = Date.now() - this.session.startTime;
-
-    return {
-      duration: this.formatTime(Math.floor(duration / 1000)),
-      diagramsViewed: this.session.diagramsViewed.length,
-      drillsCompleted: this.session.drillsCompleted,
-      stepsViewed: this.session.stepsViewed
-    };
-  }
-
-  getDaysActive() {
-    const daysSinceStart = Math.floor((Date.now() - this.data.startDate) / (1000 * 60 * 60 * 24));
-    return Math.max(1, daysSinceStart);
-  }
-
-  formatTime(seconds) {
-    if (seconds < 60) {
-      return `${seconds}s`;
-    } else if (seconds < 3600) {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = seconds % 60;
-      return `${minutes}m ${remainingSeconds}s`;
-    } else {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      return `${hours}h ${minutes}m`;
-    }
-  }
-
-  // Export/Import functionality
-  exportProgress() {
-    return {
-      version: '1.0',
-      exportDate: Date.now(),
-      data: this.data
-    };
-  }
-
-  importProgress(exportedData) {
-    if (exportedData.version === '1.0' && exportedData.data) {
-      this.data = exportedData.data;
-      this.save();
-      return true;
-    }
-    return false;
-  }
-
-  // Reset functionality
-  resetDiagram(diagramId) {
-    if (this.data.diagrams[diagramId]) {
-      delete this.data.diagrams[diagramId];
-      this.save();
-    }
-  }
-
-  resetAll() {
-    if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
-      this.data = this.getDefaultData();
-      this.session = this.getDefaultSession();
-      this.save();
-      this.saveSession();
-      location.reload();
-    }
-  }
-
-  // Learning path recommendations
-  getRecommendations() {
-    const recommendations = [];
-    const stats = this.getOverallProgress();
-
-    // Suggest unviewed diagrams
-    const allDiagramIds = [
-      '00-legend', '01-triangle', '02-scale', '03-chunk-size',
-      '04-architecture', '05-planes', '06-read-path', '07-write-path',
-      '08-lease', '09-consistency', '10-recovery', '11-evolution', '12-dna'
-    ];
-
-    const unviewed = allDiagramIds.filter(id => !this.data.diagrams[id]);
-    if (unviewed.length > 0) {
-      recommendations.push({
-        type: 'explore',
-        title: 'Explore New Diagrams',
-        description: `You have ${unviewed.length} diagrams yet to explore`,
-        action: 'view',
-        target: unviewed[0]
-      });
-    }
-
-    // Suggest incomplete drills
-    const incomplete = Object.entries(this.data.diagrams)
-      .filter(([id, data]) => data.totalDrills > data.drillsCompleted)
-      .map(([id, data]) => ({
-        id,
-        remaining: data.totalDrills - data.drillsCompleted
-      }));
-
-    if (incomplete.length > 0) {
-      const next = incomplete[0];
-      recommendations.push({
-        type: 'practice',
-        title: 'Complete Drills',
-        description: `${next.remaining} drills remaining in ${next.id}`,
-        action: 'drill',
-        target: next.id
-      });
-    }
-
-    // Suggest review based on time
-    const oldestViewed = Object.entries(this.data.diagrams)
-      .sort(([, a], [, b]) => a.lastViewed - b.lastViewed)
-      .slice(0, 3);
-
-    if (oldestViewed.length > 0) {
-      const [id, data] = oldestViewed[0];
-      const daysSince = Math.floor((Date.now() - data.lastViewed) / (1000 * 60 * 60 * 24));
-
-      if (daysSince > 7) {
-        recommendations.push({
-          type: 'review',
-          title: 'Time for Review',
-          description: `Review ${id} (last viewed ${daysSince} days ago)`,
-          action: 'review',
-          target: id
-        });
-      }
-    }
-
-    return recommendations;
-  }
 }
 
-// Export for module systems, or make global
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = LearningProgress;
-} else {
-  window.LearningProgress = LearningProgress;
-}class OverlayManager {
+// OverlayManager class for handling diagram overlays
+class OverlayManager {
   constructor(viewer) {
     this.viewer = viewer;
     this.activeOverlays = new Set();
@@ -2546,13 +2143,8 @@ ${mermaidCode}`;
   }
 
   exportProgress() {
-    const progressData = this.viewer.learningProgress.exportProgress();
-    const blob = new Blob([JSON.stringify(progressData, null, 2)], {
-      type: 'application/json;charset=utf-8'
-    });
-
-    const date = new Date().toISOString().split('T')[0];
-    this.downloadBlob(blob, `gfs-progress-${date}.json`);
+    // Progress tracking has been removed
+    alert('Progress tracking has been disabled');
     this.closeModal();
   }
 
@@ -2729,12 +2321,15 @@ ${mermaidCode}`;
           <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
         </div>
         <div class="modal-body">
+          <!-- Progress import removed - no longer tracking progress -->
+          <!--
           <div class="import-section">
             <h3>Import Progress Data</h3>
             <p>Restore your learning progress from a backup file.</p>
             <input type="file" id="import-progress" accept=".json">
             <button onclick="viewer.exportManager.importProgressFile()">Import Progress</button>
           </div>
+          -->
           <div class="import-section">
             <h3>Import Custom Diagram</h3>
             <p>Load a custom diagram specification.</p>
@@ -2752,25 +2347,8 @@ ${mermaidCode}`;
   }
 
   async importProgressFile() {
-    const input = document.getElementById('import-progress');
-    if (!input.files[0]) {
-      alert('Please select a file');
-      return;
-    }
-
-    try {
-      const text = await input.files[0].text();
-      const data = JSON.parse(text);
-
-      if (this.viewer.learningProgress.importProgress(data)) {
-        alert('Progress imported successfully!');
-        location.reload();
-      } else {
-        alert('Invalid progress file');
-      }
-    } catch (error) {
-      alert('Failed to import progress: ' + error.message);
-    }
+    // Progress tracking has been removed
+    alert('Progress tracking has been disabled');
   }
 
   async importDiagramFile() {
@@ -2823,8 +2401,9 @@ if (typeof module !== 'undefined' && module.exports) {
     this.drillSystem = null;
     this.stepper = null;
     this.overlayManager = null;
+    this.stateManager = null;  // Unified state manager
     this.exportManager = null;
-    this.learningProgress = null;
+    // learningProgress removed
 
     this.currentSpec = null;
     this.currentDiagramId = null;
@@ -2848,8 +2427,14 @@ if (typeof module !== 'undefined' && module.exports) {
       this.drillSystem = new DrillSystem();
       this.stepper = new StepThroughEngine(this.renderer, this.composer);
       this.overlayManager = new OverlayManager(this);
+
+      // Initialize StateManager if available
+      if (typeof StateManager !== 'undefined') {
+        this.stateManager = new StateManager();
+      }
+
       this.exportManager = new ExportManager(this);
-      this.learningProgress = new LearningProgress();
+      // LearningProgress removed - no progress tracking
 
       // Load manifest
       await this.loadManifest();
@@ -2907,8 +2492,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
   async loadDiagram(diagramId) {
     try {
-      // Track diagram view
-      this.learningProgress.markDiagramViewed(diagramId);
+      // Progress tracking removed
 
       // Show loading
       this.showDiagramLoading(true);
@@ -2939,6 +2523,10 @@ if (typeof module !== 'undefined' && module.exports) {
       this.updateTitle(spec.title);
       this.renderNarrative(spec);
       this.renderContracts(spec);
+      this.renderCrystallizedInsight(spec);
+      this.renderPrerequisites(spec);
+      this.renderFirstPrinciples(spec);
+      this.renderAssessments(spec);
 
       // Render the main diagram
       await this.renderDiagram();
@@ -2948,14 +2536,19 @@ if (typeof module !== 'undefined' && module.exports) {
       this.overlayManager.renderOverlayChips(spec);
       this.stepper.initialize(spec);
 
+      // Initialize StateManager with spec (for unified state controls)
+      if (this.stateManager) {
+        this.stateManager.initialize(spec);
+        this.renderStateControls();
+      }
+
       // Update step controls
       this.renderStepControls();
 
       // Update URL
       this.updateURL(diagramId);
 
-      // Update progress stats
-      this.updateProgressDisplay();
+      // Progress display removed
 
       this.showDiagramLoading(false);
     } catch (error) {
@@ -2985,13 +2578,6 @@ if (typeof module !== 'undefined' && module.exports) {
 
     nav.innerHTML = '';
 
-    // Add home button
-    const homeBtn = document.createElement('button');
-    homeBtn.className = 'nav-home';
-    homeBtn.innerHTML = '🏠 Home';
-    homeBtn.onclick = () => this.loadDiagram('00-legend');
-    nav.appendChild(homeBtn);
-
     // Add diagram list
     const list = document.createElement('div');
     list.className = 'nav-list';
@@ -3001,15 +2587,9 @@ if (typeof module !== 'undefined' && module.exports) {
       item.className = 'nav-item';
       item.dataset.diagramId = diagram.id;
 
-      const progress = this.learningProgress.getDiagramStats(diagram.id);
-      const hasProgress = progress.viewCount > 0;
-
       item.innerHTML = `
         <span class="nav-number">${index}</span>
         <span class="nav-title">${diagram.title}</span>
-        ${hasProgress ? `
-          <span class="nav-progress">${progress.completionPercentage}%</span>
-        ` : ''}
       `;
 
       item.onclick = () => this.loadDiagram(diagram.id);
@@ -3124,6 +2704,235 @@ if (typeof module !== 'undefined' && module.exports) {
     `;
   }
 
+  renderCrystallizedInsight(spec) {
+    const panel = document.getElementById('crystallized-insight');
+    if (!panel || !spec.crystallizedInsight) return;
+
+    panel.textContent = spec.crystallizedInsight;
+
+    // Show the insight panel if there's content
+    const insightPanel = document.querySelector('.insight-panel');
+    if (insightPanel && spec.crystallizedInsight) {
+      insightPanel.style.display = 'flex';
+    } else if (insightPanel) {
+      insightPanel.style.display = 'none';
+    }
+  }
+
+  renderPrerequisites(spec) {
+    const panel = document.getElementById('prerequisites-panel');
+    const content = document.getElementById('prerequisites-content');
+
+    if (!panel || !content || !spec.prerequisites) return;
+
+    // Show the prerequisites section if there's content
+    if (spec.prerequisites.concepts?.length > 0 || spec.prerequisites.understanding) {
+      panel.style.display = 'block';
+
+      content.innerHTML = `
+        ${spec.prerequisites.concepts?.length > 0 ? `
+          <div class="prereq-concepts">
+            <h5>Required Concepts:</h5>
+            <ul>
+              ${spec.prerequisites.concepts.map(c => `<li>${c}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        ${spec.prerequisites.understanding ? `
+          <div class="prereq-check">
+            <h5>Check Your Understanding:</h5>
+            <p>${spec.prerequisites.understanding}</p>
+          </div>
+        ` : ''}
+      `;
+    } else {
+      panel.style.display = 'none';
+    }
+  }
+
+  renderFirstPrinciples(spec) {
+    const container = document.getElementById('principles-container');
+    if (!container || !spec.firstPrinciples) return;
+
+    let html = '<div class="principles-content">';
+
+    // First Principles Accordion
+    html += `
+      <details class="accordion-item first-principles-accordion">
+        <summary class="accordion-header">
+          <span class="accordion-icon">▶</span>
+          <span class="accordion-title">🎯 First Principles</span>
+        </summary>
+        <div class="accordion-content">
+    `;
+
+    // Render each principle category
+    for (const [category, principles] of Object.entries(spec.firstPrinciples)) {
+      html += `
+        <details class="sub-accordion-item">
+          <summary class="sub-accordion-header">
+            <span class="sub-accordion-icon">▶</span>
+            <span class="sub-accordion-title">${category.replace(/([A-Z])/g, ' $1').trim()}</span>
+          </summary>
+          <div class="sub-accordion-content">
+            <dl class="principle-section">
+      `;
+
+      for (const [key, value] of Object.entries(principles)) {
+        html += `
+          <dt>${key.replace(/([A-Z])/g, ' $1').trim()}</dt>
+          <dd>${value}</dd>
+        `;
+      }
+
+      html += `
+            </dl>
+          </div>
+        </details>
+      `;
+    }
+
+    html += `
+        </div>
+      </details>
+    `;
+
+    // Advanced Concepts Accordion (if present)
+    if (spec.advancedConcepts) {
+      html += `
+        <details class="accordion-item advanced-concepts-accordion">
+          <summary class="accordion-header">
+            <span class="accordion-icon">▶</span>
+            <span class="accordion-title">🚀 Advanced Concepts</span>
+          </summary>
+          <div class="accordion-content">
+      `;
+
+      for (const [category, concepts] of Object.entries(spec.advancedConcepts)) {
+        html += `
+          <details class="sub-accordion-item">
+            <summary class="sub-accordion-header">
+              <span class="sub-accordion-icon">▶</span>
+              <span class="sub-accordion-title">${category.replace(/([A-Z])/g, ' $1').trim()}</span>
+            </summary>
+            <div class="sub-accordion-content">
+              <dl class="concept-section">
+        `;
+
+        for (const [key, value] of Object.entries(concepts)) {
+          html += `
+            <dt>${key.replace(/([A-Z])/g, ' $1').trim()}</dt>
+            <dd>${value}</dd>
+          `;
+        }
+
+        html += `
+              </dl>
+            </div>
+          </details>
+        `;
+      }
+
+      html += `
+        </div>
+      </details>
+      `;
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  renderAssessments(spec) {
+    const container = document.getElementById('assessment-container');
+    if (!container || !spec.assessmentCheckpoints) return;
+
+    let html = '<div class="assessment-content">';
+
+    spec.assessmentCheckpoints.forEach((checkpoint, index) => {
+      html += `
+        <div class="checkpoint-card">
+          <h4>${index + 1}. ${checkpoint.concept}</h4>
+          ${checkpoint.check ? `
+            <div class="checkpoint-check">
+              <strong>Check:</strong> ${checkpoint.check}
+            </div>
+          ` : ''}
+          ${checkpoint.mastery ? `
+            <div class="checkpoint-mastery">
+              <strong>Mastery:</strong> ${checkpoint.mastery}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  renderStateControls() {
+    const container = document.getElementById('state-controls');
+    if (!container || !this.stateManager) return;
+
+    const states = this.stateManager.getStates();
+    const currentStateIndex = this.stateManager.getCurrentStateIndex();
+    const overlays = this.stateManager.getOverlays();
+
+    if (states.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    container.style.display = 'flex';
+    container.innerHTML = `
+      <div class="state-nav-buttons">
+        <button onclick="viewer.stateManager.previousState()" ${currentStateIndex === 0 ? 'disabled' : ''}>◀</button>
+        <button onclick="viewer.stateManager.playPause()" title="Play/Pause">
+          ${this.stateManager.isPlaying ? '⏸' : '▶'}
+        </button>
+        <button onclick="viewer.stateManager.nextState()" ${currentStateIndex >= states.length - 1 ? 'disabled' : ''}>▶</button>
+      </div>
+
+      <div class="state-timeline">
+        <div class="timeline-track" onclick="viewer.handleTimelineClick(event)">
+          <div class="timeline-progress" style="width: ${(currentStateIndex + 1) / states.length * 100}%"></div>
+          <div class="timeline-markers">
+            ${states.map((state, i) => `
+              <div class="timeline-marker ${i === currentStateIndex ? 'active' : ''}"
+                   style="left: ${(i + 0.5) / states.length * 100}%"
+                   onclick="viewer.stateManager.goToState(${i})"
+                   title="${state.name}">
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="state-info">
+        <div class="state-dropdown" onclick="viewer.toggleStateDropdown(event)">
+          <span>${states[currentStateIndex]?.name || 'Select State'}</span>
+          <span>▼</span>
+        </div>
+        ${overlays.length > 0 ? `
+          <div class="layer-indicator" onclick="viewer.toggleLayerPanel(event)">
+            <span>Layers</span>
+            <span class="layer-count">${overlays.filter(o => o.active).length}</span>
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    // Listen for state changes
+    if (!this.stateListenerAdded) {
+      document.addEventListener('stateChange', (e) => {
+        this.onStateChange(e.detail);
+      });
+      this.stateListenerAdded = true;
+    }
+  }
+
   renderStepControls() {
     const controls = document.getElementById('step-controls');
     if (!controls) return;
@@ -3173,27 +2982,10 @@ if (typeof module !== 'undefined' && module.exports) {
     }
   }
 
+  // Progress display removed
   updateProgressDisplay() {
-    const stats = this.learningProgress.getOverallProgress();
-    const diagramStats = this.learningProgress.getDiagramStats(this.currentDiagramId);
-
-    const progressEl = document.getElementById('progress-summary');
-    if (progressEl) {
-      progressEl.innerHTML = `
-        <div class="progress-item">
-          <span class="progress-label">Overall:</span>
-          <span class="progress-value">${stats.completionPercentage}%</span>
-        </div>
-        <div class="progress-item">
-          <span class="progress-label">This Diagram:</span>
-          <span class="progress-value">${diagramStats.completionPercentage}%</span>
-        </div>
-        <div class="progress-item">
-          <span class="progress-label">Time Spent:</span>
-          <span class="progress-value">${diagramStats.formattedTime}</span>
-        </div>
-      `;
-    }
+    // Progress tracking removed - function kept for compatibility
+    // No-op function
   }
 
   setupEventListeners() {
@@ -3203,28 +2995,7 @@ if (typeof module !== 'undefined' && module.exports) {
       this.renderDiagram();
     });
 
-    // Listen for step changes
-    document.addEventListener('stepChange', (e) => {
-      this.learningProgress.updateStepProgress(
-        this.currentDiagramId,
-        e.detail.index,
-        e.detail.total
-      );
-    });
-
-    // Listen for drill completion
-    document.addEventListener('drillComplete', (e) => {
-      const drills = this.currentSpec.drills || [];
-      const completed = drills.filter(d =>
-        this.drillSystem.progress.isDrillComplete(this.currentDiagramId, d.id)
-      ).length;
-
-      this.learningProgress.updateDrillProgress(
-        this.currentDiagramId,
-        completed,
-        drills.length
-      );
-    });
+    // Progress tracking event listeners removed
 
     // Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
@@ -3372,6 +3143,39 @@ if (typeof module !== 'undefined' && module.exports) {
     }
   }
 
+  onStateChange(detail) {
+    // Update diagram based on state change
+    if (detail.overlays) {
+      this.currentOverlays = new Set(detail.overlays);
+      this.renderDiagram();
+    }
+
+    // Re-render state controls to update UI
+    this.renderStateControls();
+  }
+
+  handleTimelineClick(event) {
+    if (!this.stateManager) return;
+
+    const track = event.currentTarget;
+    const rect = track.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const percentage = x / rect.width;
+    const stateIndex = Math.floor(percentage * this.stateManager.getStates().length);
+
+    this.stateManager.goToState(stateIndex);
+  }
+
+  toggleStateDropdown(event) {
+    event.stopPropagation();
+    // Implementation for state dropdown
+  }
+
+  toggleLayerPanel(event) {
+    event.stopPropagation();
+    // Implementation for layer panel
+  }
+
   showHelp() {
     const modal = document.createElement('div');
     modal.className = 'modal';
@@ -3414,6 +3218,17 @@ if (typeof module !== 'undefined' && module.exports) {
             <div class="shortcut">
               <kbd>?</kbd>
               <span>Show this help</span>
+            </div>
+          </div>
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <h3 style="margin-bottom: 10px;">Resources</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <a href="intro.html" style="padding: 8px 16px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; display: inline-block;">
+                📺 Watch Introduction Video
+              </a>
+              <a href="https://youtu.be/oHZDfovrUjo" target="_blank" style="padding: 8px 16px; background: #ef4444; color: white; text-decoration: none; border-radius: 6px; display: inline-block;">
+                🎥 YouTube Video
+              </a>
             </div>
           </div>
         </div>

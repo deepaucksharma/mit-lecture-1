@@ -1,6 +1,17 @@
 {
   "id": "00-legend",
   "title": "Master Legend & System Contracts",
+  "narrative": "Before we begin: These three components and their sacred separation define everything that follows. The Master thinks but never lifts. The Chunkserver lifts but never thinks. The Client orchestrates both. Break these roles, and GFS breaks. This architecture emerges from the end-to-end argument (Saltzer, Reed, Clark, 1984): reliability and performance should be ensured at endpoints, not intermediaries.",
+  "crystallizedInsight": "The separation of control and data is the foundation of all scalable systems—it's Amdahl's Law applied to distributed architecture",
+  "firstPrinciples": {
+    "theoreticalFoundation": "From the asynchronous network model and FLP Impossibility (Fischer, Lynch, Paterson, 1985), deterministic consensus is impossible with even one faulty process. GFS's separation sidesteps this by minimizing consensus scope to metadata only.",
+    "quantitativeAnalysis": "Control ops are O(1) metadata lookups (microseconds), while data is O(size) transfers (seconds for 64MB). Mixing them violates Amdahl's Law: serial fraction f would approach 1, limiting speedup to 1/f regardless of parallelism.",
+    "derivedInvariants": [
+      "Coordination budget: Every strong guarantee costs round trips and serialization",
+      "Single-writer per partition via leases serializes without global consensus",
+      "Failure detectors are suspicion services, not truth oracles"
+    ]
+  },
   "layout": {
     "type": "flow"
   },
@@ -19,6 +30,16 @@
       "id": "C",
       "type": "client",
       "label": "Client (Application)"
+    },
+    {
+      "id": "N",
+      "type": "note",
+      "label": "Note (Annotation)"
+    },
+    {
+      "id": "S",
+      "type": "state",
+      "label": "State (State Machine)"
     }
   ],
   "edges": [
@@ -41,49 +62,206 @@
       "metrics": {
         "size": "64MB chunks"
       }
+    },
+    {
+      "id": "heartbeat",
+      "from": "CS",
+      "to": "M",
+      "kind": "heartbeat",
+      "label": "Heartbeat (Health Monitoring)",
+      "metrics": {
+        "frequency": "Every few seconds"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "base-components",
+      "name": "Base System Components",
+      "overlays": [],
+      "narrative": "The three fundamental components of GFS: Master for metadata control, Chunkserver for data storage, and Client for application interaction"
+    },
+    {
+      "id": "sacred-separation-scene",
+      "name": "The Sacred Separation Principle",
+      "overlays": ["sacred-separation"],
+      "narrative": "The most critical design decision: control and data paths must never cross. This separation enables the system to scale to thousands of machines"
+    },
+    {
+      "id": "violation-consequences",
+      "name": "What Happens When Rules Are Broken",
+      "overlays": ["what-if-violated"],
+      "narrative": "Understanding why the separation is sacred by examining the catastrophic consequences when the Master touches data directly"
+    }
+  ],
+  "overlays": [
+    {
+      "id": "sacred-separation",
+      "caption": "The Sacred Separation",
+      "diff": {
+        "highlight": {
+          "edgeIds": ["control", "data"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "separation-note",
+              "type": "note",
+              "label": "These paths NEVER cross. This is the key to everything."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "what-if-violated",
+      "caption": "What if Master touched data?",
+      "diff": {
+        "add": {
+          "edges": [
+            {
+              "id": "forbidden-path",
+              "from": "M",
+              "to": "CS",
+              "kind": "data",
+              "label": "❌ FORBIDDEN: Would destroy the system"
+            }
+          ],
+          "nodes": [
+            {
+              "id": "violation-note",
+              "type": "note",
+              "label": "If Master handled 64MB chunks: One client saturates it. 999 clients wait. System dies."
+            }
+          ]
+        },
+        "highlight": {
+          "edgeIds": ["forbidden-path"]
+        }
+      }
     }
   ],
   "contracts": {
     "invariants": [
-      "Master never touches file data",
-      "Version numbers only increase",
-      "At most one primary per chunk at any time",
-      "Chunks have exactly 3 replicas (eventually)"
+      "Master never touches file data - it would create an impossible bottleneck",
+      "Version numbers only increase - time flows forward, never backward",
+      "At most one primary per chunk - prevents conflicting updates",
+      "Chunks have exactly 3 replicas - balancing safety and cost"
     ],
     "guarantees": [
-      "Metadata operations are atomic",
-      "All chunks are replicated for fault tolerance",
-      "System continues operating with node failures"
+      "Metadata operations are atomic - no partial states",
+      "All chunks are replicated - hardware failures don't lose data",
+      "System continues with failures - designed for continuous operation"
     ],
     "caveats": [
-      "Weak consistency between replicas",
-      "Possible stale reads",
-      "No immediate visibility of changes"
+      "Replicas may diverge temporarily - consistency is eventual, not immediate",
+      "You might read old data - freshness is not guaranteed",
+      "Changes propagate slowly - this is a feature, not a bug"
     ]
   },
   "drills": [
     {
-      "id": "drill-master-data",
-      "type": "recall",
-      "prompt": "Why must the Master never be on the data path?",
-      "answer": "The Master would become a bottleneck. At 64MB chunks and hundreds of clients, even 10 clients reading at 100MB/s would require 1GB/s through the Master."
+      "id": "drill-separation-thought",
+      "type": "analyze",
+      "prompt": "The Master just started handling data directly. Walk through what happens in the next 60 seconds using Amdahl's Law.",
+      "thoughtProcess": [
+        "First client request arrives - Master handles it fine (64MB takes ~6s at 100Mbps)",
+        "Second client arrives - starts queuing behind first",
+        "By 10 seconds - queue grows to dozens of clients",
+        "Amdahl's Law kicks in: serial fraction f = 1 (all data through Master)",
+        "Speedup = 1/(f + (1-f)/N) = 1/(1 + 0) = 1 regardless of N chunkservers",
+        "By 30 seconds - Master's network saturated at 100Mbps",
+        "By 60 seconds - entire system grinding to halt, queue length = 60s × arrival rate",
+        "With 1000 clients at 10MB/s each: need 10Gbps but have 100Mbps",
+        "Key realization: The Master is a funnel, not a pipe—serial bottleneck destroys parallelism"
+      ],
+      "insight": "This violates Amdahl's Law—mixing control and data creates f=1, making N servers perform like 1"
     },
     {
-      "id": "drill-version-decrease",
-      "type": "recall",
-      "prompt": "What breaks if version numbers could decrease?",
-      "answer": "Version ordering ensures causality. If versions could decrease, clients couldn't determine which replica has the latest data, breaking consistency guarantees."
+      "id": "drill-version-paradox",
+      "type": "analyze",
+      "prompt": "Imagine version numbers could go backward. What impossible situation would this create?",
+      "scenario": "Version 7 becomes version 5, then back to version 7",
+      "thoughtProcess": [
+        "Client A sees version 7, caches it",
+        "Version 'goes back' to 5",
+        "Client B sees version 5, thinks it's newer",
+        "Version returns to 7",
+        "Which client has the 'right' data?",
+        "Time has lost meaning - causality is broken"
+      ],
+      "insight": "Version numbers are how distributed systems track time"
     },
     {
-      "id": "drill-failure-rate",
+      "id": "drill-living-with-failure",
       "type": "apply",
-      "prompt": "Calculate daily failure rate for 1000 machines with MTBF of 1 year each",
-      "scenario": "Each machine has independent failure probability",
+      "prompt": "You have 1000 machines. Something fails every single day. How do you design for this reality?",
+      "scenario": "Not 'if' but 'when' and 'how often'",
       "rubric": [
-        "Daily failure rate per machine: 1/365 ≈ 0.27%",
-        "Expected failures per day: 1000 × (1/365) ≈ 2.74",
-        "Probability of at least one failure: 1 - (364/365)^1000 ≈ 93.6%"
-      ]
+        "Accept failure as normal, not exceptional",
+        "Build automatic recovery, not prevention",
+        "Replicate everything that matters",
+        "Make failure recovery invisible to users",
+        "Monitor for patterns, not individual failures"
+      ],
+      "insight": "At scale, perfection is impossible. Resilience is everything."
     }
-  ]
+  ],
+  "assessmentCheckpoints": [
+    {
+      "id": "understand-separation",
+      "competency": "I understand why control and data must be separate",
+      "checkYourself": "Can you explain what would happen if they weren't?",
+      "mastery": "You see this pattern everywhere in distributed systems"
+    },
+    {
+      "id": "understand-invariants",
+      "competency": "I can identify what must NEVER change in GFS",
+      "checkYourself": "Could you spot a design that violates these rules?",
+      "mastery": "You understand the difference between rules and preferences"
+    },
+    {
+      "id": "understand-tradeoffs",
+      "competency": "I see what GFS sacrificed and what it gained",
+      "checkYourself": "Can you name something GFS can't do because of these choices?",
+      "mastery": "You understand there are no perfect solutions, only good tradeoffs"
+    }
+  ],
+  "advancedConcepts": {
+    "alternativeArchitectures": [
+      {
+        "name": "Symmetric/Peer-to-Peer",
+        "example": "Cassandra, Dynamo",
+        "tradeoff": "No SPOF but complex coordination; uses consistent hashing and gossip",
+        "when": "When master becomes bottleneck or geo-distribution is critical"
+      },
+      {
+        "name": "Multi-Master/Active-Active",
+        "example": "Spanner, CockroachDB",
+        "tradeoff": "Strong consistency via synchronized clocks (TrueTime) or Raft consensus",
+        "when": "When you need ACID guarantees at scale"
+      },
+      {
+        "name": "Serverless/Disaggregated",
+        "example": "AWS S3, Azure Blob",
+        "tradeoff": "Complete separation of compute and storage; pay-per-use but vendor lock-in",
+        "when": "When operational simplicity matters more than control"
+      }
+    ],
+    "theoreticalExtensions": {
+      "beyondCrashStop": "Byzantine fault tolerance (BFT) for malicious failures requires 3f+1 replicas and cryptographic verification—impractical at GFS scale without sharding",
+      "consensusEvolution": "From single-master to Raft/Multi-Paxos: distributed consensus with leader election, log replication, and joint consensus for reconfiguration",
+      "formalVerification": "TLA+ specifications can prove safety properties (no split-brain) and liveness under partial synchrony assumptions"
+    },
+    "modernEvolutions": {
+      "shardedMetadata": "Colossus shards the namespace, each shard runs Paxos—trades simplicity for scalability",
+      "erasureCoding": "Reed-Solomon (k+m) coding reduces storage from 3x to 1.5x but increases repair bandwidth",
+      "tieredStorage": "Hot data on SSD with replication, cold on HDD with erasure coding—optimize cost per byte"
+    },
+    "openProblems": [
+      "Can we achieve linearizable consistency without global coordination? (Hint: CRDTs for specific data types)",
+      "How to handle correlated failures beyond rack awareness? (Region-aware placement, anti-affinity rules)",
+      "Optimal chunk size in heterogeneous workloads? (Adaptive chunking based on access patterns)"
+    ]
+  }
 }

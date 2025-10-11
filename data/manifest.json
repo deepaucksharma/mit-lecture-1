@@ -1,98 +1,111 @@
 {
-  "version": "1.0",
-  "title": "GFS Visual Learning System",
-  "description": "Interactive visual learning system for understanding Google File System architecture",
+  "version": "2.0",
+  "title": "GFS Visual Learning System - Enhanced with First Principles",
+  "description": "Interactive visual learning system for understanding Google File System architecture through deep distributed systems theory, mathematical foundations, and advanced concepts",
   "diagrams": [
     {
       "id": "00-legend",
       "title": "Master Legend & System Contracts",
-      "description": "Foundation diagram showing symbols, components, and system-wide invariants",
+      "description": "Foundation diagram with FLP Impossibility, Amdahl's Law, end-to-end arguments, and alternative architectures",
       "difficulty": "beginner",
-      "prerequisites": []
+      "prerequisites": [],
+      "enhancements": ["firstPrinciples", "advancedConcepts"]
     },
     {
       "id": "01-triangle",
       "title": "The Impossible Triangle",
-      "description": "Trade-offs between Performance, Reliability, and Consistency",
+      "description": "CAP theorem, PACELC extension, FLP impossibility, and modern consistency models (CRDTs, Spanner)",
       "difficulty": "intermediate",
-      "prerequisites": ["00-legend"]
+      "prerequisites": ["00-legend"],
+      "enhancements": ["firstPrinciples", "advancedConcepts"]
     },
     {
       "id": "02-scale",
       "title": "Scale Reality Dashboard",
-      "description": "Comparing traditional NFS with GFS at Google scale",
+      "description": "Failure models, reliability mathematics, Markov chains, erasure coding, and cost analysis",
       "difficulty": "intermediate",
-      "prerequisites": ["00-legend"]
+      "prerequisites": ["00-legend"],
+      "enhancements": ["firstPrinciples", "advancedConcepts"]
     },
     {
       "id": "03-chunk-size",
       "title": "The 64MB Decision Tree",
-      "description": "Understanding chunk size trade-offs with RAM economics",
+      "description": "Amdahl's Law analysis, optimal chunk derivation, content-defined chunking, and modern system comparisons",
       "difficulty": "intermediate",
-      "prerequisites": ["00-legend"]
+      "prerequisites": ["00-legend"],
+      "enhancements": ["firstPrinciples", "advancedConcepts"]
     },
     {
       "id": "04-architecture",
       "title": "Complete Architecture",
-      "description": "Full system architecture with failure blast radius analysis",
+      "description": "End-to-end arguments, Little's Law, queueing theory, alternative architectures, and modern evolutions",
       "difficulty": "advanced",
-      "prerequisites": ["00-legend", "02-scale"]
+      "prerequisites": ["00-legend", "02-scale"],
+      "enhancements": ["firstPrinciples", "advancedConcepts", "prerequisites"]
     },
     {
       "id": "05-planes",
       "title": "Control vs Data Plane",
-      "description": "Separation of control and data traffic highways",
+      "description": "Control theory, Shannon capacity, SDN/Kubernetes parallels, and theoretical foundations of plane separation",
       "difficulty": "intermediate",
-      "prerequisites": ["00-legend", "04-architecture"]
+      "prerequisites": ["00-legend", "04-architecture"],
+      "enhancements": ["firstPrinciples", "advancedConcepts", "prerequisites"]
     },
     {
       "id": "06-read-path",
       "title": "Read Path with Cache",
-      "description": "Complete read operation with cache lifecycle and latencies",
+      "description": "Caching theory with Little's Law, Bélády's algorithm, cache coherence models, and modern caching strategies",
       "difficulty": "intermediate",
-      "prerequisites": ["05-planes"]
+      "prerequisites": ["05-planes"],
+      "enhancements": ["firstPrinciples", "advancedConcepts", "prerequisites"]
     },
     {
       "id": "07-write-path",
       "title": "Write Path Ballet",
-      "description": "Two-stage write operation with pipeline and commit phases",
+      "description": "Chain replication theory, two-phase analysis, consistency models, pipeline optimizations, and modern replication strategies",
       "difficulty": "advanced",
-      "prerequisites": ["05-planes"]
+      "prerequisites": ["05-planes"],
+      "enhancements": ["firstPrinciples", "advancedConcepts", "prerequisites"]
     },
     {
       "id": "08-lease",
       "title": "Lease State Machine",
-      "description": "Primary lease mechanism preventing split-brain scenarios",
+      "description": "Distributed consensus, time-based coordination, TrueTime, fencing tokens, and alternative coordination mechanisms",
       "difficulty": "advanced",
-      "prerequisites": ["07-write-path"]
+      "prerequisites": ["07-write-path"],
+      "enhancements": ["firstPrinciples", "advancedConcepts", "prerequisites"]
     },
     {
       "id": "09-consistency",
       "title": "Consistency Reality",
-      "description": "Understanding weak consistency and application-level fixes",
+      "description": "Consistency spectrum (linearizable to eventual), CRDTs, vector clocks, and modern consistency models",
       "difficulty": "advanced",
-      "prerequisites": ["07-write-path", "08-lease"]
+      "prerequisites": ["07-write-path", "08-lease"],
+      "enhancements": ["firstPrinciples", "advancedConcepts", "prerequisites"]
     },
     {
       "id": "10-recovery",
       "title": "Failure Recovery Matrix",
-      "description": "Complete failure types and recovery mechanisms",
+      "description": "Failure detection theory, recovery patterns, SRE practices, chaos engineering, and modern observability",
       "difficulty": "advanced",
-      "prerequisites": ["04-architecture", "09-consistency"]
+      "prerequisites": ["04-architecture", "09-consistency"],
+      "enhancements": ["firstPrinciples", "advancedConcepts", "prerequisites"]
     },
     {
       "id": "11-evolution",
       "title": "Single Master Evolution",
-      "description": "Timeline showing system evolution and breaking points",
+      "description": "Scaling laws, technical debt, Colossus improvements, migration strategies, and system lifecycle models",
       "difficulty": "intermediate",
-      "prerequisites": ["04-architecture"]
+      "prerequisites": ["04-architecture"],
+      "enhancements": ["firstPrinciples", "advancedConcepts", "prerequisites"]
     },
     {
       "id": "12-dna",
       "title": "GFS DNA in Modern Systems",
-      "description": "Ideas that survived, evolved, or died in modern systems",
+      "description": "GFS influence in HDFS/S3/Colossus, cross-domain impact, academic legacy, and industry transformation",
       "difficulty": "intermediate",
-      "prerequisites": ["11-evolution"]
+      "prerequisites": ["11-evolution"],
+      "enhancements": ["firstPrinciples", "advancedConcepts", "prerequisites"]
     }
   ],
   "learningPaths": [
@@ -119,6 +132,20 @@
       "title": "Reliability & Evolution",
       "description": "Failure handling and system evolution",
       "diagrams": ["10-recovery", "11-evolution", "12-dna"]
+    },
+    {
+      "id": "theoretical-foundations",
+      "title": "Theoretical Foundations",
+      "description": "Deep dive into distributed systems theory, mathematical models, and first principles",
+      "diagrams": ["00-legend", "01-triangle", "02-scale", "03-chunk-size", "04-architecture", "05-planes", "06-read-path", "07-write-path", "08-lease", "09-consistency", "10-recovery", "11-evolution", "12-dna"],
+      "focus": "firstPrinciples"
+    },
+    {
+      "id": "advanced-concepts",
+      "title": "Advanced & Alternative Approaches",
+      "description": "Modern evolutions, alternative architectures, and open research problems",
+      "diagrams": ["00-legend", "01-triangle", "02-scale", "03-chunk-size", "04-architecture", "05-planes", "06-read-path", "07-write-path", "08-lease", "09-consistency", "10-recovery", "11-evolution", "12-dna"],
+      "focus": "advancedConcepts"
     }
   ],
   "metadata": {

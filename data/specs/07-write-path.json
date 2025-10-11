@@ -1,0 +1,436 @@
+{
+  "id": "07-write-path",
+  "title": "Write Path Ballet",
+  "prerequisites": {
+    "concepts": [
+      "Read path and why caching matters (Spec 06)",
+      "Control/data plane separation (Spec 00, 05)",
+      "Replication and chunk architecture (Spec 03, 04)",
+      "Why Primary must avoid becoming bottleneck (Spec 00, 06)"
+    ],
+    "checkYourself": "Do you understand the difference between metadata operations (control) and data operations? Can you explain why we have multiple replicas per chunk?"
+  },
+  "narrative": "Witness the choreography: Data flows like water—pipelined through replicas in a chain, each server forwarding to the next at full network speed. But commitment flows like law—serialized through one Primary who decides order. This separation—pipeline data flow, serialize commitment—is not a compromise. It's the only way to be both fast and consistent. This is chain replication, a fundamental pattern in distributed storage.",
+  "crystallizedInsight": "Decouple what can be parallel from what must be serial. Speed lives in the separation—this is the essence of chain replication",
+  "firstPrinciples": {
+    "chainReplication": {
+      "principle": "Updates flow through chain: head→middle→tail. Reads from tail guarantee strong consistency",
+      "gfsVariant": "Primary acts as sequencer but all nodes equal for durability. Not pure chain replication",
+      "bandwidth": "Client sends once, O(1). Compare to broadcast: O(N) client bandwidth",
+      "latency": "O(N) hops but pipelined → perceived latency ≈ O(1) for large transfers"
+    },
+    "twoPhaseWrite": {
+      "phase1": "Data distribution: parallel pipeline, no ordering required, idempotent",
+      "phase2": "Commitment: serialized through primary, establishes total order",
+      "separation": "Heavy data (MB) flows without coordination. Light control (bytes) provides ordering",
+      "analogy": "Similar to 2PC but data pre-positioned before decision"
+    },
+    "consistencyModel": {
+      "atomicity": "Record append is atomic—all or nothing visible",
+      "ordering": "Primary provides total order for concurrent writes to same region",
+      "durability": "Write acknowledged only after all replicas confirm",
+      "isolation": "No isolation—concurrent writes may interleave at byte level"
+    },
+    "performanceAnalysis": {
+      "networkUtilization": "Each link carries data once: optimal for tree topology",
+      "clientBandwidth": "O(ChunkSize), not O(ChunkSize × Replicas)",
+      "serverBandwidth": "Ingress: ChunkSize, Egress: ChunkSize → balanced load",
+      "pipelineDepth": "Optimal depth = bandwidth × RTT (bandwidth-delay product)"
+    }
+  },
+  "layout": {
+    "type": "sequence"
+  },
+  "nodes": [
+    {
+      "id": "C",
+      "type": "client",
+      "label": "Client"
+    },
+    {
+      "id": "M",
+      "type": "master",
+      "label": "Master"
+    },
+    {
+      "id": "P",
+      "type": "chunkserver",
+      "label": "Primary"
+    },
+    {
+      "id": "S1",
+      "type": "chunkserver",
+      "label": "Secondary 1"
+    },
+    {
+      "id": "S2",
+      "type": "chunkserver",
+      "label": "Secondary 2"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "C",
+      "to": "M",
+      "kind": "control",
+      "label": "1. Who has lease?",
+      "phase": "Setup"
+    },
+    {
+      "id": "e2",
+      "from": "M",
+      "to": "C",
+      "kind": "control",
+      "label": "2. Primary + replicas",
+      "phase": "Setup"
+    },
+    {
+      "id": "e3",
+      "from": "C",
+      "to": "P",
+      "kind": "data",
+      "label": "3a. Push data",
+      "phase": "Stage 1: Pipeline"
+    },
+    {
+      "id": "e4",
+      "from": "P",
+      "to": "S1",
+      "kind": "data",
+      "label": "3b. Forward data",
+      "phase": "Stage 1: Pipeline"
+    },
+    {
+      "id": "e5",
+      "from": "S1",
+      "to": "S2",
+      "kind": "data",
+      "label": "3c. Forward data",
+      "phase": "Stage 1: Pipeline"
+    },
+    {
+      "id": "e6",
+      "from": "S2",
+      "to": "C",
+      "kind": "control",
+      "label": "4. Data staged",
+      "phase": "Stage 1: Pipeline"
+    },
+    {
+      "id": "e7",
+      "from": "C",
+      "to": "P",
+      "kind": "control",
+      "label": "5. Commit write",
+      "phase": "Stage 2: Commit"
+    },
+    {
+      "id": "e8",
+      "from": "P",
+      "to": "S1",
+      "kind": "control",
+      "label": "6. Apply mutation",
+      "phase": "Stage 2: Commit"
+    },
+    {
+      "id": "e9",
+      "from": "P",
+      "to": "S2",
+      "kind": "control",
+      "label": "6. Apply mutation",
+      "phase": "Stage 2: Commit"
+    },
+    {
+      "id": "e10",
+      "from": "S1",
+      "to": "P",
+      "kind": "control",
+      "label": "7. ACK",
+      "phase": "Stage 2: Commit"
+    },
+    {
+      "id": "e11",
+      "from": "S2",
+      "to": "P",
+      "kind": "control",
+      "label": "7. ACK",
+      "phase": "Stage 2: Commit"
+    },
+    {
+      "id": "e12",
+      "from": "P",
+      "to": "C",
+      "kind": "control",
+      "label": "8. Success/Error",
+      "phase": "Stage 2: Commit"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "normal-write",
+      "title": "Normal Write Flow",
+      "overlays": []
+    },
+    {
+      "id": "concurrent",
+      "title": "Concurrent Writers",
+      "overlays": ["concurrent-writes"]
+    },
+    {
+      "id": "failure",
+      "title": "Write Failure Recovery",
+      "overlays": ["write-failure"]
+    }
+  ],
+  "overlays": [
+    {
+      "id": "concurrent-writes",
+      "caption": "Two Clients Racing to Write",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "C2",
+              "type": "client",
+              "label": "Client 2"
+            },
+            {
+              "id": "race-note",
+              "type": "note",
+              "label": "Primary serializes:\\nA arrives first→#1\\nB arrives second→#2\\nAll replicas apply in order: A, B"
+            }
+          ],
+          "edges": [
+            {
+              "id": "ec1",
+              "from": "C2",
+              "to": "P",
+              "kind": "control",
+              "label": "5b. Commit write B"
+            }
+          ]
+        },
+        "highlight": {
+          "nodeIds": ["P"],
+          "edgeIds": ["e7"]
+        }
+      }
+    },
+    {
+      "id": "write-failure",
+      "caption": "When One Replica Dies Mid-Write",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "failure-note",
+              "type": "note",
+              "label": "Client retries entire write\\nMay create duplicates\\nApplication must handle"
+            }
+          ]
+        },
+        "highlight": {
+          "nodeIds": ["S1"],
+          "edgeIds": ["e10", "e12"]
+        },
+        "modify": {
+          "edges": [
+            {
+              "id": "e10",
+              "label": "7. FAILED"
+            },
+            {
+              "id": "e12",
+              "label": "8. Error: replica failed"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "why-two-phases",
+      "caption": "The Genius of Two Phases",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "phase-note",
+              "type": "note",
+              "label": "Phase 1: Heavy data (MBs)\\nflows through pipeline\\n\\nPhase 2: Light control (bytes)\\nflows through Primary\\n\\nPrimary never becomes bottleneck"
+            }
+          ]
+        },
+        "highlight": {
+          "edgeIds": ["e3", "e4", "e5", "e7", "e8", "e9"]
+        }
+      }
+    }
+  ],
+  "contracts": {
+    "invariants": [
+      "Primary orders all concurrent writes",
+      "Data must be staged before commit",
+      "All replicas apply mutations in same order"
+    ],
+    "guarantees": [
+      "Write atomicity at record level",
+      "Defined append region on success",
+      "Consistent ordering via primary"
+    ],
+    "caveats": [
+      "Replicas may have different bytes for same region",
+      "Failed writes may leave garbage",
+      "Application must handle padding and duplicates"
+    ]
+  },
+  "drills": [
+    {
+      "id": "drill-why-separate",
+      "type": "analyze",
+      "prompt": "Why not just send data through the Primary to the Secondaries? One path, simpler code.",
+      "thoughtProcess": [
+        "Imagine: Client sends 1GB to Primary, Primary forwards to Secondaries",
+        "Primary's network card handles 1GB in + 2GB out = 3GB total",
+        "With 10 concurrent writes: 30GB flowing through one machine",
+        "Primary's network becomes the bottleneck",
+        "GFS solution: Client starts the pipeline, data flows through chain",
+        "Each machine forwards once: 1GB in, 1GB out = 2GB per machine",
+        "All links run at full speed simultaneously—like a relay race",
+        "The Primary only coordinates tiny commit messages (bytes)",
+        "Complexity is the price we pay for not melting the Primary"
+      ],
+      "insight": "Simplicity is seductive. Scalability requires separating concerns."
+    },
+    {
+      "id": "drill-primary-power",
+      "type": "apply",
+      "prompt": "Two clients write 'HELLO' and 'WORLD' to the same region simultaneously. What ends up in the file?",
+      "scenario": "Client A writes 'HELLO', Client B writes 'WORLD', both arrive at same time",
+      "thoughtProcess": [
+        "Both push data to all replicas successfully",
+        "Both send commit requests to Primary",
+        "Primary receives them in some order—let's say A first, then B",
+        "Primary assigns: A gets serial #42, B gets serial #43",
+        "Primary tells all replicas: 'Apply #42 (HELLO), then #43 (WORLD)'",
+        "Result: File contains 'HELLOWORLD' on all replicas",
+        "If Primary had received B first: 'WORLDHELLO'",
+        "The order is consistent but arbitrary",
+        "This is why GFS is 'consistent' but not 'strongly consistent'"
+      ],
+      "insight": "The Primary doesn't resolve conflicts—it just enforces an order. Applications must handle the chaos."
+    },
+    {
+      "id": "drill-retry-nightmare",
+      "type": "create",
+      "prompt": "Secondary 1 crashes after writing but before ACKing. Client retries. What happened?",
+      "thoughtProcess": [
+        "First attempt: Data pushed to all, Primary commits",
+        "Secondary 1 writes data successfully... then crashes",
+        "Primary waits for ACK from S1, times out",
+        "Primary tells client: 'Write failed'",
+        "But S1 DID write the data before crashing!",
+        "Client retries: pushes same data, commits again",
+        "Now the data appears TWICE in the file",
+        "And that's just on the replicas that survived",
+        "S1 comes back up, sees different data than S2",
+        "This is the messy reality of distributed writes",
+        "Application must use unique IDs to deduplicate"
+      ],
+      "insight": "In distributed systems, partial failure creates duplicates. This isn't a bug—it's physics."
+    },
+    {
+      "id": "drill-pipeline-topology",
+      "type": "analyze",
+      "prompt": "GFS pipelines data along network topology (client→rack1→rack2→rack3). Why not broadcast to all at once?",
+      "thoughtProcess": [
+        "Broadcast seems faster: one send, three receives",
+        "But networks aren't magic: client has 1Gbps uplink",
+        "Sending to 3 servers = 3 copies over that 1Gbps link",
+        "Takes 3× longer than sending to one server",
+        "Pipeline is clever: client→server1 (1Gbps), server1→server2 (1Gbps in parallel)",
+        "Each link runs at full speed simultaneously",
+        "Total time: same as sending to one server!",
+        "Plus: rack-aware pipelines use fast intra-rack links",
+        "The data flows like a relay race, not a broadcast"
+      ],
+      "insight": "Network topology isn't just about distance—it's about bandwidth multiplication"
+    }
+  ],
+  "assessmentCheckpoints": [
+    {
+      "id": "understand-two-phases",
+      "competency": "I understand why data push and commit are separate phases",
+      "checkYourself": "Can you explain why combining them would create a bottleneck?",
+      "mastery": "You instinctively separate heavy data flows from lightweight control"
+    },
+    {
+      "id": "understand-primary-role",
+      "competency": "I see that the Primary enforces order, not correctness",
+      "checkYourself": "What happens when two writers race? Who decides what?",
+      "mastery": "You understand the difference between serialization and validation"
+    },
+    {
+      "id": "understand-retry-complexity",
+      "competency": "I know that retries create duplicates and inconsistencies",
+      "checkYourself": "Why can't GFS guarantee exactly-once semantics?",
+      "mastery": "You design applications that embrace at-least-once delivery"
+    },
+    {
+      "id": "see-the-tradeoffs",
+      "competency": "I see the trade-offs: speed and durability vs. clean semantics",
+      "checkYourself": "What does the application have to handle that GFS won't?",
+      "mastery": "You know that pushing complexity to applications is sometimes the right choice"
+    }
+  ],
+  "advancedConcepts": {
+    "replicationStrategies": {
+      "primaryBackup": "GFS model: primary orders, backups apply. Simple but primary is bottleneck",
+      "chainReplication": "CRAQ: writes to head, reads from tail. Strong consistency, better read scaling",
+      "quorumBased": "Cassandra: W+R>N for consistency. Tunable, no single primary",
+      "stateMAchine": "Raft/Paxos: replicated log with consensus. Complex but handles failures better"
+    },
+    "pipelineOptimizations": {
+      "tcpNodelay": "Disable Nagle's algorithm for low latency control messages",
+      "zeroC copy": "sendfile() system call avoids kernel-user space copies",
+      "rdma": "Remote Direct Memory Access bypasses CPU for data transfer",
+      "multipath": "Use multiple network paths for parallel pipeline branches"
+    },
+    "consistencyVariants": {
+      "linearWriteRead": "Write completes → immediately visible. GFS doesn't guarantee",
+      "monotonicWrites": "Same client's writes appear in order. GFS provides via primary",
+      "causalConsistency": "If write B depends on A, all see A before B. GFS doesn't track",
+      "boundedStaleness": "Read within T seconds of write. GFS unbounded staleness possible"
+    },
+    "failureHandling": {
+      "writeHoleProblem": "Failed replica creates hole. GFS allows, apps must handle",
+      "duplicateRecords": "Retry creates duplicates. Apps need idempotency",
+      "partialWrites": "Some replicas succeed, others fail. Inconsistent state",
+      "splitBrain": "Network partition during write. Lease prevents dual primaries"
+    },
+    "performanceModels": {
+      "pipelineThroughput": "T = min(client_bw, min(link_bw)) × pipeline_efficiency",
+      "commitLatency": "L = data_transfer + 2×RTT×replica_count + commit_processing",
+      "optimalPipeline": "Depth = bandwidth_delay_product / packet_size",
+      "contentionModel": "Throughput degrades as O(1/√n) with n concurrent writers"
+    },
+    "modernEvolutions": {
+      "raftReplication": "Replicated log with strong consistency. Used in etcd, CockroachDB",
+      "erasureCoding": "Reed-Solomon for cold data: (k,m) encoding, k+m fragments",
+      "nvmeOptimized": "Bypass kernel for NVMe: SPDK, io_uring for microsecond latency",
+      "disaggregatedStorage": "Separate compute and storage tiers, connected via high-speed network"
+    },
+    "theoreticalAnalysis": {
+      "capAnalysis": "GFS chooses AP: available during partitions, relaxed consistency",
+      "flpImpact": "No consensus on write order without primary (FLP impossibility)",
+      "vectorClocks": "Could provide causal ordering but overhead too high for GFS scale",
+      "byzantineFaults": "GFS assumes fail-stop. Byzantine requires 3f+1 replicas"
+    },
+    "applicationPatterns": {
+      "recordFraming": "Length prefix + checksum for atomic record detection",
+      "idempotentWrites": "Include unique ID, dedupe on read",
+      "shadowMaster": "Application-level write-ahead log for recovery",
+      "batchingWrites": "Aggregate small writes to amortize coordination overhead"
+    }
+  }
+}

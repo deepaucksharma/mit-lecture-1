@@ -1,0 +1,721 @@
+{
+  "specs": [
+    {
+      "specId": "00-legend",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 3,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "01-triangle",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 3,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "02-scale",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 3,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "03-chunk-size",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 3,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "04-architecture",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 3,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "05-planes",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 3,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "06-read-path",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 3,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "07-write-path",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 4,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "08-lease",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 4,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "09-consistency",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 4,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "10-recovery",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 4,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "11-evolution",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 4,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    },
+    {
+      "specId": "12-dna",
+      "tests": [
+        {
+          "name": "Crystallized Insight",
+          "found": true,
+          "hasContent": false,
+          "isVisible": true,
+          "content": "",
+          "passed": false
+        },
+        {
+          "name": "Prerequisites Panel",
+          "found": true,
+          "isVisible": false,
+          "hasContent": false,
+          "content": "",
+          "passed": true
+        },
+        {
+          "name": "Principles Tab",
+          "found": true,
+          "isActive": true,
+          "hasContent": false,
+          "hasFirstPrinciples": false,
+          "hasAdvanced": false,
+          "contentLength": 20,
+          "passed": false
+        },
+        {
+          "name": "Assessment Tab",
+          "found": true,
+          "isActive": false,
+          "hasContent": false,
+          "hasCheckpoints": false,
+          "checkpointCount": 0,
+          "contentLength": 32,
+          "passed": false
+        },
+        {
+          "name": "Drills Tab",
+          "found": true,
+          "isActive": false,
+          "drillCount": 4,
+          "hasContent": true,
+          "passed": true
+        },
+        {
+          "name": "Scenes System",
+          "found": false,
+          "passed": false
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "consoleErrors": [],
+  "jsErrors": []
+}

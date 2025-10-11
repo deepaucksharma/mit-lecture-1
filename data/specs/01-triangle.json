@@ -1,0 +1,256 @@
+{
+  "id": "01-triangle",
+  "title": "The Impossible Triangle",
+  "narrative": "You stand at the crossroads of distributed systems. Three paths beckon: blazing Performance, unwavering Reliability, perfect Consistency. Choose two—the third will haunt you. GFS chose wisely for its world: billions of bytes flowing like water need speed and survival, not perfect synchronization. This triangle is a simplified view of the CAP theorem (Brewer, 2000), which formally proves you cannot have Consistency, Availability, and Partition tolerance simultaneously.",
+  "crystallizedInsight": "You cannot escape trade-offs, only choose them wisely—CAP theorem makes this mathematical law",
+  "firstPrinciples": {
+    "theoreticalFoundation": "CAP Theorem (Gilbert & Lynch, 2002): Under network partitions (P), you must sacrifice either consistency (C—all nodes see same data) or availability (A—every request gets response). FLP Impossibility (1985) goes further: even without failures, consensus is impossible in asynchronous networks with one faulty process.",
+    "quantitativeAnalysis": "For N nodes with network reliability r, P(partition) = 1 - r^(N(N-1)/2). At N=1000, even 99.99% link reliability gives P(partition) ≈ 1. You WILL have partitions. The question is: when they happen, do you serve stale data (AP) or refuse service (CP)?",
+    "derivedFormula": "Consistency cost = O(N log N) messages for consensus. Availability cost = blocking during partitions. Performance cost = RTT × quorum size. Pick two to optimize.",
+    "pacelcExtension": "Even without partitions (Else case), you trade Latency vs Consistency. GFS chooses low latency (EL) over consistency (EC), allowing stale reads to avoid coordination overhead."
+  },
+  "layout": {
+    "type": "flow"
+  },
+  "nodes": [
+    {
+      "id": "P",
+      "type": "note",
+      "label": "Performance"
+    },
+    {
+      "id": "R",
+      "type": "note",
+      "label": "Reliability"
+    },
+    {
+      "id": "C",
+      "type": "note",
+      "label": "Consistency"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "P",
+      "to": "R",
+      "kind": "control",
+      "label": "Trade-off"
+    },
+    {
+      "id": "e2",
+      "from": "R",
+      "to": "C",
+      "kind": "control",
+      "label": "Trade-off"
+    },
+    {
+      "id": "e3",
+      "from": "C",
+      "to": "P",
+      "kind": "control",
+      "label": "Trade-off"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "the-triangle",
+      "name": "The Fundamental Triangle",
+      "overlays": [],
+      "narrative": "The eternal trade-off of distributed systems: Performance, Reliability, and Consistency. You can optimize for two, but must sacrifice the third"
+    },
+    {
+      "id": "gfs-tradeoff",
+      "name": "GFS's Strategic Choice",
+      "overlays": ["gfs-choice"],
+      "narrative": "GFS chose Performance and Reliability, accepting eventual consistency. This choice enables massive throughput while ensuring data durability"
+    },
+    {
+      "id": "database-tradeoff",
+      "name": "Traditional Database Approach",
+      "overlays": ["database-choice"],
+      "narrative": "Traditional databases choose Reliability and Consistency, sacrificing performance at scale. Perfect for financial transactions but struggles with big data"
+    },
+    {
+      "id": "cache-tradeoff",
+      "name": "High-Speed Cache Systems",
+      "overlays": ["cache-choice"],
+      "narrative": "Cache systems optimize for Performance and Consistency, accepting potential data loss. Ideal for hot data that can be regenerated"
+    }
+  ],
+  "overlays": [
+    {
+      "id": "gfs-choice",
+      "caption": "GFS's Bold Choice",
+      "diff": {
+        "highlight": {
+          "nodeIds": ["P", "R"],
+          "edgeIds": ["e1"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "choice-note",
+              "type": "note",
+              "label": "✓ Blazing throughput\\n✓ Never loses data\\n✗ May show stale reads"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "database-choice",
+      "caption": "Traditional Database Choice",
+      "diff": {
+        "highlight": {
+          "nodeIds": ["R", "C"],
+          "edgeIds": ["e2"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "db-note",
+              "type": "note",
+              "label": "✓ Always consistent\\n✓ Never loses data\\n✗ Slower at scale"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cache-choice",
+      "caption": "Cache System Choice",
+      "diff": {
+        "highlight": {
+          "nodeIds": ["P", "C"],
+          "edgeIds": ["e3"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "cache-note",
+              "type": "note",
+              "label": "✓ Lightning fast\\n✓ Always fresh\\n✗ May lose data on failure"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "contracts": {
+    "invariants": [
+      "At most 2 of 3 properties can be fully optimized",
+      "Every design choice involves trade-offs"
+    ],
+    "guarantees": [
+      "GFS prioritizes Performance and Reliability",
+      "Applications handle weak consistency"
+    ],
+    "caveats": [
+      "Consistency is relaxed for better performance",
+      "Applications must be designed for eventual consistency"
+    ]
+  },
+  "drills": [
+    {
+      "id": "drill-your-triangle",
+      "type": "analyze",
+      "prompt": "You're building a system for a hospital. Lives depend on it. Which two corners of the triangle do you choose?",
+      "thoughtProcess": [
+        "First instinct: Reliability and Consistency - can't lose patient data, can't show wrong data",
+        "But wait... if the system is too slow, doctors can't access critical info in emergencies",
+        "Maybe Reliability and Performance? Fast access to mostly-right data?",
+        "No, that could kill someone - wrong medication dosage",
+        "Final choice: Reliability and Consistency",
+        "Accept the performance cost - add more servers, optimize queries",
+        "Lives are worth more than milliseconds"
+      ],
+      "insight": "The 'right' choice depends entirely on what failure costs you"
+    },
+    {
+      "id": "drill-breaking-triangle",
+      "type": "create",
+      "prompt": "Someone claims they built a system with all three. Walk through their demo. Where's the hidden trade-off?",
+      "thoughtProcess": [
+        "They show blazing fast reads - check Performance ✓",
+        "They kill a server, system keeps running - check Reliability ✓",
+        "They show consistent reads across nodes - check Consistency ✓",
+        "Wait... look closer at their demo",
+        "The 'fast' reads are from a single region",
+        "The 'consistency' is only eventual - with a 5-second window",
+        "The 'reliability' assumes network partitions heal quickly",
+        "Aha! They're showing best-case scenarios",
+        "Under stress, one corner always crumbles"
+      ],
+      "insight": "Marketing slides can hide trade-offs. Reality cannot."
+    },
+    {
+      "id": "drill-evolution",
+      "type": "apply",
+      "prompt": "GFS starts serving video streaming. Millions watch the same viral video. Should they change their triangle choice?",
+      "scenario": "From serving batch analytics to real-time video streaming",
+      "thoughtProcess": [
+        "Video streaming has different needs than batch processing",
+        "Users expect instant playback - Performance is critical",
+        "A few corrupted frames? Annoying but not fatal - some Reliability is OK",
+        "Everyone seeing the same frame at the same time? Not required - Consistency can relax further",
+        "Actually... GFS's choice still works!",
+        "Performance + Reliability with weak Consistency fits perfectly",
+        "This is why GFS's descendants power YouTube"
+      ],
+      "insight": "Sometimes your trade-offs age like wine"
+    }
+  ],
+  "assessmentCheckpoints": [
+    {
+      "id": "recognize-tradeoffs",
+      "competency": "I can identify which corners of the triangle any system chose",
+      "checkYourself": "Look at any system you use daily. Can you spot its choice?",
+      "mastery": "You see trade-offs everywhere, not just in distributed systems"
+    },
+    {
+      "id": "justify-choices",
+      "competency": "I can explain why GFS chose Performance and Reliability",
+      "checkYourself": "Could you defend GFS's choice to a skeptical CTO?",
+      "mastery": "You understand that context determines the right trade-offs"
+    },
+    {
+      "id": "predict-consequences",
+      "competency": "I can predict what problems arise from each triangle configuration",
+      "checkYourself": "If a system chooses Consistency + Performance, what breaks first?",
+      "mastery": "You can architect systems by choosing failures you can live with"
+    }
+  ],
+  "advancedConcepts": {
+    "beyondCAP": {
+      "harvestYield": "Harvest (fraction of data available) × Yield (fraction of requests answered). Can trade partial results for availability.",
+      "crdts": "Conflict-free Replicated Data Types achieve eventual consistency without coordination—but only for specific operations (counters, sets).",
+      "causalConsistency": "Weaker than linearizability but stronger than eventual—preserves happens-before relationships. Achievable with vector clocks.",
+      "tunableConsistency": "Cassandra/DynamoDB let you choose per-operation: ONE (fast), QUORUM (balanced), ALL (consistent)"
+    },
+    "theoreticalLimits": {
+      "flpImpossibility": "In asynchronous networks, no algorithm can guarantee both safety and liveness for consensus—must sacrifice one",
+      "twoGeneralsParadox": "Perfect agreement requires infinite messages in unreliable networks—pragmatic systems use timeouts and retries",
+      "byzantineGenerals": "With malicious nodes, need 3f+1 total to tolerate f failures—why blockchain is expensive",
+      "universalScalabilityLaw": "Throughput = N / (1 + σ(N-1) + κN(N-1)/2), where σ=serialization, κ=crosstalk"
+    },
+    "modernSolutions": {
+      "hybridClocks": "Combine physical and logical time (HLC) for ordering without tight synchronization—used in CockroachDB",
+      "deterministicDatabases": "Calvin, FaunaDB: pre-assign transaction order, eliminate coordination during execution",
+      "localFirstArchitecture": "CRDTs + Merkle trees enable offline-first apps that sync when connected—no central coordination",
+      "multiVersionConcurrency": "MVCC allows consistent reads without blocking writes—readers see snapshot, writers create new versions"
+    },
+    "tradeoffEvolution": {
+      "strongEventualConsistency": "CRDTs guarantee convergence without coordination—but limited to commutative operations",
+      "boundedStaleness": "Azure Cosmos DB: guarantee staleness < K versions or T seconds—middle ground",
+      "externalizableConsistency": "Spanner: linearizable + external consistency via TrueTime—requires atomic clocks",
+      "adaptiveConsistency": "PBS (Probabilistically Bounded Staleness): predict consistency level based on network conditions"
+    },
+    "openResearch": [
+      "Can we build systems that automatically choose CAP tradeoffs based on workload?",
+      "How close can we get to CAP-optimal with machine learning for failure prediction?",
+      "Is there a universal consistency model that subsumes all others? (Hint: Regular sequential consistency)",
+      "Can quantum entanglement violate CAP? (Spoiler: No, information still travels at light speed)"
+    ]
+  }
+}

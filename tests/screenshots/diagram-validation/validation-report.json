@@ -1,0 +1,475 @@
+{
+  "total": 13,
+  "passed": 13,
+  "failed": 0,
+  "diagrams": {
+    "00-legend": {
+      "id": "00-legend",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "flowchart-v2",
+        "isSequenceDiagram": false,
+        "isFlowchart": true,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 370.71875,
+          "viewBox": "-8 -8 636.9609375 370.7239685058594"
+        },
+        "elementCounts": {
+          "nodes": 11,
+          "edges": 11,
+          "paths": 9,
+          "rects": 8,
+          "texts": 0
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"flowchart-v2\" role=\"img\" viewBox=\"-8 -8 636.9609375 370.7239685058594\" style=\"max-width: 636.9609375px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024735470-pnu3veerh\" aria-label=\"Master Legend &amp; System Contracts\"><desc>This diagram shows 5 compon"
+      }
+    },
+    "01-triangle": {
+      "id": "01-triangle",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "flowchart-v2",
+        "isSequenceDiagram": false,
+        "isFlowchart": true,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 288.96875,
+          "viewBox": "-8 -8 198.5 288.96875"
+        },
+        "elementCounts": {
+          "nodes": 7,
+          "edges": 11,
+          "paths": 7,
+          "rects": 6,
+          "texts": 0
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"flowchart-v2\" role=\"img\" viewBox=\"-8 -8 198.5 288.96875\" style=\"max-width: 198.5px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024737624-ktcqi4fa2\" aria-label=\"The Impossible Triangle\"><desc>This diagram shows 3 components connected by 3 relationships"
+      }
+    },
+    "02-scale": {
+      "id": "02-scale",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "sequence",
+        "isSequenceDiagram": true,
+        "isFlowchart": false,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 279,
+          "viewBox": "-50 -20 754.5 279"
+        },
+        "elementCounts": {
+          "nodes": 6,
+          "edges": 2,
+          "paths": 6,
+          "rects": 6,
+          "texts": 10
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"sequence\" role=\"img\" viewBox=\"-50 -20 754.5 279\" style=\"max-width: 754.5px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024739747-4ujbq45wy\" aria-label=\"Scale Reality Dashboard\"><desc>This diagram shows 3 components connected by 2 relationships. Compon"
+      }
+    },
+    "03-chunk-size": {
+      "id": "03-chunk-size",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "flowchart-v2",
+        "isSequenceDiagram": false,
+        "isFlowchart": true,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 363.9375,
+          "viewBox": "-8 -8 206.625 363.9384460449219"
+        },
+        "elementCounts": {
+          "nodes": 7,
+          "edges": 8,
+          "paths": 8,
+          "rects": 4,
+          "texts": 0
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"flowchart-v2\" role=\"img\" viewBox=\"-8 -8 206.625 363.9384460449219\" style=\"max-width: 206.625px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024741870-2lalekbjv\" aria-label=\"The 64MB Decision Tree\"><desc>This diagram shows 3 components connected by 2 re"
+      }
+    },
+    "04-architecture": {
+      "id": "04-architecture",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "flowchart-v2",
+        "isSequenceDiagram": false,
+        "isFlowchart": true,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 350.921875,
+          "viewBox": "-8 -8 640.671875 350.92620849609375"
+        },
+        "elementCounts": {
+          "nodes": 11,
+          "edges": 23,
+          "paths": 15,
+          "rects": 6,
+          "texts": 0
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"flowchart-v2\" role=\"img\" viewBox=\"-8 -8 640.671875 350.92620849609375\" style=\"max-width: 640.671875px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024744012-k6peulf1c\" aria-label=\"Complete Architecture\"><desc>This diagram shows 5 components connected b"
+      }
+    },
+    "05-planes": {
+      "id": "05-planes",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "sequence",
+        "isSequenceDiagram": true,
+        "isFlowchart": false,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 403.578125,
+          "viewBox": "-60 -20 1316 697"
+        },
+        "elementCounts": {
+          "nodes": 10,
+          "edges": 8,
+          "paths": 6,
+          "rects": 14,
+          "texts": 28
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"sequence\" role=\"img\" viewBox=\"-60 -20 1316 697\" style=\"max-width: 1316px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024746147-eb8645yjh\" aria-label=\"Control vs Data Plane\"><desc>This diagram shows 5 components connected by 8 relationships. Components"
+      }
+    },
+    "06-read-path": {
+      "id": "06-read-path",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "sequence",
+        "isSequenceDiagram": true,
+        "isFlowchart": false,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 313.15625,
+          "viewBox": "-50 -20 893 367"
+        },
+        "elementCounts": {
+          "nodes": 6,
+          "edges": 4,
+          "paths": 6,
+          "rects": 6,
+          "texts": 14
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"sequence\" role=\"img\" viewBox=\"-50 -20 893 367\" style=\"max-width: 893px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024748276-atrxy8t93\" aria-label=\"Read Path with Cache Lifecycle\"><desc>This diagram shows 3 components connected by 4 relationships. Com"
+      }
+    },
+    "07-write-path": {
+      "id": "07-write-path",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "sequence",
+        "isSequenceDiagram": true,
+        "isFlowchart": false,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 567.3125,
+          "viewBox": "-60 -20 1276 950"
+        },
+        "elementCounts": {
+          "nodes": 10,
+          "edges": 12,
+          "paths": 6,
+          "rects": 16,
+          "texts": 37
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"sequence\" role=\"img\" viewBox=\"-60 -20 1276 950\" style=\"max-width: 1276px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024750412-gaz9v6tql\" aria-label=\"Write Path Ballet\"><desc>This diagram shows 5 components connected by 12 relationships. Components in"
+      }
+    },
+    "08-lease": {
+      "id": "08-lease",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "stateDiagram",
+        "isSequenceDiagram": false,
+        "isFlowchart": false,
+        "isStateDiagram": true,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 711.796875,
+          "viewBox": "0 0 707.49609375 711.8125"
+        },
+        "elementCounts": {
+          "nodes": 6,
+          "edges": 9,
+          "paths": 10,
+          "rects": 15,
+          "texts": 0
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"stateDiagram\" role=\"img\" viewBox=\"0 0 707.49609375 711.8125\" style=\"max-width: 707.49609375px;\" class=\"statediagram\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024752551-b8ni96iu1\" aria-label=\"Lease State Machine\"><desc>This diagram shows 6 components "
+      }
+    },
+    "09-consistency": {
+      "id": "09-consistency",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "flowchart-v2",
+        "isSequenceDiagram": false,
+        "isFlowchart": true,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 202.421875,
+          "viewBox": "-8 -8 552.8359375 202.42633056640625"
+        },
+        "elementCounts": {
+          "nodes": 11,
+          "edges": 14,
+          "paths": 11,
+          "rects": 7,
+          "texts": 0
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"flowchart-v2\" role=\"img\" viewBox=\"-8 -8 552.8359375 202.42633056640625\" style=\"max-width: 552.8359375px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024754685-7qcrthhod\" aria-label=\"Consistency Reality\"><desc>This diagram shows 5 components connected b"
+      }
+    },
+    "10-recovery": {
+      "id": "10-recovery",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "flowchart-v2",
+        "isSequenceDiagram": false,
+        "isFlowchart": true,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 59.15625,
+          "viewBox": "-8 -7.999996185302734 1275.703125 99.05580139160156"
+        },
+        "elementCounts": {
+          "nodes": 11,
+          "edges": 11,
+          "paths": 9,
+          "rects": 8,
+          "texts": 0
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"flowchart-v2\" role=\"img\" viewBox=\"-8 -7.999996185302734 1275.703125 99.05580139160156\" style=\"max-width: 1275.703125px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024756825-ymphns3o5\" aria-label=\"Failure Recovery Matrix\"><desc>This diagram shows 5 com"
+      }
+    },
+    "11-evolution": {
+      "id": "11-evolution",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "flowchart-v2",
+        "isSequenceDiagram": false,
+        "isFlowchart": true,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 712.28125,
+          "viewBox": "-8 -8 151.953125 712.28125"
+        },
+        "elementCounts": {
+          "nodes": 9,
+          "edges": 11,
+          "paths": 7,
+          "rects": 8,
+          "texts": 0
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"flowchart-v2\" role=\"img\" viewBox=\"-8 -8 151.953125 712.28125\" style=\"max-width: 151.953125px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024758964-dox81nf3n\" aria-label=\"Single Master Evolution\"><desc>This diagram shows 4 components connected by 3 rel"
+      }
+    },
+    "12-dna": {
+      "id": "12-dna",
+      "passed": true,
+      "errors": [],
+      "warnings": [],
+      "details": {
+        "hasContainer": true,
+        "hasSvg": true,
+        "hasMermaid": false,
+        "hasMermaidError": false,
+        "errorText": null,
+        "containerHeight": 880,
+        "containerWidth": 812,
+        "diagramType": "flowchart-v2",
+        "isSequenceDiagram": false,
+        "isFlowchart": true,
+        "isStateDiagram": false,
+        "svgDimensions": {
+          "width": "100%",
+          "height": 317,
+          "viewBox": "-8 -8 848.1640625 352.8482971191406"
+        },
+        "elementCounts": {
+          "nodes": 15,
+          "edges": 20,
+          "paths": 14,
+          "rects": 10,
+          "texts": 0
+        },
+        "svgHasContent": true,
+        "hasVisualElements": true,
+        "isEmpty": false,
+        "containerClasses": "diagram-container",
+        "innerHTML": "<svg aria-roledescription=\"flowchart-v2\" role=\"img\" viewBox=\"-8 -8 848.1640625 352.8482971191406\" style=\"max-width: 848.1640625px;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" id=\"mermaid-1760024761097-6h5td30rm\" aria-label=\"GFS DNA in Modern Systems\"><desc>This diagram shows 7 components connec"
+      }
+    }
+  }
+}
