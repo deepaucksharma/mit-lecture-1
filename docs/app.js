@@ -194,6 +194,11 @@ if (typeof module !== 'undefined' && module.exports) {
   composeScene(spec, overlayIds = []) {
     // Deep clone the spec to avoid mutations
     const composed = this.deepClone(spec);
+
+    // Add defensive null checks for nodes and edges
+    if (!composed.nodes) composed.nodes = [];
+    if (!composed.edges) composed.edges = [];
+
     const nodeMap = new Map(composed.nodes.map(n => [n.id, n]));
     const edgeMap = new Map(composed.edges.map(e => [e.id, e]));
 
@@ -893,7 +898,31 @@ if (typeof module !== 'undefined' && module.exports) {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
     } catch (error) {
-      console.error('Failed to save progress:', error);
+      if (error.name === 'QuotaExceededError') {
+        // Try to clear old data and retry
+        console.warn('localStorage quota exceeded, clearing old progress data');
+        this.clearOldProgress();
+        try {
+          localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
+        } catch (retryError) {
+          console.error('Still cannot save progress after clearing:', retryError);
+          alert('Storage quota exceeded. Please clear browser data.');
+        }
+      } else {
+        console.error('Failed to save progress:', error);
+      }
+    }
+  }
+
+  clearOldProgress() {
+    // Remove oldest entries (keep only last 20 drills)
+    const entries = Object.entries(this.progress);
+    if (entries.length > 20) {
+      // Sort by timestamp and keep only recent ones
+      const sorted = entries.sort((a, b) =>
+        (b[1].timestamp || 0) - (a[1].timestamp || 0)
+      );
+      this.progress = Object.fromEntries(sorted.slice(0, 20));
     }
   }
 
@@ -938,6 +967,17 @@ class DrillSystem {
     this.progress = new ProgressTracker();
     this.currentDrill = null;
     this.currentDiagramId = null;
+  }
+
+  // Sanitize user input to prevent XSS
+  sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    return input
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+      .replace(/&(?!(lt|gt|quot|#039);)/g, '&amp;');
   }
 
   renderDrills(spec, containerId = 'drills-container') {
@@ -1257,7 +1297,10 @@ class DrillSystem {
   }
 
   checkApply(drillId) {
-    const solution = document.getElementById(`solution-${drillId}`).value;
+    const solutionEl = document.getElementById(`solution-${drillId}`);
+    if (!solutionEl) return;
+
+    const solution = this.sanitizeInput(solutionEl.value);
 
     if (!solution.trim()) {
       alert('Please enter your solution');
@@ -1275,9 +1318,15 @@ class DrillSystem {
   }
 
   checkAnalysis(drillId) {
-    const similarities = document.getElementById(`similarities-${drillId}`).value;
-    const differences = document.getElementById(`differences-${drillId}`).value;
-    const tradeoffs = document.getElementById(`tradeoffs-${drillId}`).value;
+    const simEl = document.getElementById(`similarities-${drillId}`);
+    const diffEl = document.getElementById(`differences-${drillId}`);
+    const tradeEl = document.getElementById(`tradeoffs-${drillId}`);
+
+    if (!simEl || !diffEl || !tradeEl) return;
+
+    const similarities = this.sanitizeInput(simEl.value);
+    const differences = this.sanitizeInput(diffEl.value);
+    const tradeoffs = this.sanitizeInput(tradeEl.value);
 
     if (!similarities.trim() || !differences.trim() || !tradeoffs.trim()) {
       alert('Please complete all three analysis sections');
@@ -2409,6 +2458,24 @@ if (typeof module !== 'undefined' && module.exports) {
     this.currentDiagramId = null;
     this.currentOverlays = new Set();
     this.manifest = null;
+
+    // Store event listeners for cleanup
+    this.eventListeners = [];
+  }
+
+  // Helper to add event listeners that can be cleaned up
+  addCleanableListener(element, event, handler) {
+    if (!element) return;
+    element.addEventListener(event, handler);
+    this.eventListeners.push({ element, event, handler });
+  }
+
+  // Clean up all event listeners
+  cleanupEventListeners() {
+    this.eventListeners.forEach(({ element, event, handler }) => {
+      element.removeEventListener(event, handler);
+    });
+    this.eventListeners = [];
   }
 
   async initialize() {
@@ -2492,6 +2559,9 @@ if (typeof module !== 'undefined' && module.exports) {
 
   async loadDiagram(diagramId) {
     try {
+      // Clean up previous diagram's event listeners
+      this.cleanupEventListeners();
+
       // Progress tracking removed
 
       // Show loading

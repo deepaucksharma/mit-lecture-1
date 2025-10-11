@@ -11,8 +11,8 @@
   --bg-secondary: #f9fafb;
   --bg-tertiary: #f3f4f6;
   --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
   --border-color: #e5e7eb;
   --accent-primary: #2b6cb0;
   --accent-secondary: #059669;
@@ -2291,11 +2291,29 @@ details[open] > summary .sub-accordion-icon {
   .sidebar,
   .sidebar-contracts {
     width: 100% !important;
-    max-height: 200px;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-left-condensed {
+    width: 100% !important;
+    height: auto;
+    max-height: 40vh;
+  }
+
+  .sidebar-right {
+    width: 100% !important;
+    max-height: 50vh;
   }
 
   .narrative-panel-horizontal {
-    max-height: 120px;
+    max-height: 150px;
+  }
+
+  .state-controls-floating {
+    width: 95%;
+    max-width: none;
+    bottom: var(--spacing-sm);
   }
 }
 

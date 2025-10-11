@@ -140,7 +140,10 @@ class StateManager {
    * Get current state
    */
   getCurrentState() {
-    return this.states[this.currentStateIndex];
+    if (this.currentStateIndex >= 0 && this.currentStateIndex < this.states.length) {
+      return this.states[this.currentStateIndex];
+    }
+    return null;
   }
 
   /**
@@ -154,8 +157,12 @@ class StateManager {
       this.customLayers.clear();
     }
 
-    // Apply state layers
-    this.customLayers = new Set(state.layers);
+    // Apply state layers with null check
+    if (state.layers) {
+      this.customLayers = new Set(state.layers);
+    } else {
+      this.customLayers = new Set();
+    }
 
     // Emit state change event
     this.emitStateChange(state);
@@ -202,6 +209,8 @@ class StateManager {
    * Jump to position on timeline (0-100)
    */
   jumpToPosition(position) {
+    if (this.states.length === 0) return;
+
     // Find closest state to this position
     let closestIndex = 0;
     let closestDistance = Math.abs(this.states[0].position - position);
@@ -214,8 +223,10 @@ class StateManager {
       }
     });
 
-    this.currentStateIndex = closestIndex;
-    this.applyState(this.states[closestIndex]);
+    if (closestIndex >= 0 && closestIndex < this.states.length) {
+      this.currentStateIndex = closestIndex;
+      this.applyState(this.states[closestIndex]);
+    }
   }
 
   /**
