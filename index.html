@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GFS Visual Learning System</title>
+  <meta name="description" content="Interactive visual learning system for understanding Google File System architecture">
+  <link rel="icon" type="image/svg+xml" href="favicon.ico">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Mermaid for diagram rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <!-- AJV for JSON Schema validation - Disabled: causes CommonJS conflicts in browser -->
+  <!-- Schema validation is optional and handled gracefully when unavailable -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/ajv@7.2.4/dist/ajv.min.js"></script> -->
+
+  <!-- Unified State Manager -->
+  <script src="state-manager.js"></script>
+</head>
+<body class="theme-light">
+  <!-- Loading Screen -->
+  <div id="loading" class="loading-screen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading GFS Learning System...</div>
+  </div>
+
+  <!-- Main Application -->
+  <div id="app" class="app app-no-header">
+    <!-- Condensed Left Sidebar -->
+    <aside class="sidebar sidebar-left-condensed">
+      <!-- Title Section -->
+      <div class="sidebar-title">
+        <h1>🎯 <span>GFS</span></h1>
+        <div class="sidebar-controls">
+          <button id="theme-toggle" class="mini-btn" title="Theme">🌙</button>
+          <button id="help-btn" class="mini-btn" title="Help">❓</button>
+        </div>
+      </div>
+
+      <!-- Current Diagram Info -->
+      <div class="current-info">
+        <span id="diagram-title" class="current-diagram"></span>
+      </div>
+
+      <!-- Navigation -->
+      <nav id="diagram-nav" class="diagram-nav-condensed">
+        <!-- Navigation will be populated here -->
+      </nav>
+
+    </aside>
+
+    <!-- Contracts Sidebar (floating to the right of navigation) -->
+    <aside class="sidebar sidebar-contracts">
+      <div class="contracts-panel panel">
+        <div class="panel-header">
+          <h3>📋 Contracts & Prerequisites</h3>
+        </div>
+        <div class="panel-content">
+          <!-- Contracts Section -->
+          <div id="contracts-panel">
+            <!-- Contracts will be populated here -->
+          </div>
+
+          <!-- Prerequisites Accordion -->
+          <details class="prerequisites-accordion" id="prerequisites-panel" style="display: none;">
+            <summary class="prerequisites-header">
+              <span class="accordion-icon">▶</span>
+              <span>📚 Prerequisites</span>
+            </summary>
+            <div id="prerequisites-content" class="prerequisites-content">
+              <!-- Prerequisites will be populated here -->
+            </div>
+          </details>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+
+      <!-- Center - Main Diagram Area -->
+      <main class="main-content">
+        <!-- Top Info Panels -->
+        <div class="top-panels">
+          <!-- Crystallized Insight -->
+          <div class="insight-panel">
+            <div class="insight-icon">💎</div>
+            <div id="crystallized-insight" class="insight-text">
+              <!-- Crystallized insight will be populated here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Narrative Panel - Horizontal above diagram -->
+        <div class="panel narrative-panel-horizontal">
+          <div class="panel-header">
+            <h3>📖 Narrative</h3>
+          </div>
+          <div id="narrative-panel" class="panel-content">
+            <!-- Narrative content will be populated here -->
+          </div>
+        </div>
+
+        <!-- Diagram Container -->
+        <div class="diagram-section">
+          <div id="diagram-container" class="diagram-container">
+            <!-- Mermaid diagram will render here -->
+          </div>
+
+          <!-- Unified State Controls -->
+          <div id="state-controls" class="state-controls-floating">
+            <!-- Unified timeline controls will be populated here -->
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Sidebar - Learning Tools -->
+      <aside class="sidebar sidebar-right">
+        <!-- Tab Navigation -->
+        <div class="sidebar-tabs">
+          <button class="tab-btn active" data-tab="principles">Principles</button>
+          <button class="tab-btn" data-tab="practice">Practice & Assessment</button>
+        </div>
+
+        <!-- First Principles Container (Default Active) -->
+        <section id="principles-container" class="tab-content principles-container active">
+          <!-- First principles and advanced concepts will be populated here -->
+        </section>
+
+        <!-- Combined Practice Container (Drills + Assessment) -->
+        <section id="practice-container" class="tab-content practice-container">
+          <!-- Assessment Accordion Section -->
+          <div class="accordion-section">
+            <details class="accordion-item assessment-accordion">
+              <summary class="accordion-header">
+                <span class="accordion-icon">▶</span>
+                <span class="accordion-title">📊 Assessment Checkpoints</span>
+                <span class="accordion-badge"></span>
+              </summary>
+              <div id="assessment-container" class="accordion-content assessment-content">
+                <!-- Assessment checkpoints will be populated here -->
+              </div>
+            </details>
+          </div>
+
+          <!-- Drills Accordion Section -->
+          <div class="accordion-section">
+            <details class="accordion-item drills-accordion">
+              <summary class="accordion-header">
+                <span class="accordion-icon">▶</span>
+                <span class="accordion-title">🎯 Practice Drills</span>
+                <span class="accordion-badge"></span>
+              </summary>
+              <div id="drills-container" class="accordion-content drills-content">
+                <!-- Drills will be populated here -->
+              </div>
+            </details>
+          </div>
+        </section>
+      </aside>
+  </div>
+
+  <!-- Application JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>

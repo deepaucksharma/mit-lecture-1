@@ -1,0 +1,324 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "title", "nodes", "edges", "contracts"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9]{2}-[a-z-]+$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "narrative": {
+      "type": "string",
+      "description": "Extended narrative explaining the concept with storytelling"
+    },
+    "crystallizedInsight": {
+      "type": "string",
+      "description": "One-line distillation of the key insight"
+    },
+    "prerequisites": {
+      "type": "object",
+      "description": "Prerequisites for understanding this spec",
+      "properties": {
+        "concepts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checkYourself": {
+          "type": "string"
+        }
+      }
+    },
+    "firstPrinciples": {
+      "type": "object",
+      "description": "Deep theoretical foundations and mathematical analysis",
+      "additionalProperties": true
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "label"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "enum": ["master", "chunkserver", "client", "rack", "switch", "note", "state"]
+          },
+          "label": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "ram": {
+                "type": "string"
+              },
+              "cpu": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "qps": {
+                "type": "string"
+              },
+              "chunks": {
+                "type": "integer"
+              },
+              "cacheSize": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to", "kind"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": ["control", "data", "cache", "heartbeat"]
+          },
+          "label": {
+            "type": "string"
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "size": {
+                "type": "string"
+              },
+              "latency": {
+                "type": "string"
+              },
+              "throughput": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": ["sequence", "flow", "state", "matrix", "timeline"]
+        },
+        "numbered": {
+          "type": "boolean"
+        }
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "overlays"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "overlays": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "narrative": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "overlays": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "caption", "diff"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "diff": {
+            "type": "object",
+            "properties": {
+              "add": {
+                "type": "object",
+                "properties": {
+                  "nodes": {
+                    "type": "array"
+                  },
+                  "edges": {
+                    "type": "array"
+                  }
+                }
+              },
+              "remove": {
+                "type": "object",
+                "properties": {
+                  "nodeIds": {
+                    "type": "array"
+                  },
+                  "edgeIds": {
+                    "type": "array"
+                  }
+                }
+              },
+              "highlight": {
+                "type": "object",
+                "properties": {
+                  "nodeIds": {
+                    "type": "array"
+                  },
+                  "edgeIds": {
+                    "type": "array"
+                  }
+                }
+              },
+              "modify": {
+                "type": "object",
+                "properties": {
+                  "nodes": {
+                    "type": "array"
+                  },
+                  "edges": {
+                    "type": "array"
+                  }
+                }
+              }
+            }
+          },
+          "contracts": {
+            "type": "object",
+            "properties": {
+              "modifies": {
+                "type": "array"
+              },
+              "preserves": {
+                "type": "array"
+              }
+            }
+          }
+        }
+      }
+    },
+    "contracts": {
+      "type": "object",
+      "required": ["invariants", "guarantees", "caveats"],
+      "properties": {
+        "invariants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "guarantees": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "caveats": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "drills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "prompt"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "enum": ["recall", "apply", "analyze", "create"]
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          },
+          "scenario": {
+            "type": "string"
+          },
+          "thoughtProcess": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Step-by-step thought process for working through the drill"
+          },
+          "insight": {
+            "type": "string",
+            "description": "Key insight from the drill"
+          },
+          "rubric": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "assessmentCheckpoints": {
+      "type": "array",
+      "description": "Learning assessment and mastery checkpoints",
+      "items": {
+        "type": "object",
+        "required": ["id", "competency", "checkYourself", "mastery"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "competency": {
+            "type": "string"
+          },
+          "checkYourself": {
+            "type": "string"
+          },
+          "mastery": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "advancedConcepts": {
+      "type": "object",
+      "description": "Advanced and alternative concepts beyond core foundations",
+      "additionalProperties": true
+    }
+  }
+}

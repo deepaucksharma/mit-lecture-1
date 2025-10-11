@@ -1,0 +1,339 @@
+{
+  "id": "08-lease",
+  "title": "Lease State Machine",
+  "prerequisites": {
+    "concepts": [
+      "Write path and Primary's role (Spec 07)",
+      "Why having multiple servers think they're Primary is catastrophic (Spec 07)",
+      "Network failures and partitions exist (Spec 02, 04)",
+      "Distributed coordination challenges"
+    ],
+    "checkYourself": "Do you understand what a 'Primary' is and why we need one? Can you explain what happens if two servers both think they're in charge of the same chunk?"
+  },
+  "narrative": "Time is a weapon against chaos. In a world where clocks lie and networks vanish, how do you prevent two servers from both believing they're in charge? You give one server temporary authority—60 seconds of absolute power. Then you take it back. This lease mechanism isn't just clever engineering. It's a peace treaty between distributed nodes, enforced by the relentless march of time.",
+  "crystallizedInsight": "Authority must expire. Time is the only arbiter that never lies—eventually.",
+  "layout": {
+    "type": "state"
+  },
+  "nodes": [
+    {
+      "id": "NoLease",
+      "type": "state",
+      "label": "No Lease",
+      "metadata": {
+        "description": "No primary assigned"
+      }
+    },
+    {
+      "id": "Granting",
+      "type": "state",
+      "label": "Granting Lease",
+      "metadata": {
+        "description": "Master granting lease"
+      }
+    },
+    {
+      "id": "Active",
+      "type": "state",
+      "label": "Lease Active",
+      "metadata": {
+        "description": "Primary has valid lease"
+      }
+    },
+    {
+      "id": "Expiring",
+      "type": "state",
+      "label": "Lease Expiring",
+      "metadata": {
+        "description": "Near expiration, renewing"
+      }
+    },
+    {
+      "id": "Expired",
+      "type": "state",
+      "label": "Lease Expired",
+      "metadata": {
+        "description": "Lease timed out"
+      }
+    },
+    {
+      "id": "Revoking",
+      "type": "state",
+      "label": "Revoking",
+      "metadata": {
+        "description": "Master revoking lease"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "grant",
+      "from": "NoLease",
+      "to": "Granting",
+      "label": "Client requests write"
+    },
+    {
+      "id": "granted",
+      "from": "Granting",
+      "to": "Active",
+      "label": "Lease granted (60s)"
+    },
+    {
+      "id": "renew-start",
+      "from": "Active",
+      "to": "Expiring",
+      "label": "50s elapsed"
+    },
+    {
+      "id": "renewed",
+      "from": "Expiring",
+      "to": "Active",
+      "label": "Extension granted"
+    },
+    {
+      "id": "timeout",
+      "from": "Expiring",
+      "to": "Expired",
+      "label": "No response (10s)"
+    },
+    {
+      "id": "expire",
+      "from": "Active",
+      "to": "Expired",
+      "label": "60s elapsed"
+    },
+    {
+      "id": "expired-done",
+      "from": "Expired",
+      "to": "NoLease",
+      "label": "Wait for safety"
+    },
+    {
+      "id": "revoke-start",
+      "from": "Active",
+      "to": "Revoking",
+      "label": "Master revokes"
+    },
+    {
+      "id": "revoked",
+      "from": "Revoking",
+      "to": "NoLease",
+      "label": "Revocation complete"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "normal-flow",
+      "title": "Normal Renewal",
+      "overlays": ["normal-renewal"]
+    },
+    {
+      "id": "network-partition",
+      "title": "Network Partition",
+      "overlays": ["partition-scenario"]
+    },
+    {
+      "id": "clock-drift",
+      "title": "Clock Drift Safety",
+      "overlays": ["clock-analysis"]
+    }
+  ],
+  "overlays": [
+    {
+      "id": "normal-renewal",
+      "caption": "The Happy Path—Renewal Before Expiry",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "renewal-note",
+              "type": "note",
+              "label": "At 50 seconds:\\n- Primary asks for extension\\n- Master grants 60 more seconds\\n- System hums along\\n- No one notices"
+            }
+          ]
+        },
+        "highlight": {
+          "edgeIds": ["renew-start", "renewed"]
+        }
+      }
+    },
+    {
+      "id": "partition-scenario",
+      "caption": "The Nightmare—Network Split",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "partition-note",
+              "type": "note",
+              "label": "Primary's view: 'Master ignores me!'\\nMaster's view: 'Primary is dead!'\\nTruth: Network cable cut\\n\\nLease expires. Primary MUST stop.\\nMaster waits 2×lease before new grant.\\nSplit-brain impossible."
+            }
+          ]
+        },
+        "highlight": {
+          "edgeIds": ["timeout", "expired-done"]
+        }
+      }
+    },
+    {
+      "id": "clock-analysis",
+      "caption": "Clock Drift—The Silent Killer",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "clock-note",
+              "type": "note",
+              "label": "Master's clock: 60.000s\\nPrimary's clock: 59.900s\\nDrift: 100ms over 60s\\n\\nSafety margin: 10 seconds\\nDrift margin: 100ms\\nTotal buffer: Plenty\\n\\nThis is why 60s, not 6s"
+            }
+          ]
+        },
+        "highlight": {
+          "nodeIds": ["Active"]
+        }
+      }
+    },
+    {
+      "id": "revocation-emergency",
+      "caption": "Emergency Revocation",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "revoke-note",
+              "type": "note",
+              "label": "Master needs to move chunk\\nCan't wait 60 seconds\\nSends revocation message\\nPrimary surrenders immediately\\nOr Master waits for expiration"
+            }
+          ]
+        },
+        "highlight": {
+          "edgeIds": ["revoke-start", "revoked"]
+        }
+      }
+    }
+  ],
+  "contracts": {
+    "invariants": [
+      "At most one primary per chunk at any time",
+      "Lease duration > 2 × max clock drift",
+      "Grace period after expiration before new grant"
+    ],
+    "guarantees": [
+      "No split-brain possible",
+      "Primary authority is time-bounded",
+      "Clean handoff on planned transitions"
+    ],
+    "caveats": [
+      "Network delays can cause lease loss",
+      "Clock skew affects safety margins",
+      "In-flight operations during transition"
+    ]
+  },
+  "drills": [
+    {
+      "id": "drill-why-time",
+      "type": "analyze",
+      "prompt": "Why use time-based leases instead of explicit 'I quit' messages from the Primary?",
+      "thoughtProcess": [
+        "Explicit messages sound cleaner: Primary says 'I'm done', Master appoints new one",
+        "But what if the Primary crashes? No goodbye message.",
+        "What if network partitions? Message never arrives.",
+        "Master waits forever for a message that will never come",
+        "Time-based leases handle the worst case: silence",
+        "Silence means expired, not 'waiting for confirmation'",
+        "60 seconds pass, old Primary's authority MUST end",
+        "Even if Primary doesn't know, even if network is dead",
+        "Time is the ultimate timeout"
+      ],
+      "insight": "In distributed systems, you can't rely on hearing 'no'. Silence must have a meaning."
+    },
+    {
+      "id": "drill-60-seconds",
+      "type": "apply",
+      "prompt": "Walk through the math: Why exactly 60 seconds? Why not 10 or 600?",
+      "scenario": "Typical server clock drift: 100ms/min, Network RTT: 1-5ms, Heartbeat interval: 10s",
+      "thoughtProcess": [
+        "Too short (10s): Constant renewal chatter, minor hiccups cause failures",
+        "- Clock drift over 10s: 16ms",
+        "- Heartbeat might miss one interval: 10s wait",
+        "- Barely any safety margin",
+        "Too long (600s): Primary keeps authority for 10 minutes during failures",
+        "- Failed Primary blocks writes for 10 minutes",
+        "- Users notice. Tickets get filed. People get paged.",
+        "Just right (60s):",
+        "- Clock drift over 60s: 100ms (0.16% error)",
+        "- Renewal at 50s gives 10s buffer",
+        "- If Primary dies, 60s until recovery starts",
+        "- 1 minute is long enough to ignore blips, short enough to recover from crashes"
+      ],
+      "insight": "The right timeout balances false positives (noise) against false negatives (outages)"
+    },
+    {
+      "id": "drill-split-brain",
+      "type": "create",
+      "prompt": "You're the old Primary, partitioned from the Master. Your lease expires. A client asks you to write. What do you do?",
+      "thoughtProcess": [
+        "You haven't heard from Master in 60 seconds",
+        "Your local clock says: lease expired",
+        "But wait... what if my clock is slow?",
+        "Or what if the network just healed and I'm about to reconnect?",
+        "The temptation: 'Just this one write, what could go wrong?'",
+        "NO. The lease is expired. You are no longer Primary.",
+        "You MUST reject the write.",
+        "Tell the client: 'I'm not Primary anymore. Ask the Master.'",
+        "Even if you're wrong, even if it seems wasteful",
+        "Because the alternative is two Primaries, writing different data",
+        "That way lies madness and data corruption"
+      ],
+      "insight": "When your authority expires, surrender it. Pride kills distributed systems."
+    },
+    {
+      "id": "drill-clock-skew-attack",
+      "type": "analyze",
+      "prompt": "An attacker can skew the Primary's clock. How much skew is needed to cause split-brain?",
+      "thoughtProcess": [
+        "Master grants lease: timestamp T",
+        "Master's view: expires at T+60s",
+        "Normal Primary's view: expires at T+60s (roughly)",
+        "Attacker speeds up Primary's clock by 10 minutes",
+        "Primary's view: 'Only 5 seconds have passed'",
+        "Master's view: '60 seconds passed, lease expired'",
+        "Master grants new lease to different server",
+        "Now TWO servers think they're Primary!",
+        "But wait... GFS has a grace period",
+        "Master waits 2×lease (120s) before granting new lease",
+        "So attacker needs to slow clock by... impossible",
+        "Actually: speeding up Primary's clock makes it expire FASTER",
+        "Slowing it down... Primary holds on longer, but eventually its lease expires",
+        "The vulnerability: if attacker controls BOTH Master and Primary clocks"
+      ],
+      "insight": "Time-based coordination assumes bounded clock drift. Break that assumption, break the system."
+    }
+  ],
+  "assessmentCheckpoints": [
+    {
+      "id": "understand-lease-purpose",
+      "competency": "I understand that leases prevent split-brain scenarios",
+      "checkYourself": "Can you explain what happens if two servers think they're Primary?",
+      "mastery": "You see leases as a coordination mechanism, not just a performance optimization"
+    },
+    {
+      "id": "understand-time-based-safety",
+      "competency": "I know why time-based expiration is more robust than explicit revocation",
+      "checkYourself": "What if the network fails during revocation?",
+      "mastery": "You design systems that work even when communication fails"
+    },
+    {
+      "id": "understand-clock-assumptions",
+      "competency": "I see how clock drift affects lease safety",
+      "checkYourself": "How much drift can the system tolerate?",
+      "mastery": "You account for clock skew in every distributed protocol"
+    },
+    {
+      "id": "understand-grace-periods",
+      "competency": "I know why the Master waits after lease expiry before granting new leases",
+      "checkYourself": "Why not grant immediately at expiration?",
+      "mastery": "You build safety margins into coordination protocols"
+    }
+  ]
+}

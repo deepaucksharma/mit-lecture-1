@@ -1,0 +1,512 @@
+{
+  "id": "10-recovery",
+  "title": "Failure Recovery Matrix",
+  "prerequisites": {
+    "concepts": [
+      "Scale means constant failure (Spec 02)",
+      "Replication provides fault tolerance (Spec 03, 04)",
+      "Lease mechanism and timeouts (Spec 08)",
+      "Master vs chunkserver roles (Spec 00, 04)",
+      "Network partitions and detection (Spec 08)",
+      "Consistency trade-offs (Spec 09)"
+    ],
+    "checkYourself": "Do you understand why failure is normal at scale? Can you explain how replication helps with failures? Do you know what a lease timeout means?"
+  },
+  "narrative": "Failure is not an edge case—it's the steady state. In a cluster of 10,000 machines, something is always dying. Disks fail. Networks partition. Processes crash. Lightning strikes data centers. GFS doesn't prevent failure. It dances with it. Each failure type has its own rhythm: detection time, recovery path, blast radius. Learn the patterns. Embrace the chaos. Build systems that heal themselves.",
+  "crystallizedInsight": "Design for failure as the default, not the exception. Recovery is not a feature—it's the architecture.",
+  "firstPrinciples": {
+    "failureModeling": {
+      "failStop": "Process stops cleanly, doesn't send incorrect messages. GFS assumption",
+      "byzantine": "Arbitrary failures including malicious behavior. GFS doesn't handle",
+      "crashRecovery": "Process crashes but can restart with persistent state. Master uses this",
+      "networkPartition": "Nodes operational but can't communicate. Lease mechanism handles"
+    },
+    "reliabilityMathematics": {
+      "mtbf": "Mean Time Between Failures: disk ~3 years, server ~2 years, rack switch ~5 years",
+      "mttr": "Mean Time To Recovery: detection_time + diagnosis_time + repair_time",
+      "availability": "A = MTBF / (MTBF + MTTR). GFS target: 99.9% for reads",
+      "durabilityFormula": "P(data_loss) = P(all_replicas_fail_in_recovery_window)^chunks"
+    },
+    "markovChainAnalysis": {
+      "states": "{Healthy, Degraded, Failed, Recovering}",
+      "transitionRates": "λ_fail = 1/MTBF, μ_repair = 1/MTTR",
+      "steadyState": "π = solve(πQ = 0) where Q is transition rate matrix",
+      "availability": "A = π_healthy + π_degraded (operational states)"
+    },
+    "recoveryStrategies": {
+      "reactive": "Wait for failure, then recover. Simple but has downtime",
+      "proactive": "Predict failures, migrate early. Complex but reduces impact",
+      "checkpointing": "Periodic state saves. Master uses operation log + checkpoints",
+      "replication": "Multiple copies. Primary strategy for chunkservers"
+    }
+  },
+  "layout": {
+    "type": "matrix"
+  },
+  "nodes": [
+    {
+      "id": "CS-Crash",
+      "type": "chunkserver",
+      "label": "Chunkserver Crash"
+    },
+    {
+      "id": "M-Crash",
+      "type": "master",
+      "label": "Master Crash"
+    },
+    {
+      "id": "Net-Part",
+      "type": "note",
+      "label": "Network Partition"
+    },
+    {
+      "id": "Corrupt",
+      "type": "note",
+      "label": "Data Corruption"
+    },
+    {
+      "id": "Rack-Fail",
+      "type": "note",
+      "label": "Rack Failure"
+    }
+  ],
+  "edges": [
+    {
+      "id": "cs-detect",
+      "from": "CS-Crash",
+      "to": "CS-Crash",
+      "kind": "heartbeat",
+      "label": "Detect: 10s",
+      "metrics": {
+        "latency": "10s heartbeat"
+      }
+    },
+    {
+      "id": "m-detect",
+      "from": "M-Crash",
+      "to": "M-Crash",
+      "kind": "control",
+      "label": "Detect: Immediate",
+      "metrics": {
+        "latency": "< 1s"
+      }
+    },
+    {
+      "id": "net-detect",
+      "from": "Net-Part",
+      "to": "Net-Part",
+      "kind": "heartbeat",
+      "label": "Detect: 10-60s",
+      "metrics": {
+        "latency": "10-60s"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "failure-types",
+      "title": "Failure Types",
+      "overlays": []
+    },
+    {
+      "id": "recovery-times",
+      "title": "Recovery Times",
+      "overlays": ["recovery-metrics"]
+    },
+    {
+      "id": "alert-levels",
+      "title": "Alert Priority",
+      "overlays": ["alerts"]
+    }
+  ],
+  "overlays": [
+    {
+      "id": "recovery-metrics",
+      "caption": "The Failure Spectrum",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "metrics-detail",
+              "type": "note",
+              "label": "Chunkserver: Boring\\nMaster: Terrifying\\nNetwork: Ambiguous\\nCorruption: Insidious\\nRack: Expensive"
+            }
+          ]
+        },
+        "modify": {
+          "nodes": [
+            {
+              "id": "CS-Crash",
+              "label": "Chunkserver Crash\\n\\nDetect: 10s (missed heartbeats)\\nRecover: Auto, 10min\\nData Loss: None (3 replicas)\\nImpact: None\\n\\nThis happens daily. Nobody notices."
+            },
+            {
+              "id": "M-Crash",
+              "label": "Master Crash\\n\\nDetect: < 1s (monitoring)\\nRecover: 30-120s (from checkpoint)\\nData Loss: None (operation log)\\nImpact: FULL OUTAGE\\n\\nThis is the nightmare scenario."
+            },
+            {
+              "id": "Net-Part",
+              "label": "Network Partition\\n\\nDetect: 10-60s (depends on lease)\\nRecover: Auto (when network heals)\\nData Loss: Possible\\nImpact: Partial degradation\\n\\nThe ambiguous failure."
+            },
+            {
+              "id": "Corrupt",
+              "label": "Data Corruption\\n\\nDetect: On read (checksum fail)\\nRecover: Re-replicate from good copy\\nData Loss: None (checksums catch it)\\nImpact: None\\n\\nSilent data corruption caught."
+            },
+            {
+              "id": "Rack-Fail",
+              "label": "Rack Failure\\n\\nDetect: 10s (all servers)\\nRecover: 10-30min (re-replicate)\\nData Loss: None (cross-rack replicas)\\nImpact: Degraded performance\\n\\nThis is why we replicate across racks."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "alerts",
+      "caption": "Alert Strategy—What Deserves a Page?",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "alert-philosophy",
+              "type": "note",
+              "label": "CRITICAL: Page immediately\\nWARNING: Monitor closely\\nINFO: Log and track\\n\\nDon't page for auto-healing failures"
+            }
+          ]
+        },
+        "highlight": {
+          "nodeIds": ["M-Crash"]
+        },
+        "modify": {
+          "nodes": [
+            {
+              "id": "M-Crash",
+              "label": "Master Crash\\n\\nALERT: CRITICAL\\n🚨 Page on-call immediately\\n📞 Wake people up\\n⏱️ SLA: < 2min response\\n\\nEverything stops without Master"
+            },
+            {
+              "id": "CS-Crash",
+              "label": "Chunkserver Crash\\n\\nALERT: INFO\\n📝 Log it\\n📊 Dashboard shows it\\n🤖 Auto-recovery handles it\\n\\nNo human intervention needed"
+            },
+            {
+              "id": "Net-Part",
+              "label": "Network Partition\\n\\nALERT: WARNING\\n👀 Watch dashboards\\n🔍 May need investigation\\n⏳ Wait before acting\\n\\nOften resolves itself"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "durability-calculation",
+      "caption": "The Math of Durability",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "math-note",
+              "type": "note",
+              "label": "3 replicas across racks\\n0.1% daily failure rate per server\\n10min recovery time\\n\\nP(lose all 3 in 10min window):\\n= (0.001 × 10/1440)³\\n= 3.4 × 10⁻¹³\\n\\n= Essentially never\\n\\nThis is why replication works"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "contracts": {
+    "invariants": [
+      "Data durability maintained (3 replicas)",
+      "Master state persisted to disk",
+      "Recovery preserves consistency"
+    ],
+    "guarantees": [
+      "No data loss for committed writes",
+      "Automatic recovery for most failures",
+      "Manual intervention only for catastrophic failures"
+    ],
+    "caveats": [
+      "Master failure causes full outage",
+      "Recovery time varies by failure type",
+      "Some failures need human intervention"
+    ]
+  },
+  "drills": [
+    {
+      "id": "drill-why-boring",
+      "type": "analyze",
+      "prompt": "Why is chunkserver failure 'boring' but Master failure 'terrifying'? Both are single machines dying.",
+      "thoughtProcess": [
+        "Same event—one server crashes—but vastly different outcomes",
+        "Chunkserver dies:",
+        "- Data exists on 2 other servers",
+        "- Clients just read from different replica",
+        "- Master schedules re-replication in background",
+        "- 10 minutes later, back to 3 replicas",
+        "- No one noticed anything",
+        "Master dies:",
+        "- Nobody knows where anything is",
+        "- No new operations can start",
+        "- Existing data transfers continue (separation!)",
+        "- But new reads? Blocked. Writes? Blocked.",
+        "- Humans get paged. Tickets filed. Dashboards red.",
+        "The difference: Chunkservers are replaceable. Master is unique.",
+        "This is the price of the single-master design"
+      ],
+      "insight": "Replicated components fail gracefully. Unique components fail catastrophically."
+    },
+    {
+      "id": "drill-network-ambiguity",
+      "type": "apply",
+      "prompt": "A chunkserver stops sending heartbeats. Is it dead, or is the network partitioned? How do you decide?",
+      "scenario": "Chunkserver CS7 hasn't sent heartbeat in 15 seconds",
+      "thoughtProcess": [
+        "Master's view: 'CS7 is silent. Assume dead? Or wait?'",
+        "Option 1: Declare it dead immediately",
+        "- Risk: It's just a network blip, CS7 is fine",
+        "- Cost: Start unnecessary re-replication, waste resources",
+        "Option 2: Wait indefinitely",
+        "- Risk: It really is dead",
+        "- Cost: Running with under-replicated chunks for too long",
+        "GFS's choice: Wait for lease expiration (60s)",
+        "- If CS7 was Primary, lease expires, new Primary chosen",
+        "- If CS7 was just a replica, wait a bit longer",
+        "- After 60s of silence: presumed dead, start recovery",
+        "But here's the twist: You never really know",
+        "CS7 might come back 61 seconds later, perfectly fine",
+        "This is the fundamental ambiguity of distributed systems"
+      ],
+      "insight": "In distributed systems, you can't distinguish between a slow node and a dead node. You can only choose a timeout."
+    },
+    {
+      "id": "drill-corruption-philosophy",
+      "type": "create",
+      "prompt": "Design a monitoring dashboard for GFS. What are the 5 most important metrics? Why?",
+      "thoughtProcess": [
+        "Metric 1: Master availability (% uptime)",
+        "- Why: Single point of failure, this is existential",
+        "- Alert: Page if down for > 1 minute",
+        "Metric 2: Chunks with < 3 replicas (count)",
+        "- Why: Under-replicated chunks are at risk",
+        "- Alert: Page if count > 1000 or increasing rapidly",
+        "Metric 3: Chunkserver disk space (% full, per server)",
+        "- Why: Full disks can't accept new chunks",
+        "- Alert: Warning at 80%, critical at 90%",
+        "Metric 4: Write operation success rate (%)",
+        "- Why: Directly measures user experience",
+        "- Alert: Page if < 99.9%",
+        "Metric 5: Master operation latency (p99)",
+        "- Why: Slow Master means slow everything",
+        "- Alert: Warning if p99 > 100ms",
+        "What's NOT on this list: Individual chunkserver health",
+        "Why: That's noise, auto-healing handles it"
+      ],
+      "insight": "Monitor what threatens the system, not what the system can fix itself"
+    },
+    {
+      "id": "drill-rack-failure-scenario",
+      "type": "analyze",
+      "prompt": "Lightning strikes a data center. An entire rack of 40 chunkservers goes offline. Walk through the next hour.",
+      "thoughtProcess": [
+        "T+0s: Lightning strikes, power lost, 40 servers die",
+        "T+10s: Master notices: 'All heartbeats from rack 3 stopped'",
+        "T+15s: Master checks: 'Which chunks were ONLY on rack 3?'",
+        "- If any chunk had all 3 replicas on rack 3: DATA LOST (bad placement)",
+        "- If replicas spread across racks: DATA SAFE",
+        "T+60s: All leases for primaries on rack 3 expire",
+        "T+61s: Master appoints new primaries from other racks",
+        "T+5min: Master starts re-replication for under-replicated chunks",
+        "T+10min: Tens of terabytes copying across network",
+        "T+30min: Most chunks back to 3 replicas",
+        "T+60min: System fully recovered",
+        "Meanwhile: Clients keep reading/writing (slower, but alive)",
+        "Key insight: Cross-rack replication prevents total loss",
+        "This is why placement matters"
+      ],
+      "insight": "Correlated failures are the real threat. Replication must account for failure domains."
+    }
+  ],
+  "assessmentCheckpoints": [
+    {
+      "id": "understand-failure-types",
+      "competency": "I can categorize failures by their blast radius and recovery path",
+      "checkYourself": "For each failure type, do you know: detection time, recovery mechanism, impact?",
+      "mastery": "You design systems with failure modes as first-class concerns"
+    },
+    {
+      "id": "understand-replication-purpose",
+      "competency": "I see that replication is about fault tolerance, not performance",
+      "checkYourself": "Why 3 replicas? Why not 2 or 10?",
+      "mastery": "You can calculate durability and availability from replication strategies"
+    },
+    {
+      "id": "understand-single-points",
+      "competency": "I know that the Master is a single point of failure and understand the trade-offs",
+      "checkYourself": "What would it take to eliminate the Master as a SPOF? What would it cost?",
+      "mastery": "You consciously choose when centralization is worth the risk"
+    },
+    {
+      "id": "understand-failure-domains",
+      "competency": "I understand correlated failures and failure domains (rack, datacenter, region)",
+      "checkYourself": "How does replica placement affect durability?",
+      "mastery": "You automatically consider failure correlation in system design"
+    }
+  ],
+  "advancedConcepts": {
+    "failureDetection": {
+      "heartbeatMechanisms": {
+        "pushBased": "Nodes send periodic 'I'm alive' messages. GFS uses this",
+        "pullBased": "Master polls nodes. Higher overhead but deterministic",
+        "gossipBased": "Nodes share health info. Scales better, eventual detection",
+        "quorumBased": "Multiple observers must agree node is dead"
+      },
+      "phiAccrualFailureDetector": {
+        "principle": "Compute probability of failure, not binary dead/alive",
+        "formula": "φ(t) = -log₁₀(P(t_heartbeat > t))",
+        "threshold": "φ > 8 means < 10⁻⁸ chance node is alive",
+        "advantage": "Adapts to network conditions automatically"
+      },
+      "swimProtocol": {
+        "mechanism": "Scalable Weakly-consistent Infection-style Membership",
+        "detection": "Ping, then ask k random nodes to ping if no response",
+        "dissemination": "Piggyback membership changes on other messages",
+        "scalability": "O(1) detection load per node regardless of cluster size"
+      }
+    },
+    "recoveryPatterns": {
+      "bulkheadPattern": {
+        "principle": "Isolate failures to prevent cascade",
+        "implementation": "Separate thread pools, connection pools per service",
+        "gfsExample": "Master operations isolated from chunkserver operations"
+      },
+      "circuitBreakerPattern": {
+        "states": "Closed (normal) → Open (failing) → Half-open (testing)",
+        "trigger": "Open circuit after N failures in time window",
+        "recovery": "Periodically test with single request",
+        "benefit": "Fast-fail prevents resource exhaustion"
+      },
+      "retryStrategies": {
+        "exponentialBackoff": "delay = base × 2^attempt + jitter",
+        "adaptiveRetry": "Adjust retry rate based on success rate",
+        "budgetedRetry": "Limit total retry attempts across all operations",
+        "hedgedRequests": "Send backup request if primary slow"
+      },
+      "checkpointRecovery": {
+        "writeAheadLog": "Log operations before applying. Master uses this",
+        "snapshotting": "Periodic full state capture + incremental logs",
+        "copyOnWrite": "Snapshot without stopping operations",
+        "distributedSnapshot": "Chandy-Lamport algorithm for consistent global state"
+      }
+    },
+    "replicationStrategies": {
+      "staticReplication": {
+        "fixed": "Always N replicas. GFS default = 3",
+        "placement": "Rack-aware, datacenter-aware placement",
+        "tradeoff": "Simple but may over/under-replicate"
+      },
+      "dynamicReplication": {
+        "hotData": "More replicas for frequently accessed chunks",
+        "coldData": "Fewer replicas or erasure coding",
+        "adaptive": "Adjust based on access patterns and failure rates"
+      },
+      "erasureCoding": {
+        "reedSolomon": "(k,m) encoding: k data blocks, m parity blocks",
+        "storageEfficiency": "1.5x overhead vs 3x for replication",
+        "recoveryComplexity": "Reconstruction needs k of k+m blocks",
+        "useCase": "Cold data, archival storage"
+      },
+      "georeplication": {
+        "synchronous": "Write to all regions before acknowledging",
+        "asynchronous": "Write locally, replicate to other regions later",
+        "conflict": "Vector clocks, CRDTs, or last-writer-wins"
+      }
+    },
+    "cascadingFailures": {
+      "causes": {
+        "retryStorms": "Failed requests retry, overwhelming system",
+        "resourceExhaustion": "Memory/CPU/connections depleted",
+        "deadlocks": "Circular dependencies in recovery",
+        "positiveFeedback": "Load increases failure rate increases load"
+      },
+      "mitigation": {
+        "loadShedding": "Drop requests when overloaded",
+        "prioritization": "Critical operations first",
+        "backpressure": "Signal upstream to slow down",
+        "jitter": "Randomize timing to prevent synchronization"
+      },
+      "analysis": {
+        "contagionModel": "P(cascade) = 1 - ∏(1 - p_i) for failure probabilities p_i",
+        "percolationTheory": "Critical threshold where local failures become global",
+        "meanFieldApproximation": "Average behavior of large system"
+      }
+    },
+    "proactiveRecovery": {
+      "failurePrediction": {
+        "diskSmartData": "Temperature, bad sectors, spin retries",
+        "machineMetrics": "Memory errors, CPU throttling, network drops",
+        "mlModels": "Random forest, LSTM for failure prediction",
+        "accuracy": "~80% detection rate with 1 week advance warning"
+      },
+      "liveMigration": {
+        "vmMigration": "Move running VMs before host maintenance",
+        "storMigration": "Copy data to new disk before old fails",
+        "zeroDowntime": "Seamless transition for applications",
+        "bandwidth": "Limit migration traffic to avoid impact"
+      },
+      "rejuvenation": {
+        "rollingRestart": "Periodically restart services to clear state",
+        "memoryReset": "Restart before memory leaks cause issues",
+        "schedule": "During low-traffic periods",
+        "benefit": "Prevents accumulation of subtle issues"
+      }
+    },
+    "disasterRecovery": {
+      "rpo": "Recovery Point Objective: max acceptable data loss. GFS ≈ 0",
+      "rto": "Recovery Time Objective: max downtime. GFS ≈ minutes for Master",
+      "drStrategies": {
+        "hotStandby": "Shadow master ready to take over immediately",
+        "warmStandby": "Backup master needs startup but has recent state",
+        "coldStandby": "Backup exists but needs full restoration",
+        "pilotLight": "Minimal infrastructure ready to scale up"
+      },
+      "testingApproaches": {
+        "chaosEngineering": "Netflix's Chaos Monkey: random failures in production",
+        "gameDay": "Planned failure exercises",
+        "disasterRecoveryDrills": "Full datacenter failover tests",
+        "faultInjection": "Systematic failure testing in staging"
+      }
+    },
+    "theoreticalFoundations": {
+      "renewalTheory": {
+        "renewalProcess": "System alternates between up and down states",
+        "renewalFunction": "Expected number of failures by time t",
+        "limitTheorem": "Long-term failure rate converges to 1/MTBF"
+      },
+      "queueingForRecovery": {
+        "repairQueue": "Failed components queue for repair resources",
+        "m/m/c": "c repair workers, exponential service time",
+        "utilization": "ρ = λ/(cμ) must be < 1 for stability"
+      },
+      "reliabilityEngineering": {
+        "bathtubCurve": "Early failures → constant rate → wear-out",
+        "weibullDistribution": "Flexible failure time distribution",
+        "redundancyCalculus": "Series: R = ∏R_i, Parallel: R = 1-∏(1-R_i)"
+      }
+    },
+    "modernEvolutions": {
+      "sre": {
+        "errorBudgets": "Acceptable failure rate, spend on features vs reliability",
+        "slos": "Service Level Objectives: measurable reliability targets",
+        "toil": "Automate manual recovery tasks",
+        "blamelessPostmortems": "Learn from failures without blame"
+      },
+      "observability": {
+        "distributedTracing": "Track requests across services (Jaeger, Zipkin)",
+        "metrics": "Time series data (Prometheus, DataDog)",
+        "logging": "Structured logs (ELK stack, Splunk)",
+        "serviceMesh": "Automatic observability (Istio, Linkerd)"
+      },
+      "automatedRecovery": {
+        "kubernetesOperators": "Custom controllers for app-specific recovery",
+        "selfHealingSystems": "Automatic diagnosis and repair",
+        "aiOps": "ML-driven incident response",
+        "intentBasedNetworking": "Declare desired state, system maintains it"
+      }
+    }
+  }
+}

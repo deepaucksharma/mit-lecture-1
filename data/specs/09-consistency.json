@@ -1,0 +1,473 @@
+{
+  "id": "09-consistency",
+  "title": "Consistency Reality",
+  "prerequisites": {
+    "concepts": [
+      "Write path two-phase commit (Spec 07)",
+      "Lease mechanism and Primary authority (Spec 08)",
+      "Replication across multiple servers (Spec 03, 04)",
+      "Network failures and partial failures (Spec 02, 07)",
+      "CAP theorem trade-offs (Spec 01)"
+    ],
+    "checkYourself": "Do you understand how writes flow through Primary to replicas? Can you explain what happens when a write partially succeeds? Do you recall the CAP triangle trade-offs?"
+  },
+  "narrative": "Three replicas. Same chunk. Read from any one. Different data. This isn't corruption—it's consistency, GFS-style. Where database designers see chaos, Google saw opportunity. Accept imperfection. Push recovery to applications. Gain speed, scale, and simplicity. This is the bargain: Your application deals with disorder, and in return, the system never stops moving.",
+  "crystallizedInsight": "Perfection is expensive. Strategic imperfection is liberating.",
+  "firstPrinciples": {
+    "consistencySpectrum": {
+      "linearizability": "Operations appear instantaneous at some point between start and completion. Strongest guarantee",
+      "sequentialConsistency": "Operations appear in program order for each process, total order for all",
+      "causalConsistency": "Causally related operations ordered, concurrent operations may differ",
+      "eventualConsistency": "All replicas converge to same value eventually, no ordering guarantees",
+      "gfsConsistency": "Relaxed: defined (all have data) but not necessarily identical byte-for-byte"
+    },
+    "formalDefinitions": {
+      "consistencyPredicate": "C(H) → ∀r1,r2 ∈ Replicas: eventually(content(r1) ≈ content(r2))",
+      "definedRegion": "Region is defined if all replicas have the same data (may include padding)",
+      "undefinedRegion": "Different data or missing data across replicas",
+      "consistentMutation": "File region is consistent if all clients see the same data",
+      "atomicAppend": "At-least-once delivery, may create duplicates but preserves record boundaries"
+    },
+    "capAnalysis": {
+      "gfsChoice": "AP system: Available during partitions, sacrifices immediate consistency",
+      "consistencyRelaxation": "Weak consistency + application-level recovery = higher availability",
+      "quantification": "Availability ≈ 99.9% with weak vs ≈ 99% with strong consistency",
+      "latencyImpact": "Weak: O(1) replica write. Strong: O(N) replicas must agree"
+    },
+    "mathematicalModeling": {
+      "convergenceTime": "T_converge = network_delay + processing_time + lease_duration (worst case)",
+      "inconsistencyWindow": "P(inconsistent at time t) = e^(-λt) where λ = sync_rate",
+      "duplicateProbability": "P(duplicate) = P(retry) × P(original_succeeded) ≈ 0.001 for typical workloads",
+      "reorderingMetric": "Kendall's τ distance between replica orderings, typically < 0.1"
+    }
+  },
+  "layout": {
+    "type": "flow"
+  },
+  "nodes": [
+    {
+      "id": "Client",
+      "type": "client",
+      "label": "Client View"
+    },
+    {
+      "id": "R1",
+      "type": "chunkserver",
+      "label": "Replica 1"
+    },
+    {
+      "id": "R2",
+      "type": "chunkserver",
+      "label": "Replica 2"
+    },
+    {
+      "id": "R3",
+      "type": "chunkserver",
+      "label": "Replica 3"
+    },
+    {
+      "id": "App",
+      "type": "note",
+      "label": "Application Layer"
+    }
+  ],
+  "edges": [
+    {
+      "id": "read1",
+      "from": "Client",
+      "to": "R1",
+      "kind": "data",
+      "label": "Read: A,B,C"
+    },
+    {
+      "id": "read2",
+      "from": "Client",
+      "to": "R2",
+      "kind": "data",
+      "label": "Read: A,Pad,B,C"
+    },
+    {
+      "id": "read3",
+      "from": "Client",
+      "to": "R3",
+      "kind": "data",
+      "label": "Read: B,A,A,C"
+    },
+    {
+      "id": "fix",
+      "from": "Client",
+      "to": "App",
+      "kind": "control",
+      "label": "Apply fixes"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "after-append",
+      "title": "After Concurrent Appends",
+      "overlays": []
+    },
+    {
+      "id": "app-recovery",
+      "title": "Application Recovery",
+      "overlays": ["app-fixes"]
+    },
+    {
+      "id": "consistency-window",
+      "title": "Consistency Timeline",
+      "overlays": ["timeline"]
+    }
+  ],
+  "overlays": [
+    {
+      "id": "app-fixes",
+      "caption": "The Application's Burden",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "fix-detail",
+              "type": "note",
+              "label": "Application strategies:\\n\\n1. Checksums detect padding\\n2. Record IDs enable deduplication\\n3. Timestamps allow reordering\\n4. Retry logic handles failures\\n\\nGFS outsources consistency to you"
+            }
+          ]
+        },
+        "highlight": {
+          "nodeIds": ["App"],
+          "edgeIds": ["fix"]
+        }
+      }
+    },
+    {
+      "id": "timeline",
+      "caption": "The Consistency Window",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "timeline-note",
+              "type": "note",
+              "label": "T+0ms: Write committed on Primary\\nT+10ms: Replicas catching up\\nT+100ms: Most replicas consistent\\nT+60s: Lease expires, forced sync\\n\\nEventual consistency means:\\neventually, but not instantly"
+            }
+          ]
+        },
+        "highlight": {
+          "edgeIds": ["read1", "read2", "read3"]
+        }
+      }
+    },
+    {
+      "id": "why-weak",
+      "caption": "Why Weak Consistency Works for Google",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "workload-note",
+              "type": "note",
+              "label": "MapReduce workload:\\n- Processes records independently\\n- Idempotent operations\\n- Duplicates? Process twice, same result\\n- Reordering? Doesn't matter\\n- Padding? Skip it\\n\\nThe workload allows weak consistency"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "contracts": {
+    "invariants": [
+      "All successful records exist somewhere",
+      "Record boundaries preserved (atomic append)",
+      "Checksums detect corruption"
+    ],
+    "guarantees": [
+      "Defined: All replicas have same data eventually",
+      "Atomic: Each record succeeds/fails completely",
+      "Consistent: Successful appends visible on all replicas"
+    ],
+    "caveats": [
+      "NOT Ordered: Different replica orders possible",
+      "NOT Immediate: Stale reads possible",
+      "NOT Identical: Byte-level differences exist"
+    ]
+  },
+  "drills": [
+    {
+      "id": "drill-database-vs-gfs",
+      "type": "analyze",
+      "prompt": "A database engineer looks at GFS consistency and says 'This is broken!' Are they wrong?",
+      "thoughtProcess": [
+        "Database perspective: ACID properties are sacred",
+        "- Atomicity: All-or-nothing",
+        "- Consistency: Valid state always",
+        "- Isolation: Transactions don't interfere",
+        "- Durability: Committed means saved",
+        "GFS violates... almost all of these",
+        "But wait—what's the USE CASE?",
+        "Database: Financial transactions, user accounts, critical state",
+        "GFS: Log files, web crawl data, MapReduce intermediates",
+        "Database: 'I need to know the exact balance NOW'",
+        "GFS: 'I'm processing petabytes, a few duplicates are fine'",
+        "The database engineer isn't wrong—they're solving a different problem",
+        "GFS chose its constraints based on its workload"
+      ],
+      "insight": "There's no such thing as 'broken consistency'—only consistency models matched or mismatched to workloads"
+    },
+    {
+      "id": "drill-consistency-cost",
+      "type": "apply",
+      "prompt": "What would GFS have to do to provide strong consistency? What would it cost?",
+      "scenario": "Every read must see the latest write, always",
+      "thoughtProcess": [
+        "Option 1: All reads go through Primary",
+        "- Primary is the source of truth",
+        "- Cost: Primary becomes bottleneck, no read scaling",
+        "Option 2: Synchronous replication on every write",
+        "- Wait for all replicas before acknowledging",
+        "- Cost: Writes become 3× slower, any replica failure blocks writes",
+        "Option 3: Distributed consensus (like Paxos) on every operation",
+        "- Cost: Multiple round-trips per operation, complex protocol",
+        "Option 4: Global lock on every chunk",
+        "- Cost: Concurrency destroyed, everything serialized",
+        "Reality: Any of these would reduce throughput by orders of magnitude",
+        "GFS chose: Fast and loose over slow and strict"
+      ],
+      "insight": "Strong consistency is possible but expensive. Know when you can't afford it."
+    },
+    {
+      "id": "drill-record-format",
+      "type": "create",
+      "prompt": "You're designing an application on GFS. What does a robust record format look like?",
+      "thoughtProcess": [
+        "Requirement 1: Detect corruption",
+        "- Solution: Add a checksum (CRC32 or better)",
+        "- Format: [4-byte checksum][data]",
+        "Requirement 2: Detect duplicates",
+        "- Solution: Include a unique ID (UUID or timestamp+counter)",
+        "- Format: [checksum][16-byte UUID][data]",
+        "Requirement 3: Handle reordering",
+        "- Solution: Add a timestamp or sequence number",
+        "- Format: [checksum][UUID][8-byte timestamp][data]",
+        "Requirement 4: Know where record ends (skip padding)",
+        "- Solution: Include length prefix",
+        "- Format: [4-byte length][checksum][UUID][timestamp][data]",
+        "Final format: [length][checksum][UUID][timestamp][actual-data]",
+        "Overhead: 32 bytes per record",
+        "But worth it: Now you can handle any GFS consistency issue"
+      ],
+      "insight": "When the storage layer is unreliable, the data format must be self-describing and self-validating"
+    },
+    {
+      "id": "drill-stale-read",
+      "type": "analyze",
+      "prompt": "You read a chunk from a stale replica. How long until you see the latest data?",
+      "thoughtProcess": [
+        "Best case: Next read, you hit a different replica (maybe current)",
+        "Typical case: Within the consistency window (usually milliseconds to seconds)",
+        "Worst case: Up to the lease duration (60 seconds)",
+        "But here's the twist: You might NEVER read the latest data",
+        "If you keep hitting the same stale replica, you'll keep seeing stale data",
+        "Unless: The replica catches up, the lease expires, or you retry",
+        "Reality: Most stale reads converge in milliseconds",
+        "But 'eventual consistency' has no upper bound",
+        "Application must decide: Is stale data acceptable?",
+        "For logs: Yes. For bank balances: No."
+      ],
+      "insight": "Eventual consistency means 'probably soon' but guarantees nothing about 'when'"
+    }
+  ],
+  "assessmentCheckpoints": [
+    {
+      "id": "understand-weak-consistency",
+      "competency": "I understand that GFS provides weak consistency by design, not accident",
+      "checkYourself": "Can you explain why strong consistency would hurt GFS's goals?",
+      "mastery": "You see consistency as a spectrum of trade-offs, not a binary choice"
+    },
+    {
+      "id": "understand-application-burden",
+      "competency": "I know what the application must handle: duplicates, reordering, padding",
+      "checkYourself": "Could you design a record format that survives GFS's inconsistencies?",
+      "mastery": "You build applications that embrace, not fight, the storage layer"
+    },
+    {
+      "id": "understand-workload-match",
+      "competency": "I see that weak consistency works for some workloads, not others",
+      "checkYourself": "Which of your projects could run on GFS? Which couldn't?",
+      "mastery": "You match consistency models to workload requirements automatically"
+    },
+    {
+      "id": "understand-eventual-convergence",
+      "competency": "I understand what 'eventual consistency' really means",
+      "checkYourself": "How long is 'eventual'? What makes it happen faster or slower?",
+      "mastery": "You reason about consistency windows in distributed systems"
+    }
+  ],
+  "advancedConcepts": {
+    "modernConsistencyModels": {
+      "boundedStaleness": {
+        "definition": "Read returns value at most T seconds old or K versions behind",
+        "example": "Azure Cosmos DB: staleness < 5 seconds or < 100 operations",
+        "tradeoff": "Predictable staleness vs eventual consistency's unbounded delay"
+      },
+      "readYourWrites": {
+        "definition": "Process always sees its own writes, others may not",
+        "implementation": "Session tokens, sticky routing to same replica",
+        "useCase": "Social media posts, user settings"
+      },
+      "monotonicReads": {
+        "definition": "Successive reads never go backward in time",
+        "guarantee": "If read returns v2, future reads return v2 or later",
+        "implementation": "Version vectors, client-side caching"
+      },
+      "causalPlus": {
+        "definition": "Causal consistency + convergent conflict resolution",
+        "example": "CRDTs (Conflict-free Replicated Data Types)",
+        "property": "Deterministic merge without coordination"
+      }
+    },
+    "conflictResolution": {
+      "lastWriterWins": {
+        "mechanism": "Use timestamps, highest timestamp wins",
+        "problem": "Lost updates, depends on clock synchronization",
+        "gfsApproach": "Primary assigns order, no conflict possible"
+      },
+      "vectorClocks": {
+        "structure": "Each node maintains vector [n1:v1, n2:v2, ...]",
+        "comparison": "Partial order: some events incomparable",
+        "overhead": "O(N) space per object where N = number of nodes"
+      },
+      "crdts": {
+        "gwCounter": "Grow-only counter: each node increments its slot",
+        "orSet": "Observed-Remove Set: unique tags prevent resurrection",
+        "mergeable": "Any order of merges produces same result"
+      },
+      "operationalTransformation": {
+        "principle": "Transform operations to preserve intent",
+        "example": "Google Docs: concurrent edits transformed for consistency",
+        "complexity": "O(n²) transformations for n concurrent operations"
+      }
+    },
+    "consistencyVerification": {
+      "invariantChecking": {
+        "method": "Define invariants, continuously verify across replicas",
+        "example": "Sum of account balances = total money in system",
+        "gfsInvariant": "All committed data exists on at least one replica"
+      },
+      "readRepair": {
+        "trigger": "Detect inconsistency during read",
+        "action": "Update stale replicas with latest value",
+        "cost": "Higher read latency, eventual convergence"
+      },
+      "merkleTreeSync": {
+        "structure": "Hash tree of data blocks",
+        "comparison": "Compare root hashes, drill down to find differences",
+        "efficiency": "O(log n) comparisons to find inconsistent blocks"
+      },
+      "witnessReplicas": {
+        "role": "Lightweight replicas that store hashes, not data",
+        "verification": "Detect inconsistency without full data transfer",
+        "tradeoff": "Less storage but can't serve reads"
+      }
+    },
+    "performanceImplications": {
+      "consistencyTaxonomy": {
+        "strong": "2-3x latency increase, 50% throughput reduction",
+        "causal": "1.5x latency, 20% throughput reduction",
+        "eventual": "No latency penalty, full throughput",
+        "gfs": "Minimal latency, pushes cost to application layer"
+      },
+      "scalabilityLimits": {
+        "consensusBased": "O(n²) messages for n replicas, practical limit ~7",
+        "primaryBased": "O(n) messages, scales to 100s of replicas",
+        "gossipBased": "O(log n) convergence time, scales to 1000s",
+        "crdtBased": "O(1) coordination, unlimited scale"
+      },
+      "networkPartitionBehavior": {
+        "strong": "Unavailable on minority side",
+        "eventual": "Available everywhere, divergence during partition",
+        "gfs": "Writes need Primary (may be unavailable), reads always work"
+      }
+    },
+    "applicationPatterns": {
+      "compensatingTransactions": {
+        "pattern": "Undo effects of failed distributed transaction",
+        "example": "Saga pattern in microservices",
+        "gfsUsage": "Clean up duplicate records after retry"
+      },
+      "idempotencyKeys": {
+        "pattern": "Unique ID prevents duplicate processing",
+        "implementation": "UUID per record, dedupe on read",
+        "overhead": "16 bytes per record for UUID storage"
+      },
+      "readRepairStrategies": {
+        "aggressive": "Check all replicas on every read",
+        "lazy": "Check randomly with probability p",
+        "triggered": "Only when inconsistency detected"
+      },
+      "eventSourcing": {
+        "principle": "Store events, not state. Replay for consistency",
+        "benefit": "Natural audit log, time-travel debugging",
+        "gfsAlignment": "Append-only matches event log pattern"
+      }
+    },
+    "theoreticalFoundations": {
+      "brewersConjecture": {
+        "original": "CAP: Choose 2 of Consistency, Availability, Partition tolerance",
+        "refinement": "During partition: choose C or A. Otherwise, have both",
+        "pacelc": "If Partition, choose A or C; Else, choose Latency or Consistency"
+      },
+      "consistencyHierarchy": {
+        "strict": "Linearizability → Sequential → Causal → PRAM → Eventual",
+        "composability": "Some models compose (causal + FIFO), others don't",
+        "verification": "NP-complete to verify sequential consistency in general"
+      },
+      "impossibilityResults": {
+        "flpExtended": "Cannot achieve consensus + consistency + availability",
+        "capTheorem": "Proved by Gilbert & Lynch (2002)",
+        "weakerIsPossible": "Eventual consistency always achievable"
+      },
+      "probabilisticConsistency": {
+        "pbs": "Probabilistically Bounded Staleness",
+        "formula": "P(staleness > t) < e^(-λt)",
+        "tunable": "Trade consistency for performance probabilistically"
+      }
+    },
+    "industryEvolution": {
+      "strongConsistencySystems": {
+        "spanner": "Google: Linearizable using TrueTime + 2PC",
+        "cockroachDB": "Serializable SQL using Raft consensus",
+        "foundationDB": "ACID with automatic sharding, used by Apple"
+      },
+      "eventualConsistencySystems": {
+        "cassandra": "Facebook: Tunable consistency with quorums",
+        "dynamoDB": "Amazon: Eventually consistent with read repair",
+        "riak": "Basho: Vector clocks + CRDTs for convergence"
+      },
+      "hybridSystems": {
+        "cosmosDB": "Microsoft: 5 consistency levels to choose from",
+        "mongodb": "Tunable read/write concerns per operation",
+        "yugabyteDB": "Strong consistency for SQL, eventual for NoSQL"
+      }
+    },
+    "futureDirections": {
+      "mlDrivenConsistency": {
+        "concept": "Learn application patterns, predict consistency needs",
+        "adaptation": "Dynamically adjust consistency level per operation",
+        "research": "Stanford's Anna, Berkeley's Confluo"
+      },
+      "blockchainInspired": {
+        "concept": "Immutable logs with cryptographic verification",
+        "benefit": "Tamper-proof consistency proofs",
+        "challenge": "Performance overhead of cryptography"
+      },
+      "quantumConsistency": {
+        "speculation": "Quantum entanglement for instant consistency",
+        "reality": "Still theoretical, decoherence is challenging",
+        "timeline": "20+ years away from practical systems"
+      },
+      "edgeConsistency": {
+        "challenge": "Consistency across geo-distributed edge nodes",
+        "approach": "Hierarchical consistency domains",
+        "example": "Cloudflare Workers, AWS Lambda@Edge"
+      }
+    }
+  }
+}

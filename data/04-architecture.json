@@ -1,0 +1,340 @@
+{
+  "id": "04-architecture",
+  "title": "Complete Architecture",
+  "narrative": "Behold the symphony: One Master conducting, thousands of Chunkservers playing, countless Clients dancing. The Master whispers locations, then steps aside. The real music—terabytes flowing like rivers—happens where the Master never goes. This separation is not just clever; it's the only way this works. It embodies the end-to-end argument: intelligence belongs at the edges, not in the middle.",
+  "crystallizedInsight": "Power lies not in doing everything, but in doing only what matters—this is the end-to-end principle applied to storage",
+  "prerequisites": {
+    "concepts": [
+      "Control/data separation fundamentals (Spec 00)",
+      "Scale and failure models (Spec 02)",
+      "Why centralization fails at scale (Spec 00, 02)"
+    ],
+    "checkYourself": "Can you explain why mixing control and data creates bottlenecks? Do you understand Amdahl's Law?"
+  },
+  "firstPrinciples": {
+    "endToEndArgument": {
+      "principle": "Functions placed at low levels may be redundant or of little value when compared to providing them at the edges (Saltzer, Reed, Clark, 1984)",
+      "application": "GFS pushes intelligence to clients (caching, retry, error handling) rather than making the system 'smart'",
+      "reasoning": "Lower layers cannot anticipate all failure modes; only endpoints have full context",
+      "quantification": "Smart middle: O(N²) state complexity. Smart edges: O(N) complexity"
+    },
+    "coordinationComplexity": {
+      "centralizedConsensus": "O(N²) messages for N nodes to agree through central coordinator",
+      "gfsApproach": "O(1) for metadata (single master), O(N) for data (parallel transfers)",
+      "formula": "Total_complexity = α×O(1) + (1-α)×O(N) where α = metadata_fraction ≈ 0.001",
+      "result": "Near-linear scaling with negligible coordination overhead"
+    },
+    "littlesLaw": {
+      "formula": "L = λW where L=queue length, λ=arrival rate, W=wait time",
+      "masterQueue": "L_master = λ_metadata × W_metadata ≈ 10K ops/s × 1ms = 10 requests in queue",
+      "ifDataThrough": "L_disaster = λ_data × W_data ≈ 10K ops/s × 100ms = 1000 requests → overflow"
+    }
+  },
+  "layout": {
+    "type": "flow"
+  },
+  "nodes": [
+    {
+      "id": "C",
+      "type": "client",
+      "label": "Clients"
+    },
+    {
+      "id": "M",
+      "type": "master",
+      "label": "Master"
+    },
+    {
+      "id": "CS1",
+      "type": "chunkserver",
+      "label": "Chunkserver 1"
+    },
+    {
+      "id": "CS2",
+      "type": "chunkserver",
+      "label": "Chunkserver 2"
+    },
+    {
+      "id": "CS3",
+      "type": "chunkserver",
+      "label": "Chunkserver 3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "control",
+      "from": "C",
+      "to": "M",
+      "kind": "control",
+      "label": "Metadata requests"
+    },
+    {
+      "id": "data1",
+      "from": "C",
+      "to": "CS1",
+      "kind": "data",
+      "label": "Direct data I/O"
+    },
+    {
+      "id": "data2",
+      "from": "C",
+      "to": "CS2",
+      "kind": "data",
+      "label": "Direct data I/O"
+    },
+    {
+      "id": "data3",
+      "from": "C",
+      "to": "CS3",
+      "kind": "data",
+      "label": "Direct data I/O"
+    },
+    {
+      "id": "heartbeat1",
+      "from": "CS1",
+      "to": "M",
+      "kind": "heartbeat",
+      "label": "Heartbeats"
+    },
+    {
+      "id": "heartbeat2",
+      "from": "CS2",
+      "to": "M",
+      "kind": "heartbeat",
+      "label": "Heartbeats"
+    },
+    {
+      "id": "heartbeat3",
+      "from": "CS3",
+      "to": "M",
+      "kind": "heartbeat",
+      "label": "Heartbeats"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "full-architecture",
+      "name": "Complete GFS Architecture",
+      "overlays": [],
+      "narrative": "The complete GFS architecture with Master, multiple racks of chunkservers, and clients. Each component has a specific role in the distributed system"
+    },
+    {
+      "id": "control-plane-view",
+      "name": "Control Plane Operations",
+      "overlays": ["control-plane"],
+      "narrative": "The control plane handles all metadata operations, lease management, and system coordination. It's the brain that makes decisions but never touches data"
+    },
+    {
+      "id": "data-plane-view",
+      "name": "Data Plane Operations",
+      "overlays": ["data-plane"],
+      "narrative": "The data plane handles all actual file data transfers. Massive amounts of data flow directly between clients and chunkservers without Master involvement"
+    },
+    {
+      "id": "at-scale",
+      "name": "Operating at Scale",
+      "overlays": ["scale-vision"],
+      "narrative": "With 10,000+ machines, the architecture shows its true power. Thousands of parallel data streams flow while the Master orchestrates from above"
+    }
+  ],
+  "overlays": [
+    {
+      "id": "control-plane",
+      "caption": "The Control Plane - Where Decisions Live",
+      "diff": {
+        "highlight": {
+          "edgeIds": ["control", "heartbeat1", "heartbeat2", "heartbeat3"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "control-note",
+              "type": "note",
+              "label": "Lightweight metadata\\nFast decisions\\nGlobal knowledge"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "data-plane",
+      "caption": "The Data Plane - Where Work Happens",
+      "diff": {
+        "highlight": {
+          "edgeIds": ["data1", "data2", "data3"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "data-note",
+              "type": "note",
+              "label": "Heavy lifting\\nParallel flows\\nNo Master involved"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "scale-vision",
+      "caption": "At True Scale - 10,000 Machines",
+      "diff": {
+        "add": {
+          "nodes": [
+            {
+              "id": "scale-note",
+              "type": "note",
+              "label": "1 Master\\n10,000 Chunkservers\\n100,000 Clients\\nPetabytes flowing"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "contracts": {
+    "invariants": [
+      "Single Master holds all metadata",
+      "Master never handles file data",
+      "Chunkservers report to Master via heartbeats"
+    ],
+    "guarantees": [
+      "Master provides strong consistency for metadata",
+      "Data flows directly between clients and chunkservers"
+    ],
+    "caveats": [
+      "Master is a single point of failure (mitigated by shadow masters)",
+      "Master can become bottleneck for metadata operations"
+    ]
+  },
+  "drills": [
+    {
+      "id": "drill-bottleneck-hunt",
+      "type": "analyze",
+      "prompt": "A competitor claims their system is 'better' because everything goes through a central server for 'consistency'. Trace what happens at scale.",
+      "thoughtProcess": [
+        "One client, 100MB/s - central server handles it fine",
+        "10 clients, 1GB/s - server's network card is working hard",
+        "100 clients, 10GB/s - server needs 10Gbps network, getting expensive",
+        "1000 clients, 100GB/s - no single server can handle this",
+        "They'll claim: 'Just use a bigger server!'",
+        "But physics has limits - network cards, PCIe buses, memory bandwidth",
+        "Eventually they'll need to... distribute the central server",
+        "Congratulations, they just reinvented GFS with extra steps"
+      ],
+      "insight": "Centralization is a luxury that scale cannot afford"
+    },
+    {
+      "id": "drill-master-death",
+      "type": "create",
+      "prompt": "The Master just died. What continues working? What stops? For how long?",
+      "thoughtProcess": [
+        "First millisecond: Nobody notices",
+        "First second: New metadata requests fail",
+        "But wait... what about existing operations?",
+        "Client already reading chunk from CS7? Continues perfectly!",
+        "Client in the middle of a 10GB transfer? Keeps flowing!",
+        "Chunkservers replicating data? Keep going!",
+        "The data plane lives on, the control plane is frozen",
+        "It's like a highway where the traffic control center died",
+        "Cars already on the road keep moving, new cars can't enter",
+        "This is the beauty of separation"
+      ],
+      "insight": "A well-designed system degrades gracefully, not catastrophically"
+    },
+    {
+      "id": "drill-heartbeat-philosophy",
+      "type": "apply",
+      "prompt": "Chunkservers send heartbeats to the Master every few seconds. What profound truth about distributed systems does this represent?",
+      "scenario": "Every 3 seconds: 'I'm alive, I have these chunks, this is my state'",
+      "thoughtProcess": [
+        "Why not have the Master poll chunkservers?",
+        "With 10,000 chunkservers, Master would do nothing but poll",
+        "Why not trust chunkservers are alive until proven dead?",
+        "Because in distributed systems, silence is ambiguous",
+        "Network partition? Process hung? Machine on fire?",
+        "Heartbeats are proof of life in an uncertain world",
+        "Miss 3 heartbeats? You're presumed dead",
+        "It's harsh but necessary - the system must move on",
+        "This is the rhythm of all distributed systems"
+      ],
+      "insight": "In distributed systems, you're only alive if you can prove it"
+    }
+  ],
+  "assessmentCheckpoints": [
+    {
+      "id": "see-the-separation",
+      "competency": "I understand why control and data planes must be separated",
+      "checkYourself": "Can you explain this to someone who insists on centralized control?",
+      "mastery": "You instinctively separate concerns in every system you design"
+    },
+    {
+      "id": "trace-the-flow",
+      "competency": "I can trace both control and data flows through the system",
+      "checkYourself": "Close your eyes. Can you draw the complete flow for a read operation?",
+      "mastery": "You see the choreography, not just the components"
+    },
+    {
+      "id": "failure-reasoning",
+      "competency": "I can reason about partial failures and their impacts",
+      "checkYourself": "What fails when each component dies? What survives?",
+      "mastery": "You design for partial failure as the normal state"
+    }
+  ],
+  "advancedConcepts": {
+    "architecturalPatterns": {
+      "microkernel": "Master as microkernel: minimal core (namespace) with services (chunk management) as add-ons",
+      "publishSubscribe": "Heartbeats as pub-sub: chunkservers publish state, master subscribes and aggregates",
+      "bulkhead": "Failure isolation: control plane failure doesn't affect data plane (like ship compartments)",
+      "circuitBreaker": "Clients stop requesting from dead chunkservers after timeout (prevents cascading failure)"
+    },
+    "alternativeArchitectures": {
+      "symmetricP2P": {
+        "example": "Cassandra, Chord DHT",
+        "approach": "Every node equal, consistent hashing for data distribution",
+        "tradeoff": "No SPOF, but O(log N) lookup complexity and eventual consistency",
+        "when": "When no single point of failure is more important than simplicity"
+      },
+      "hierarchicalFederation": {
+        "example": "HDFS Federation, Ceph",
+        "approach": "Multiple masters, each owns namespace partition",
+        "tradeoff": "Scales metadata but requires cross-master coordination for some operations",
+        "when": "When single master RAM becomes limiting factor"
+      },
+      "serverlessDisaggregated": {
+        "example": "AWS S3, Azure Blob",
+        "approach": "Complete separation of compute, storage, metadata services",
+        "tradeoff": "Infinite scale but higher latency and vendor lock-in",
+        "when": "When operational simplicity outweighs control"
+      }
+    },
+    "theoreticalAnalysis": {
+      "queueingTheory": "Master as M/M/1 queue: utilization ρ = λ/μ must be < 1 for stability",
+      "controlTheory": "System as feedback loop: heartbeats provide observability, lease grants provide control",
+      "graphTheory": "Architecture as bipartite graph: clients and chunkservers with master as articulation point",
+      "informationTheory": "Metadata as compressed representation: H(metadata) << H(data), enabling centralization"
+    },
+    "scalabilityLimits": {
+      "masterRAM": "At 100B per chunk, 64GB RAM → 640M chunks → 40PB with 64MB chunks",
+      "masterCPU": "At 1μs per request, single core → 1M ops/s theoretical max",
+      "networkBandwidth": "10Gbps master NIC → 125MB/s control traffic ceiling",
+      "solution": "Sharding (Colossus), Caching (reduce requests), Batching (amortize overhead)"
+    },
+    "modernEvolutions": {
+      "colossus": "Google's GFS successor: sharded metadata, smaller chunks, more real-time",
+      "hdfs3": "Erasure coding, federation, in-memory caching, better small file handling",
+      "tectonic": "Facebook's warehouse-scale filesystem: multi-tenant, resource sharing, better isolation",
+      "rados": "Ceph's distributed object store: CRUSH algorithm for placement, strong consistency"
+    },
+    "faultTolerancePatterns": {
+      "shadowMasters": "Read-only replicas with log replay, instant promotion on failure",
+      "witnessReplicas": "Lightweight replicas that only store metadata for quorum without full data",
+      "chainReplication": "Updates flow through chain for consistency: head→middle→tail",
+      "quorumSystems": "Use consensus (Raft/Paxos) for master state—complex but robust"
+    },
+    "performanceOptimizations": {
+      "affinityScheduling": "Co-locate computation with data to minimize network traffic",
+      "tieredStorage": "Hot data on SSD, warm on HDD, cold in object storage",
+      "readAheadPrefetching": "Predict and fetch next chunks based on access patterns",
+      "adaptiveReplication": "More replicas for hot data, fewer for cold"
+    }
+  }
+}

@@ -1,0 +1,428 @@
+{
+  "id": "05-planes",
+  "title": "Control vs Data Plane",
+  "narrative": "Two planes, two destinies. The control plane whispers: 'Go here, talk to them.' The data plane roars: terabytes flowing like Niagara Falls. If these planes merged, the whisper would drown in the roar. Their separation isn't architecture—it's survival. This mirrors network design: BGP (control) vs packet forwarding (data), SDN controllers vs switches.",
+  "crystallizedInsight": "Separate what must be fast from what must be smart—this is the fundamental principle of all scalable systems",
+  "prerequisites": {
+    "concepts": [
+      "Basic architecture understanding (Spec 04)",
+      "Control/data separation principle (Spec 00)",
+      "Chain replication basics from write path (Spec 07)"
+    ],
+    "checkYourself": "Do you understand why the Master never touches data? Can you trace a basic read/write flow?"
+  },
+  "firstPrinciples": {
+    "controlTheory": {
+      "observability": "Control plane provides system state visibility through heartbeats and metadata",
+      "controllability": "Master can influence system through lease grants and replica placement",
+      "feedbackLoop": "Heartbeats → State aggregation → Decisions → Commands → System change → Heartbeats",
+      "stabilityCondition": "Response time < Lease duration to prevent oscillation"
+    },
+    "networkingPrinciples": {
+      "dataPlaneRequirements": "High throughput, low latency, simple forwarding, no complex decisions",
+      "controlPlaneRequirements": "Consistency, complex logic, global view, can be slower",
+      "separation": "Similar to SDN: OpenFlow (data) vs controller (control), or BGP (control) vs IP forwarding (data)",
+      "quantification": "Control: O(log N) complexity acceptable. Data: Must be O(1) per packet/chunk"
+    },
+    "informationFlow": {
+      "shannonCapacity": "C = B log₂(1 + S/N). Control plane: low B sufficient. Data plane: maximize B",
+      "latencyBandwidthProduct": "BDP = bandwidth × RTT. Data plane optimizes for high BDP",
+      "flowConservation": "Σ(input rates) = Σ(output rates) + storage rate. Applies to both planes independently"
+    }
+  },
+  "layout": {
+    "type": "sequence"
+  },
+  "nodes": [
+    {
+      "id": "C",
+      "type": "client",
+      "label": "Client"
+    },
+    {
+      "id": "M",
+      "type": "master",
+      "label": "Master"
+    },
+    {
+      "id": "CS1",
+      "type": "chunkserver",
+      "label": "Primary CS"
+    },
+    {
+      "id": "CS2",
+      "type": "chunkserver",
+      "label": "Secondary CS"
+    },
+    {
+      "id": "CS3",
+      "type": "chunkserver",
+      "label": "Secondary CS"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "C",
+      "to": "M",
+      "kind": "control",
+      "label": "1. Where is chunk X?",
+      "phase": "Control Plane"
+    },
+    {
+      "id": "e2",
+      "from": "M",
+      "to": "C",
+      "kind": "control",
+      "label": "2. CS1 (primary), CS2, CS3",
+      "phase": "Control Plane"
+    },
+    {
+      "id": "e3",
+      "from": "C",
+      "to": "CS1",
+      "kind": "data",
+      "label": "3. Send data",
+      "phase": "Data Plane"
+    },
+    {
+      "id": "e4",
+      "from": "CS1",
+      "to": "CS2",
+      "kind": "data",
+      "label": "4. Forward data",
+      "phase": "Data Plane"
+    },
+    {
+      "id": "e5",
+      "from": "CS2",
+      "to": "CS3",
+      "kind": "data",
+      "label": "5. Forward data",
+      "phase": "Data Plane"
+    },
+    {
+      "id": "e6",
+      "from": "CS3",
+      "to": "CS2",
+      "kind": "control",
+      "label": "6. ACK",
+      "phase": "Data Plane"
+    },
+    {
+      "id": "e7",
+      "from": "CS2",
+      "to": "CS1",
+      "kind": "control",
+      "label": "7. ACK",
+      "phase": "Data Plane"
+    },
+    {
+      "id": "e8",
+      "from": "CS1",
+      "to": "C",
+      "kind": "control",
+      "label": "8. Success",
+      "phase": "Data Plane"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "separation-principle",
+      "name": "The Separation Principle",
+      "overlays": [],
+      "narrative": "Control and data planes must be separated to achieve scalability. The control plane coordinates while the data plane executes"
+    },
+    {
+      "id": "control-operations",
+      "name": "Control Plane Whispers",
+      "overlays": ["control-whisper"],
+      "narrative": "Control messages are tiny but critical—metadata lookups, lease grants, placement decisions. These whispers orchestrate the entire system"
+    },
+    {
+      "id": "data-operations",
+      "name": "Data Plane Roars",
+      "overlays": ["data-roar"],
+      "narrative": "Data operations involve massive transfers—64MB chunks flowing like rivers between nodes. This is where the real work happens"
+    },
+    {
+      "id": "replication-flow",
+      "name": "Chain Replication in Action",
+      "overlays": ["chain-reaction"],
+      "narrative": "Watch how data flows through the replication chain during writes. Each chunkserver forwards to the next, creating a pipeline of data"
+    }
+  ],
+  "overlays": [
+    {
+      "id": "control-whisper",
+      "caption": "The Control Whisper - Bytes of Wisdom",
+      "diff": {
+        "highlight": {
+          "edgeIds": ["control-req", "control-resp"],
+          "nodeIds": ["C", "M"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "control-note",
+              "type": "note",
+              "label": "~200 bytes: 'Where is chunk X?' → 'Talk to CS1, CS2, CS3'"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "data-roar",
+      "caption": "The Data Roar - Gigabytes Flowing",
+      "diff": {
+        "highlight": {
+          "edgeIds": ["data-flow"],
+          "nodeIds": ["C", "CS1", "CS2", "CS3"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "data-note",
+              "type": "note",
+              "label": "64MB chunks × 1000s of clients = Terabytes/sec of raw bandwidth"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "chain-reaction",
+      "caption": "The Replication Chain Dance",
+      "diff": {
+        "highlight": {
+          "edgeIds": ["chain1", "chain2"],
+          "nodeIds": ["CS1", "CS2", "CS3"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "chain-note",
+              "type": "note",
+              "label": "Data flows CS1→CS2→CS3 in a pipeline, not a tree. Network-efficient!"
+            }
+          ],
+          "edges": [
+            {
+              "id": "pipeline",
+              "from": "CS1",
+              "to": "CS3",
+              "kind": "data",
+              "label": "Pipeline replication"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "contracts": {
+    "invariants": [
+      "Master never sees file data",
+      "Clients cache metadata for reuse",
+      "Data flows directly between clients and chunkservers"
+    ],
+    "guarantees": [
+      "Control plane provides consistent metadata",
+      "Data plane provides high bandwidth"
+    ],
+    "caveats": [
+      "Cached metadata can become stale",
+      "Network partitions affect planes differently"
+    ]
+  },
+  "overlays": [
+    {
+      "id": "control-whisper",
+      "caption": "The Control Whisper - Bytes of Wisdom",
+      "diff": {
+        "highlight": {
+          "edgeIds": ["e1", "e2"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "control-size",
+              "type": "note",
+              "label": "Total control traffic: ~300 bytes\\nTime: microseconds\\nMaster can handle millions"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "data-roar",
+      "caption": "The Data Roar - Gigabytes Flowing",
+      "diff": {
+        "highlight": {
+          "edgeIds": ["e3", "e4", "e5"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "data-size",
+              "type": "note",
+              "label": "Total data traffic: 192MB\\n(64MB × 3 replicas)\\nMaster sees: 0 bytes"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "chain-reaction",
+      "caption": "The Replication Chain Dance",
+      "diff": {
+        "highlight": {
+          "edgeIds": ["e3", "e4", "e5", "e6", "e7", "e8"]
+        },
+        "add": {
+          "nodes": [
+            {
+              "id": "chain-note",
+              "type": "note",
+              "label": "Data flows like a river\\nEach server adds to the chain\\nAcks flow backwards like echoes"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "drills": [
+    {
+      "id": "drill-plane-crash",
+      "type": "analyze",
+      "prompt": "A network partition cuts the control plane but not the data plane. What happens to ongoing operations?",
+      "thoughtProcess": [
+        "Client can't reach Master - no new metadata",
+        "But client already knows where chunk 42 lives",
+        "Client is midway through reading 10GB from CS7",
+        "Does the read stop? NO!",
+        "The data plane doesn't care the Master is unreachable",
+        "That 10GB transfer completes perfectly",
+        "But when client needs chunk 43's location... stuck",
+        "This is the beauty: partial failure, partial functionality",
+        "Compare to a centralized system: everything would stop"
+      ],
+      "insight": "Plane separation turns catastrophic failures into partial degradation"
+    },
+    {
+      "id": "drill-chain-philosophy",
+      "type": "create",
+      "prompt": "Why does GFS replicate in a chain (CS1→CS2→CS3) instead of parallel (Client→CS1, Client→CS2, Client→CS3)?",
+      "thoughtProcess": [
+        "Parallel seems faster - client sends once to each",
+        "But wait... client's upload bandwidth is the bottleneck",
+        "Parallel: Client uploads 64MB three times = 192MB",
+        "Chain: Client uploads 64MB once, servers forward",
+        "Client bandwidth usage: 1/3 of parallel approach!",
+        "But there's more: network topology matters",
+        "Chain can follow rack topology, minimizing cross-rack traffic",
+        "Parallel sprays data everywhere, congesting core switches",
+        "The chain is slower but gentler on the network"
+      ],
+      "insight": "Sometimes the 'slower' approach is actually faster at scale"
+    },
+    {
+      "id": "drill-two-masters",
+      "type": "apply",
+      "prompt": "Someone suggests having two Masters - one for control, one for data. Explain why this misses the point entirely.",
+      "scenario": "Proposed: Master-Control handles metadata, Master-Data handles data flow",
+      "thoughtProcess": [
+        "They think they're improving on GFS",
+        "But Master-Data would handle what exactly?",
+        "Route 100GB/s of data through it? That's the problem we're avoiding!",
+        "Would it just track data flow? That's what Master-Control already does",
+        "Would it coordinate transfers? Chunkservers already do that",
+        "The 'Master-Data' either becomes a bottleneck or does nothing",
+        "They've misunderstood the fundamental principle",
+        "The point isn't to have two masters",
+        "The point is that data must flow where no master goes"
+      ],
+      "insight": "Adding coordination to the data plane defeats its purpose"
+    }
+  ],
+  "assessmentCheckpoints": [
+    {
+      "id": "plane-separation",
+      "competency": "I understand why control and data planes must be separate",
+      "checkYourself": "Can you explain what would break if they merged?",
+      "mastery": "You naturally separate concerns in every system you design"
+    },
+    {
+      "id": "chain-understanding",
+      "competency": "I understand why replication uses a chain",
+      "checkYourself": "Can you explain the trade-offs vs parallel replication?",
+      "mastery": "You see how data flow patterns affect system behavior"
+    },
+    {
+      "id": "partial-failure",
+      "competency": "I can reason about partial system failures",
+      "checkYourself": "What works and what breaks when each plane fails?",
+      "mastery": "You design systems that degrade gracefully"
+    }
+  ],
+  "advancedConcepts": {
+    "planePatterns": {
+      "inBandVsOutOfBand": "Control in-band (mixed with data) vs out-of-band (separate). GFS uses out-of-band",
+      "fastPathSlowPath": "Common operations optimized (fast), rare cases handled separately (slow)",
+      "dataPlaneOffload": "Modern NICs offload data plane (RDMA, DPDK) while CPU handles control",
+      "controlPlaneScaling": "Hierarchical (DNS), Distributed (BGP), or Centralized (GFS, SDN)"
+    },
+    "modernExamples": {
+      "softwareDefinedNetworking": {
+        "control": "SDN Controller (OpenDaylight, ONOS)",
+        "data": "OpenFlow switches forward based on flow tables",
+        "similarity": "Controller:Master :: Switches:Chunkservers"
+      },
+      "kubernetes": {
+        "control": "API server, scheduler, controller-manager",
+        "data": "Kubelet, container runtime, CNI plugins",
+        "similarity": "Declarative control, autonomous data plane"
+      },
+      "cdn": {
+        "control": "DNS routing, origin selection",
+        "data": "Edge servers serving cached content",
+        "similarity": "Metadata lookup then direct data transfer"
+      },
+      "loadBalancers": {
+        "control": "Health checks, weight updates, configuration",
+        "data": "Packet forwarding using ECMP or consistent hashing",
+        "similarity": "Control decisions cached, data flows directly"
+      }
+    },
+    "theoreticalFoundations": {
+      "separationOfConcerns": "Dijkstra's principle applied to distributed systems—each plane has single responsibility",
+      "rateMatching": "Control rate << Data rate. If rates comparable, separation loses benefit",
+      "timescaleSeparation": "Control: seconds. Data: microseconds. 6 orders of magnitude difference",
+      "algebraicSeparation": "Control plane: Turing complete. Data plane: Regular expressions/finite automata"
+    },
+    "performanceAnalysis": {
+      "controlPlaneMetrics": "Decisions/second, consistency latency, state convergence time",
+      "dataPlaneMetrics": "Throughput (Gbps), latency (μs), packets/second",
+      "amdahlImpact": "f_control ≈ 0.001 → negligible impact on scalability",
+      "queuingAnalysis": "Control: G/G/1 queue. Data: M/M/c parallel servers"
+    },
+    "evolutionPath": {
+      "programmableDataPlanes": "P4, eBPF allow custom data plane logic without control plane changes",
+      "disaggregation": "Control plane as service (RaaS), data plane as commodity",
+      "aiOptimization": "ML in control plane for placement, routing. Data plane remains simple",
+      "quantumNetworking": "Quantum control plane, classical data plane (quantum channels too fragile for bulk data)"
+    },
+    "failureIsolation": {
+      "blastRadius": "Control failure affects new ops. Data failure affects specific flows",
+      "cascadingFailures": "Control plane failures don't cascade to data (unlike coupled systems)",
+      "recoveryTime": "Control: seconds (consensus). Data: milliseconds (reroute)",
+      "grayFailures": "Slow control plane detected via timeout. Slow data plane via latency monitoring"
+    },
+    "antiPatterns": {
+      "leakyAbstraction": "Data plane making control decisions (e.g., routing in middleboxes)",
+      "heavyControl": "Control plane handling frequent operations (violates timescale separation)",
+      "tightCoupling": "Data plane blocking on control plane (creates cascading failures)",
+      "stateExplosion": "Control plane tracking per-packet state (should track aggregates)"
+    }
+  }
+}
