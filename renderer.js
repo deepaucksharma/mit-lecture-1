@@ -356,20 +356,17 @@ class MermaidRenderer {
   }
 
   formatFlowchartEdgeLabel(edge) {
-    // Escape problematic characters for Mermaid flowchart labels
-    // Use HTML entities to preserve the original meaning
+    // Simplified label format for flowcharts (no emojis, no special chars)
+    // Only use basic text to avoid Mermaid parsing conflicts
+    // Remove or escape problematic characters: parentheses, pipes, brackets
     const label = edge.label || '';
     return label
-      .replace(/\(/g, '&#40;')  // Escape opening parentheses
-      .replace(/\)/g, '&#41;')  // Escape closing parentheses
-      .replace(/\|/g, '&#124;') // Escape pipe characters
-      .replace(/\[/g, '&#91;')  // Escape opening brackets
-      .replace(/\]/g, '&#93;')  // Escape closing brackets
-      .replace(/</g, '&lt;')    // Escape less than
-      .replace(/>/g, '&gt;')    // Escape greater than
-      .replace(/"/g, '&quot;')  // Escape quotes
-      .replace(/'/g, '&#39;')   // Escape single quotes
-      .replace(/\s+/g, ' ')     // Normalize whitespace
+      .replace(/\(/g, '')  // Remove opening parentheses
+      .replace(/\)/g, '')  // Remove closing parentheses
+      .replace(/\|/g, '')  // Remove pipe characters
+      .replace(/\[/g, '')  // Remove brackets
+      .replace(/\]/g, '')
+      .replace(/\s+/g, ' ') // Normalize whitespace
       .trim();
   }
 

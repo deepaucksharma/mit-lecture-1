@@ -3895,4 +3895,4 @@ window.addEventListener('DOMContentLoaded', () => {
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = GFSViewer;
-}// Bundle created: Sat Oct 11 12:49:27 UTC 2025
+}// Bundle created: Sat Oct 11 12:51:47 UTC 2025
