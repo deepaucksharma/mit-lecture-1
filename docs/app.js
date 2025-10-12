@@ -1254,6 +1254,11 @@ if (typeof module !== 'undefined' && module.exports) {
       timestamp: Date.now()
     };
     this.saveProgress();
+
+    // Dispatch event so LearningProgress can sync
+    document.dispatchEvent(new CustomEvent('drillComplete', {
+      detail: { diagramId, drillId }
+    }));
   }
 
   getDiagramProgress(diagramId) {
@@ -3425,7 +3430,7 @@ if (typeof module !== 'undefined' && module.exports) {
       item.dataset.diagramId = diagram.id;
 
       const progress = this.learningProgress.getDiagramStats(diagram.id);
-      const hasProgress = progress.viewCount > 0;
+      const hasProgress = progress.completionPercentage > 0;
 
       item.innerHTML = `
         <span class="nav-number">${index}</span>
@@ -3473,6 +3478,31 @@ if (typeof module !== 'undefined' && module.exports) {
     if (prevBtn) prevBtn.disabled = currentIndex === 0;
     if (nextBtn) nextBtn.disabled = currentIndex === total - 1;
     if (current) current.textContent = `${currentIndex + 1} / ${total}`;
+  }
+
+  updateNavigationProgress() {
+    // Update progress badges in navigation items without full re-render
+    document.querySelectorAll('.nav-item').forEach(item => {
+      const diagramId = item.dataset.diagramId;
+      if (!diagramId) return;
+
+      const progress = this.learningProgress.getDiagramStats(diagramId);
+      const hasProgress = progress.completionPercentage > 0;
+
+      // Remove existing progress badge if any
+      const existingBadge = item.querySelector('.nav-progress');
+      if (existingBadge) {
+        existingBadge.remove();
+      }
+
+      // Add new progress badge if there's progress
+      if (hasProgress) {
+        const badge = document.createElement('span');
+        badge.className = 'nav-progress';
+        badge.textContent = `${progress.completionPercentage}%`;
+        item.appendChild(badge);
+      }
+    });
   }
 
   updateTitle(title) {
@@ -3746,6 +3776,10 @@ if (typeof module !== 'undefined' && module.exports) {
         completed,
         drills.length
       );
+
+      // Update navigation to reflect new progress
+      this.updateNavigationProgress();
+      this.updateProgressDisplay();
     });
 
     // Theme toggle
