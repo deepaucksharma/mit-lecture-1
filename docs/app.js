@@ -41,7 +41,10 @@ class DiagramValidator {
 
     // Schema validation if available
     if (this.validate && !this.validate(spec)) {
-      throw new ValidationError('Schema', this.ajv.errors.map(e => e.message));
+      const schemaErrors = this.ajv && this.ajv.errors
+        ? this.ajv.errors.map(e => e.message || 'Unknown schema error')
+        : ['Schema validation failed'];
+      throw new ValidationError('Schema', schemaErrors);
     }
 
     // Semantic validation
@@ -2579,7 +2582,7 @@ if (typeof module !== 'undefined' && module.exports) {
       try {
         this.validator.validateSpec(spec);
       } catch (validationError) {
-        console.warn('Validation warning:', validationError);
+        console.warn('Validation warning:', validationError.message || validationError);
         // Continue anyway for development
       }
 
@@ -2622,7 +2625,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
       this.showDiagramLoading(false);
     } catch (error) {
-      console.error('Failed to load diagram:', error);
+      console.error('Failed to load diagram:', error.message || error);
       this.handleError(error);
       this.showDiagramLoading(false);
     }
@@ -3334,7 +3337,7 @@ if (typeof module !== 'undefined' && module.exports) {
   }
 
   handleError(error) {
-    console.error('Viewer error:', error);
+    console.error('Viewer error:', error.message || error);
 
     const container = document.getElementById('diagram-container');
     if (container) {

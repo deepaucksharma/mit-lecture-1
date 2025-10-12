@@ -45,7 +45,7 @@ async function testJSErrors() {
   try {
     // Test intro page
     console.log('📱 Testing intro page...');
-    await page.goto('http://localhost:8888/intro.html', {
+    await page.goto('http://localhost:8000/intro.html', {
       waitUntil: 'networkidle0',
       timeout: 30000
     });
@@ -53,7 +53,7 @@ async function testJSErrors() {
 
     // Test main application
     console.log('\n📱 Testing main application...');
-    await page.goto('http://localhost:8888/index.html', {
+    await page.goto('http://localhost:8000/index.html', {
       waitUntil: 'networkidle0',
       timeout: 30000
     });
@@ -73,7 +73,7 @@ async function testJSErrors() {
 
     for (const diagram of diagrams) {
       console.log(`  Testing ${diagram}...`);
-      await page.goto(`http://localhost:8888/index.html?d=${diagram}`, {
+      await page.goto(`http://localhost:8000/index.html?d=${diagram}`, {
         waitUntil: 'networkidle0',
         timeout: 30000
       });

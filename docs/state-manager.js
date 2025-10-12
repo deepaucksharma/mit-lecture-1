@@ -347,6 +347,39 @@ class StateManager {
     if (this.states.length === 0) return 0;
     return (this.currentStateIndex / (this.states.length - 1)) * 100;
   }
+
+  /**
+   * Get all states
+   */
+  getStates() {
+    return this.states;
+  }
+
+  /**
+   * Get current state index
+   */
+  getCurrentStateIndex() {
+    return this.currentStateIndex;
+  }
+
+  /**
+   * Get all overlays/layers
+   */
+  getOverlays() {
+    return Array.from(this.layers.keys());
+  }
+
+  /**
+   * Go to a specific state by index
+   */
+  goToState(index) {
+    if (index >= 0 && index < this.states.length) {
+      this.currentStateIndex = index;
+      this.applyState(this.states[index]);
+      return true;
+    }
+    return false;
+  }
 }
 
 // Export for module systems

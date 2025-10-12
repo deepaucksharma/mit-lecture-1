@@ -1,0 +1,3874 @@
+{
+  "timestamp": "2025-10-11T12:50:55.808Z",
+  "specs": {
+    "00-legend": {
+      "id": "00-legend",
+      "timestamp": "2025-10-11T12:51:02.833Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 803
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "The separation of control and data is the foundation of all scalable systems—it's Amdahl's Law applied to distributed architecture",
+            "contentLength": 130
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": false,
+            "conceptCount": 0,
+            "concepts": [],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 3,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 19314,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 3,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 3,
+            "drills": [
+              {
+                "prompt": "The Master just started handling data directly. Walk through what happens in the next 60 seconds using Amdahl's Law.",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Imagine version numbers could go backward. What impossible situation would this create?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "You have 1000 machines. Something fails every single day. How do you design for this reality?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 4,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "1 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": true,
+            "nextDisabled": false,
+            "currentDiagramId": "00-legend",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/00-legend-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/00-legend-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/00-legend-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/00-legend-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/00-legend-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/00-legend-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/00-legend-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/00-legend-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/00-legend-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "01-triangle": {
+      "id": "01-triangle",
+      "timestamp": "2025-10-11T12:51:16.213Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 810
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "You cannot escape trade-offs, only choose them wisely—CAP theorem makes this mathematical law",
+            "contentLength": 93
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": false,
+            "conceptCount": 0,
+            "concepts": [],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 4,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 35814,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 3,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 3,
+            "drills": [
+              {
+                "prompt": "You're building a system for a hospital. Lives depend on it. Which two corners of the triangle do you choose?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Someone claims they built a system with all three. Walk through their demo. Where's the hidden trade-off?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "GFS starts serving video streaming. Millions watch the same viral video. Should they change their triangle choice?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 5,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "2 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "01-triangle",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/01-triangle-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/01-triangle-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/01-triangle-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/01-triangle-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/01-triangle-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/01-triangle-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/01-triangle-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/01-triangle-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/01-triangle-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "02-scale": {
+      "id": "02-scale",
+      "timestamp": "2025-10-11T12:51:28.495Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 810
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "At scale, failure isn't a problem to solve—it's a property to embrace. Design for continuous partial failure.",
+            "contentLength": 109
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": false,
+            "conceptCount": 0,
+            "concepts": [],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 3,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 6779,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 3,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 3,
+            "drills": [
+              {
+                "prompt": "Your monitoring dashboard shows 3 disk failures today. In the old world, this is a crisis. In GFS's world, what is it?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "You're scaling from 100 to 10,000 machines. At what point does your old approach break? What changes first?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Your CFO wants to buy expensive 'enterprise' hardware to reduce failures. Walk them through why GFS chose commodity hardware instead.",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 5,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "3 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "02-scale",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/02-scale-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/02-scale-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/02-scale-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/02-scale-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/02-scale-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/02-scale-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/02-scale-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/02-scale-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/02-scale-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "03-chunk-size": {
+      "id": "03-chunk-size",
+      "timestamp": "2025-10-11T12:51:40.827Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 803
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "The right abstraction size determines whether a system thrives or dies—it's the quantum of your distributed system",
+            "contentLength": 114
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": false,
+            "conceptCount": 0,
+            "concepts": [],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 3,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 7340,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 3,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 3,
+            "drills": [
+              {
+                "prompt": "The Master has 64GB of RAM. Someone suggests using 64KB chunks for 'better granularity'. Walk through why this would destroy everything.",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Your system stores millions of 1KB config files. With 64MB chunks, what horror unfolds?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "It's 2024. SSDs are everywhere, networks are 100x faster. Should GFS's spiritual successors still use 64MB chunks?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 5,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "4 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "03-chunk-size",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/03-chunk-size-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/03-chunk-size-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/03-chunk-size-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/03-chunk-size-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/03-chunk-size-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/03-chunk-size-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/03-chunk-size-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/03-chunk-size-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/03-chunk-size-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "04-architecture": {
+      "id": "04-architecture",
+      "timestamp": "2025-10-11T12:51:54.042Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 803
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "Power lies not in doing everything, but in doing only what matters—this is the end-to-end principle applied to storage",
+            "contentLength": 118
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": true,
+            "conceptCount": 3,
+            "concepts": [
+              "Control/data separation fundamentals (Spec 00)",
+              "Scale and failure models (Spec 02)",
+              "Why centralization fails at scale (Spec 00, 02)"
+            ],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 3,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 6352,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 3,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 3,
+            "drills": [
+              {
+                "prompt": "A competitor claims their system is 'better' because everything goes through a central server for 'consistency'. Trace what happens at scale.",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "The Master just died. What continues working? What stops? For how long?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Chunkservers send heartbeats to the Master every few seconds. What profound truth about distributed systems does this represent?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 5,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "5 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "04-architecture",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/04-architecture-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/04-architecture-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/04-architecture-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/04-architecture-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/04-architecture-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/04-architecture-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/04-architecture-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/04-architecture-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/04-architecture-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "05-planes": {
+      "id": "05-planes",
+      "timestamp": "2025-10-11T12:52:06.357Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 803
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "Separate what must be fast from what must be smart—this is the fundamental principle of all scalable systems",
+            "contentLength": 108
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": true,
+            "conceptCount": 3,
+            "concepts": [
+              "Basic architecture understanding (Spec 04)",
+              "Control/data separation principle (Spec 00)",
+              "Chain replication basics from write path (Spec 07)"
+            ],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 3,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 6363,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 3,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 3,
+            "drills": [
+              {
+                "prompt": "A network partition cuts the control plane but not the data plane. What happens to ongoing operations?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Why does GFS replicate in a chain (CS1→CS2→CS3) instead of parallel (Client→CS1, Client→CS2, Client→CS3)?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Someone suggests having two Masters - one for control, one for data. Explain why this misses the point entirely.",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 5,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "6 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "05-planes",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/05-planes-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/05-planes-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/05-planes-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/05-planes-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/05-planes-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/05-planes-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/05-planes-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/05-planes-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/05-planes-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "06-read-path": {
+      "id": "06-read-path",
+      "timestamp": "2025-10-11T12:52:19.522Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 803
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "Cache for load reduction, not latency. The Master is precious—protect it. This is Little's Law in action: L = λW",
+            "contentLength": 112
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": true,
+            "conceptCount": 3,
+            "concepts": [
+              "Control/data plane separation (Spec 00, 05)",
+              "Master holds metadata, chunkservers hold data (Spec 04)",
+              "Why Master bottleneck must be avoided (Spec 00, 04)"
+            ],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 3,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 6773,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 3,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 3,
+            "drills": [
+              {
+                "prompt": "The cache saves only 2ms out of 107ms total. Why is this tiny improvement critical?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "All client caches just expired simultaneously (maybe a time sync issue). What happens?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "You need to decide: How long should cache entries live? What are you optimizing for?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 4,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "7 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "06-read-path",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/06-read-path-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/06-read-path-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/06-read-path-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/06-read-path-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/06-read-path-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/06-read-path-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/06-read-path-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/06-read-path-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/06-read-path-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "07-write-path": {
+      "id": "07-write-path",
+      "timestamp": "2025-10-11T12:52:31.790Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 803
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "Decouple what can be parallel from what must be serial. Speed lives in the separation—this is the essence of chain replication",
+            "contentLength": 126
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": true,
+            "conceptCount": 4,
+            "concepts": [
+              "Read path and why caching matters (Spec 06)",
+              "Control/data plane separation (Spec 00, 05)",
+              "Replication and chunk architecture (Spec 03, 04)",
+              "Why Primary must avoid becoming bottleneck (Spec 00, 06)"
+            ],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 4,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 7386,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 4,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "4. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 4,
+            "drills": [
+              {
+                "prompt": "Why not just send data through the Primary to the Secondaries? One path, simpler code.",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "GFS pipelines data along network topology (client→rack1→rack2→rack3). Why not broadcast to all at once?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Two clients write 'HELLO' and 'WORLD' to the same region simultaneously. What ends up in the file?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Secondary 1 crashes after writing but before ACKing. Client retries. What happened?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 4,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "8 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "07-write-path",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/07-write-path-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/07-write-path-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/07-write-path-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/07-write-path-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/07-write-path-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/07-write-path-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/07-write-path-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/07-write-path-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/07-write-path-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "08-lease": {
+      "id": "08-lease",
+      "timestamp": "2025-10-11T12:52:44.121Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 810
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "Authority must expire. Time is the only arbiter that never lies—eventually.",
+            "contentLength": 75
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": true,
+            "conceptCount": 4,
+            "concepts": [
+              "Write path and Primary's role (Spec 07)",
+              "Why having multiple servers think they're Primary is catastrophic (Spec 07)",
+              "Network failures and partitions exist (Spec 02, 04)",
+              "Distributed coordination challenges"
+            ],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 4,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 6456,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": false,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 4,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "4. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 4,
+            "drills": [
+              {
+                "prompt": "Why use time-based leases instead of explicit 'I quit' messages from the Primary?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "An attacker can skew the Primary's clock. How much skew is needed to cause split-brain?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Walk through the math: Why exactly 60 seconds? Why not 10 or 600?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "You're the old Primary, partitioned from the Master. Your lease expires. A client asks you to write. What do you do?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 4,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "9 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "08-lease",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/08-lease-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/08-lease-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/08-lease-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/08-lease-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/08-lease-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/08-lease-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/08-lease-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/08-lease-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/08-lease-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "09-consistency": {
+      "id": "09-consistency",
+      "timestamp": "2025-10-11T12:52:57.267Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 810
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "Perfection is expensive. Strategic imperfection is liberating.",
+            "contentLength": 62
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": true,
+            "conceptCount": 5,
+            "concepts": [
+              "Write path two-phase commit (Spec 07)",
+              "Lease mechanism and Primary authority (Spec 08)",
+              "Replication across multiple servers (Spec 03, 04)",
+              "Network failures and partial failures (Spec 02, 07)",
+              "CAP theorem trade-offs (Spec 01)"
+            ],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 4,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 6405,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 4,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "4. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 4,
+            "drills": [
+              {
+                "prompt": "A database engineer looks at GFS consistency and says 'This is broken!' Are they wrong?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "You read a chunk from a stale replica. How long until you see the latest data?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "What would GFS have to do to provide strong consistency? What would it cost?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "You're designing an application on GFS. What does a robust record format look like?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 4,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "10 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "09-consistency",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/09-consistency-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/09-consistency-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/09-consistency-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/09-consistency-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/09-consistency-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/09-consistency-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/09-consistency-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/09-consistency-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/09-consistency-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "10-recovery": {
+      "id": "10-recovery",
+      "timestamp": "2025-10-11T12:53:09.566Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 810
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "Design for failure as the default, not the exception. Recovery is not a feature—it's the architecture.",
+            "contentLength": 102
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": true,
+            "conceptCount": 6,
+            "concepts": [
+              "Scale means constant failure (Spec 02)",
+              "Replication provides fault tolerance (Spec 03, 04)",
+              "Lease mechanism and timeouts (Spec 08)",
+              "Master vs chunkserver roles (Spec 00, 04)",
+              "Network partitions and detection (Spec 08)",
+              "Consistency trade-offs (Spec 09)"
+            ],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 4,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 5682,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 4,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "4. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 4,
+            "drills": [
+              {
+                "prompt": "Why is chunkserver failure 'boring' but Master failure 'terrifying'? Both are single machines dying.",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Lightning strikes a data center. An entire rack of 40 chunkservers goes offline. Walk through the next hour.",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "A chunkserver stops sending heartbeats. Is it dead, or is the network partitioned? How do you decide?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Design a monitoring dashboard for GFS. What are the 5 most important metrics? Why?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 4,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "11 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "10-recovery",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/10-recovery-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/10-recovery-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/10-recovery-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/10-recovery-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/10-recovery-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/10-recovery-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/10-recovery-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/10-recovery-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/10-recovery-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "11-evolution": {
+      "id": "11-evolution",
+      "timestamp": "2025-10-11T12:53:21.849Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 810
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "Every design decision is a bet on the future. Some bets age well. Some don't. Know when to fold.",
+            "contentLength": 96
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": true,
+            "conceptCount": 5,
+            "concepts": [
+              "Single master architecture (Spec 00, 04)",
+              "Metadata bottleneck implications (Spec 03, 04)",
+              "Scale challenges (Spec 02)",
+              "Why RAM is critical for Master (Spec 04, 06)",
+              "Workload assumptions of GFS (Spec 00)"
+            ],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 4,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 6631,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 4,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "4. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 4,
+            "drills": [
+              {
+                "prompt": "Why does metadata have to live in RAM? Couldn't they use disk/SSD for overflow?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "What did the GFS designers in 2003 get right about the future? What did they miss?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Calculate: With 96GB RAM, how many files can GFS handle? Show the math.",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "You're in 2009, presenting to leadership. Should Google invest in more GFS optimizations, or start building Colossus? Make your case.",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 4,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "12 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": false,
+            "currentDiagramId": "11-evolution",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1,
+            "continuityTest": {
+              "before": -1,
+              "after": -1,
+              "worked": false
+            }
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/11-evolution-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/11-evolution-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/11-evolution-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/11-evolution-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/11-evolution-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/11-evolution-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/11-evolution-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/11-evolution-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/11-evolution-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    },
+    "12-dna": {
+      "id": "12-dna",
+      "timestamp": "2025-10-11T12:53:34.891Z",
+      "tests": [
+        {
+          "name": "Diagram Rendering",
+          "passed": false,
+          "details": {
+            "hasContainer": true,
+            "hasSvg": false,
+            "hasMermaid": false,
+            "svgDimensions": null,
+            "nodeCount": 0,
+            "edgeCount": 0,
+            "containerDimensions": {
+              "width": 812,
+              "height": 810
+            }
+          }
+        },
+        {
+          "name": "Crystallized Insight",
+          "passed": true,
+          "details": {
+            "hasPanel": true,
+            "hasText": true,
+            "isVisible": true,
+            "content": "Ideas evolve faster than systems. The best architectures teach lessons that outlive their implementations.",
+            "contentLength": 106
+          }
+        },
+        {
+          "name": "Prerequisites",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isVisible": true,
+            "conceptCount": 4,
+            "concepts": [
+              "All previous GFS concepts (Specs 00-11)",
+              "How GFS evolved into Colossus (Spec 11)",
+              "Core principles vs implementation details",
+              "Why some ideas survive and others don't"
+            ],
+            "hasCheckQuestion": false,
+            "checkQuestion": ""
+          }
+        },
+        {
+          "name": "First Principles",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": true,
+            "sectionCount": 4,
+            "hasTheoretical": false,
+            "hasQuantitative": false,
+            "hasSystemDesign": false,
+            "contentLength": 5409,
+            "sections": [
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              },
+              {
+                "title": "",
+                "hasContent": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Advanced Concepts",
+          "passed": false,
+          "details": {
+            "found": false,
+            "hasAlternatives": false,
+            "hasModern": true,
+            "hasOpenProblems": false,
+            "contentLength": 0
+          }
+        },
+        {
+          "name": "Assessment Checkpoints",
+          "passed": true,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "checkpointCount": 4,
+            "checkpoints": [
+              {
+                "title": "1. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "2. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "3. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              },
+              {
+                "title": "4. undefined",
+                "hasCheck": false,
+                "hasMastery": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "Drills with ThoughtProcess",
+          "passed": false,
+          "details": {
+            "found": true,
+            "isActive": false,
+            "drillCount": 4,
+            "drills": [
+              {
+                "prompt": "HDFS is an almost perfect clone of GFS. Was this wise, or did they copy GFS's limitations too?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Which GFS ideas should you use in your next project? Which should you avoid?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Modern systems use erasure coding instead of 3x replication. Walk through the math: why?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              },
+              {
+                "prompt": "Amazon S3 took lessons from GFS but built something different. What did they change and why?",
+                "hasAnswer": false,
+                "hasThoughtProcess": false,
+                "hasInsight": false,
+                "thoughtSteps": 0
+              }
+            ],
+            "hasRecallDrills": false,
+            "hasApplicationDrills": false,
+            "hasAnalysisDrills": true
+          }
+        },
+        {
+          "name": "Scene Navigation",
+          "passed": true,
+          "details": {
+            "found": true,
+            "sceneCount": 5,
+            "currentIndex": 0,
+            "currentScene": "initial",
+            "hasControls": true,
+            "hasTimeline": false,
+            "hasPrevButton": false,
+            "hasNextButton": false,
+            "hasPlayButton": false
+          },
+          "error": "window.viewer?.stateManager?.goToState is not a function"
+        },
+        {
+          "name": "Unified Navigation",
+          "passed": false,
+          "details": {
+            "found": true,
+            "navText": "13 / 13",
+            "navParts": {
+              "diagram": "",
+              "state": "",
+              "global": ""
+            },
+            "hasDiagramInfo": false,
+            "hasStateInfo": false,
+            "hasGlobalInfo": false,
+            "prevDisabled": false,
+            "nextDisabled": true,
+            "currentDiagramId": "12-dna",
+            "currentStateIndex": 3,
+            "totalStates": 0,
+            "currentGlobalPos": -1
+          }
+        },
+        {
+          "name": "Interactive Elements",
+          "passed": false,
+          "details": {
+            "navigation": {
+              "prevButton": false,
+              "nextButton": false,
+              "homeButton": false
+            },
+            "controls": {
+              "playButton": false,
+              "speedControl": false,
+              "layerToggle": false
+            },
+            "tabs": {
+              "drillsTab": false,
+              "principlesTab": true,
+              "assessmentTab": false
+            },
+            "overlays": {
+              "hasOverlays": false,
+              "overlayCount": 0
+            },
+            "totalInteractive": 1
+          }
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "diagram",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/12-dna-01-diagram.png"
+        },
+        {
+          "name": "insight",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/12-dna-02-insight.png"
+        },
+        {
+          "name": "first-principles",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/12-dna-03-principles.png"
+        },
+        {
+          "name": "assessment",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/12-dna-04-assessment.png"
+        },
+        {
+          "name": "drills",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/12-dna-05-drills.png"
+        },
+        {
+          "name": "scene-2",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/12-dna-scene-2.png"
+        },
+        {
+          "name": "scene-3",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/12-dna-scene-3.png"
+        },
+        {
+          "name": "scene-4",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/12-dna-scene-4.png"
+        },
+        {
+          "name": "unified-navigation",
+          "path": "/home/deepak/mit-lecture-1/tests/screenshots/comprehensive/12-dna-07-unified-nav.png"
+        }
+      ],
+      "errors": []
+    }
+  },
+  "summary": {
+    "total": 130,
+    "passed": 52,
+    "failed": 78,
+    "errors": [
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:50:57.384Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:50:57.384Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:02.917Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:02.917Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:51:08.125Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:14.114Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:14.114Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:15.450Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:15.451Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:16.295Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:16.295Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:51:21.522Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:26.419Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:26.419Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:27.731Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:27.731Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:28.566Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:28.566Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:51:33.801Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:38.715Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:38.715Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:40.033Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:40.033Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:40.909Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:40.909Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:51:47.024Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:51.946Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:51.946Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:53.277Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:53.277Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:54.127Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:51:54.127Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:51:59.353Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:04.237Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:04.237Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:05.575Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:05.575Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:06.439Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:06.439Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:52:11.634Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:16.500Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:16.500Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:18.730Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:18.730Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:19.597Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:19.597Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:52:24.827Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:29.708Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:29.708Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:31.019Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:31.019Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:31.872Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:31.873Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:52:37.075Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:42.016Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:42.016Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:43.330Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:43.330Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:44.212Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:44.212Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:52:49.415Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:55.156Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:55.156Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:56.500Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:56.500Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:57.347Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:52:57.347Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:53:02.556Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:07.463Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:07.463Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:08.780Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:08.780Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:09.649Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:09.649Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:53:14.873Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:19.759Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:19.760Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:21.095Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:21.095Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:21.927Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:21.927Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:53:27.918Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:32.809Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:32.809Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:34.124Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:34.124Z"
+      },
+      {
+        "type": "console",
+        "message": "Failed to load diagram: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:34.984Z"
+      },
+      {
+        "type": "console",
+        "message": "Viewer error: JSHandle@error",
+        "timestamp": "2025-10-11T12:53:34.984Z"
+      },
+      {
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-11T12:53:40.174Z"
+      }
+    ]
+  }
+}

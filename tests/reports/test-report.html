@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GFS Visual Learning - E2E Test Report</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; background: #f5f5f5; }
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
+    h1 { margin: 0; font-size: 2em; }
+    .timestamp { opacity: 0.9; margin-top: 10px; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .stat-value { font-size: 2em; font-weight: bold; color: #333; }
+    .stat-label { color: #666; margin-top: 5px; }
+    .spec-card { background: white; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; }
+    .spec-header { padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; }
+    .spec-title { font-size: 1.2em; font-weight: 600; }
+    .spec-stats { display: flex; gap: 15px; }
+    .spec-body { padding: 20px; }
+    .test-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+    .test-item:last-child { border-bottom: none; }
+    .test-status { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; }
+    .test-status.pass { background: #28a745; color: white; }
+    .test-status.fail { background: #dc3545; color: white; }
+    .test-name { flex: 1; font-weight: 500; }
+    .test-details { color: #666; font-size: 0.9em; }
+    .screenshots { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 15px; }
+    .screenshot { background: #f8f9fa; padding: 10px; border-radius: 4px; text-align: center; font-size: 0.85em; }
+    .error-section { background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; margin-top: 20px; }
+    .error-item { margin: 10px 0; padding: 10px; background: white; border-radius: 4px; }
+    .progress-bar { width: 100%; height: 30px; background: #e9ecef; border-radius: 15px; overflow: hidden; margin-top: 10px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #28a745, #20c997); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎯 GFS Visual Learning - E2E Test Report</h1>
+    <div class="timestamp">Generated: 2025-10-11T12:50:55.808Z</div>
+  </div>
+
+  <div class="summary">
+    <div class="stat-card">
+      <div class="stat-value">130</div>
+      <div class="stat-label">Total Tests</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: #28a745">52</div>
+      <div class="stat-label">Passed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: #dc3545">78</div>
+      <div class="stat-label">Failed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: #ffc107">89</div>
+      <div class="stat-label">Errors</div>
+    </div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" style="width: 40.0%">40.0% Pass Rate</div>
+  </div>
+
+  <h2 style="margin-top: 40px;">Test Results by Specification</h2>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">00-legend</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">130 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">19314 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">3 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">3 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">4 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">01-triangle</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">93 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">35814 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">3 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">3 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">5 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">02-scale</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">109 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">6779 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">3 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">3 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">5 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">03-chunk-size</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">114 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">7340 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">3 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">3 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">5 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">04-architecture</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">118 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">6352 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">3 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">3 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">5 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">05-planes</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">108 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">6363 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">3 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">3 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">5 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">06-read-path</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">112 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">6773 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">3 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">3 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">4 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">07-write-path</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">126 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">7386 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">4 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">4 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">4 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">08-lease</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">75 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">6456 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">4 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">4 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">4 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">09-consistency</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">62 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">6405 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">4 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">4 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">4 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">10-recovery</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">102 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">5682 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">4 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">4 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">4 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">11-evolution</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">96 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">6631 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">4 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">4 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">4 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-header">
+      <div class="spec-title">12-dna</div>
+      <div class="spec-stats">
+        <span style="color: #28a745">✓ 4</span>
+        <span style="color: #dc3545">✗ 6</span>
+        <span style="color: #666">Total: 10</span>
+      </div>
+    </div>
+    <div class="spec-body">
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Diagram Rendering</div>
+        <div class="test-details">0 nodes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Crystallized Insight</div>
+        <div class="test-details">106 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Prerequisites</div>
+        <div class="test-details">PASS</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">First Principles</div>
+        <div class="test-details">5409 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Advanced Concepts</div>
+        <div class="test-details">0 chars</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Assessment Checkpoints</div>
+        <div class="test-details">4 checkpoints</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Drills with ThoughtProcess</div>
+        <div class="test-details">4 drills</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status pass">✓</div>
+        <div class="test-name">Scene Navigation</div>
+        <div class="test-details">5 scenes</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Unified Navigation</div>
+        <div class="test-details">0 total states</div>
+      </div>
+
+      <div class="test-item">
+        <div class="test-status fail">✗</div>
+        <div class="test-name">Interactive Elements</div>
+        <div class="test-details">FAIL</div>
+      </div>
+
+      <div class="screenshots">
+        <div class="screenshot">📸 diagram</div>
+        <div class="screenshot">📸 insight</div>
+        <div class="screenshot">📸 first-principles</div>
+        <div class="screenshot">📸 assessment</div>
+        <div class="screenshot">📸 drills</div>
+        <div class="screenshot">📸 scene-2</div>
+        <div class="screenshot">📸 scene-3</div>
+        <div class="screenshot">📸 scene-4</div>
+        <div class="screenshot">📸 unified-navigation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-section" style="margin-top: 30px;">
+    <h3>Console & JavaScript Errors</h3>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[console] Failed to load diagram: JSHandle@error</div>
+    <div class="error-item">[console] Viewer error: JSHandle@error</div>
+    <div class="error-item">[javascript] Cannot read properties of null (reading 'checkAnalysis')</div>
+  </div>
+
+</body>
+</html>
