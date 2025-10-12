@@ -496,9 +496,23 @@ class GFSViewer {
       <div class="assessment-content">
         ${Array.isArray(assessment) ?
           assessment.map((item, index) => `
-            <div class="assessment-item">
-              <h4>Question ${index + 1}</h4>
-              <p>${item.question || item.text || item}</p>
+            <div class="assessment-checkpoint">
+              <div class="checkpoint-header">
+                <span class="checkpoint-number">${index + 1}</span>
+                <h4 class="checkpoint-title">${item.competency || item.question || item.text || item}</h4>
+              </div>
+              ${item.checkYourself ? `
+                <div class="checkpoint-check">
+                  <strong>✓ Check Yourself:</strong>
+                  <p>${item.checkYourself}</p>
+                </div>
+              ` : ''}
+              ${item.mastery ? `
+                <details class="checkpoint-mastery">
+                  <summary><strong>🎯 Mastery Goal</strong></summary>
+                  <p>${item.mastery}</p>
+                </details>
+              ` : ''}
               ${item.answer ? `
                 <details class="answer-reveal">
                   <summary>Show Answer</summary>
