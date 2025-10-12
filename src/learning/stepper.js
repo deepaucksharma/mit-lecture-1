@@ -382,6 +382,16 @@ class StepThroughEngine {
       this.renderStep(0);
     }
   }
+
+  // Cleanup method to prevent memory leaks
+  destroy() {
+    this.stopAutoPlay();
+    this.steps = [];
+    this.spec = null;
+    this.currentStep = 0;
+    this.renderer = null;
+    this.composer = null;
+  }
 }
 
 // Export for module systems, or make global

@@ -13,12 +13,8 @@
   <!-- Mermaid for diagram rendering -->
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
-  <!-- AJV for JSON Schema validation - Disabled: causes CommonJS conflicts in browser -->
-  <!-- Schema validation is optional and handled gracefully when unavailable -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/ajv@7.2.4/dist/ajv.min.js"></script> -->
-
-  <!-- State Manager and Renderer are now bundled in app.js -->
-  <!-- <script src="state-manager.js"></script> -->
+  <!-- DOMPurify for XSS protection -->
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 </head>
 <body class="theme-light">
   <!-- Loading Screen -->

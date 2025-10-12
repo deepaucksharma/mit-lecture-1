@@ -509,18 +509,9 @@ class GFSViewer {
       );
     });
 
-    // Listen for drill completion
+    // Listen for drill completion - just refresh UI, ProgressTracker already updated learning progress
     document.addEventListener('drillComplete', (e) => {
-      const drills = this.currentSpec.drills || [];
-      const completed = drills.filter(d =>
-        this.drillSystem.progress.isDrillComplete(this.currentDiagramId, d.id)
-      ).length;
-
-      this.learningProgress.updateDrillProgress(
-        this.currentDiagramId,
-        completed,
-        drills.length
-      );
+      this.updateProgressDisplay();
     });
 
     // Theme toggle

@@ -1,4 +1,383 @@
-class SceneComposer {
+/**
+ * HTML Sanitization Utility
+ * Provides safe HTML rendering to prevent XSS attacks
+ */
+class HTMLSanitizer {
+  constructor() {
+    // Check if DOMPurify is available
+    this.purify = typeof DOMPurify !== 'undefined' ? DOMPurify : null;
+
+    if (!this.purify) {
+      console.warn('DOMPurify not available. HTML sanitization disabled.');
+    }
+  }
+
+  /**
+   * Sanitize HTML string
+   * @param {string} dirty - Unsanitized HTML
+   * @param {Object} options - DOMPurify options
+   * @returns {string} Sanitized HTML
+   */
+  sanitize(dirty, options = {}) {
+    if (!dirty) return '';
+
+    if (this.purify) {
+      return this.purify.sanitize(dirty, {
+        ALLOWED_TAGS: [
+          'p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+          'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'a', 'span', 'div',
+          'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'hr'
+        ],
+        ALLOWED_ATTR: [
+          'href', 'title', 'class', 'id', 'src', 'alt', 'width', 'height',
+          'data-*'
+        ],
+        ALLOW_DATA_ATTR: true,
+        ...options
+      });
+    }
+
+    // Fallback: basic escaping if DOMPurify not available
+    return this.escapeHTML(dirty);
+  }
+
+  /**
+   * Basic HTML escaping (fallback)
+   * @param {string} text - Text to escape
+   * @returns {string} Escaped text
+   */
+  escapeHTML(text) {
+    if (!text) return '';
+
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  /**
+   * Sanitize and set innerHTML safely
+   * @param {HTMLElement} element - Target element
+   * @param {string} html - HTML to set
+   * @param {Object} options - Sanitization options
+   */
+  setHTML(element, html, options = {}) {
+    if (!element) return;
+    element.innerHTML = this.sanitize(html, options);
+  }
+
+  /**
+   * Create element with sanitized HTML
+   * @param {string} tag - Element tag name
+   * @param {string} html - HTML content
+   * @param {Object} options - Sanitization options
+   * @returns {HTMLElement} Created element
+   */
+  createElement(tag, html, options = {}) {
+    const element = document.createElement(tag);
+    this.setHTML(element, html, options);
+    return element;
+  }
+
+  /**
+   * Sanitize an object's string properties recursively
+   * @param {Object} obj - Object to sanitize
+   * @returns {Object} Sanitized object
+   */
+  sanitizeObject(obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.sanitizeObject(item));
+    }
+
+    const sanitized = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (typeof value === 'string') {
+        sanitized[key] = this.sanitize(value);
+      } else if (typeof value === 'object') {
+        sanitized[key] = this.sanitizeObject(value);
+      } else {
+        sanitized[key] = value;
+      }
+    }
+
+    return sanitized;
+  }
+
+  /**
+   * Check if string contains potentially dangerous content
+   * @param {string} text - Text to check
+   * @returns {boolean} True if suspicious
+   */
+  isSuspicious(text) {
+    if (!text || typeof text !== 'string') return false;
+
+    const suspiciousPatterns = [
+      /<script/i,
+      /javascript:/i,
+      /on\w+\s*=/i,  // onclick, onerror, etc.
+      /<iframe/i,
+      /<object/i,
+      /<embed/i,
+      /data:text\/html/i
+    ];
+
+    return suspiciousPatterns.some(pattern => pattern.test(text));
+  }
+
+  /**
+   * Log warning if suspicious content detected
+   * @param {string} text - Text to check
+   * @param {string} context - Context for logging
+   */
+  warnIfSuspicious(text, context = 'content') {
+    if (this.isSuspicious(text)) {
+      console.warn(`Suspicious content detected in ${context}:`, text.substring(0, 100));
+    }
+  }
+}
+
+// Create singleton instance
+const sanitizer = new HTMLSanitizer();
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { HTMLSanitizer, sanitizer };
+} else {
+  window.HTMLSanitizer = HTMLSanitizer;
+  window.sanitizer = sanitizer;
+}
+/**
+ * Unified Application State Manager
+ * Single source of truth for all application state
+ */
+class AppState {
+  constructor() {
+    this.state = {
+      // Current diagram
+      currentDiagramId: null,
+      currentSpec: null,
+
+      // UI state
+      currentOverlays: new Set(),
+      currentStep: 0,
+      isPlaying: false,
+      theme: 'light',
+
+      // Progress tracking
+      progress: null,
+      achievements: [],
+
+      // Session info
+      sessionStart: Date.now(),
+      diagramViewCount: 0
+    };
+
+    this.listeners = new Map();
+    this.history = [];
+    this.maxHistory = 50;
+  }
+
+  /**
+   * Get state value by path (supports dot notation)
+   * @param {string} path - Path to state value (e.g., 'ui.theme')
+   * @returns {*} State value
+   */
+  get(path) {
+    const keys = path.split('.');
+    let value = this.state;
+
+    for (const key of keys) {
+      if (value && typeof value === 'object') {
+        value = value[key];
+      } else {
+        return undefined;
+      }
+    }
+
+    return value;
+  }
+
+  /**
+   * Set state value and notify listeners
+   * @param {string} path - Path to state value
+   * @param {*} value - New value
+   * @param {Object} options - Options for state update
+   */
+  set(path, value, options = {}) {
+    const { silent = false, addToHistory = true } = options;
+
+    // Store previous value for history
+    const previousValue = this.get(path);
+
+    // Set the new value
+    const keys = path.split('.');
+    let target = this.state;
+
+    for (let i = 0; i < keys.length - 1; i++) {
+      const key = keys[i];
+      if (!target[key] || typeof target[key] !== 'object') {
+        target[key] = {};
+      }
+      target = target[key];
+    }
+
+    const lastKey = keys[keys.length - 1];
+    target[lastKey] = value;
+
+    // Add to history if requested
+    if (addToHistory && previousValue !== value) {
+      this.addToHistory({
+        path,
+        previousValue,
+        newValue: value,
+        timestamp: Date.now()
+      });
+    }
+
+    // Notify listeners unless silent
+    if (!silent) {
+      this.notify(path, value, previousValue);
+    }
+  }
+
+  /**
+   * Subscribe to state changes
+   * @param {string} path - Path to watch (supports wildcards)
+   * @param {Function} callback - Callback function
+   * @returns {Function} Unsubscribe function
+   */
+  subscribe(path, callback) {
+    if (!this.listeners.has(path)) {
+      this.listeners.set(path, new Set());
+    }
+
+    this.listeners.get(path).add(callback);
+
+    // Return unsubscribe function
+    return () => {
+      const listeners = this.listeners.get(path);
+      if (listeners) {
+        listeners.delete(callback);
+        if (listeners.size === 0) {
+          this.listeners.delete(path);
+        }
+      }
+    };
+  }
+
+  /**
+   * Notify listeners of state change
+   * @private
+   */
+  notify(path, newValue, previousValue) {
+    // Notify exact path listeners
+    const exactListeners = this.listeners.get(path);
+    if (exactListeners) {
+      exactListeners.forEach(callback => {
+        try {
+          callback(newValue, previousValue, path);
+        } catch (error) {
+          console.error(`Error in state listener for ${path}:`, error);
+        }
+      });
+    }
+
+    // Notify wildcard listeners
+    const parts = path.split('.');
+    for (let i = 1; i <= parts.length; i++) {
+      const wildcardPath = parts.slice(0, i - 1).join('.') +
+                          (i > 1 ? '.' : '') + '*';
+      const wildcardListeners = this.listeners.get(wildcardPath);
+      if (wildcardListeners) {
+        wildcardListeners.forEach(callback => {
+          try {
+            callback(newValue, previousValue, path);
+          } catch (error) {
+            console.error(`Error in wildcard listener for ${wildcardPath}:`, error);
+          }
+        });
+      }
+    }
+  }
+
+  /**
+   * Add state change to history
+   * @private
+   */
+  addToHistory(change) {
+    this.history.push(change);
+
+    // Limit history size
+    if (this.history.length > this.maxHistory) {
+      this.history.shift();
+    }
+  }
+
+  /**
+   * Get state history
+   * @returns {Array} State change history
+   */
+  getHistory() {
+    return [...this.history];
+  }
+
+  /**
+   * Clear history
+   */
+  clearHistory() {
+    this.history = [];
+  }
+
+  /**
+   * Get complete state snapshot
+   * @returns {Object} Current state
+   */
+  getSnapshot() {
+    return JSON.parse(JSON.stringify(this.state));
+  }
+
+  /**
+   * Restore state from snapshot
+   * @param {Object} snapshot - State snapshot
+   */
+  restoreSnapshot(snapshot) {
+    this.state = JSON.parse(JSON.stringify(snapshot));
+    this.notify('*', this.state, null);
+  }
+
+  /**
+   * Reset state to initial values
+   */
+  reset() {
+    this.state = {
+      currentDiagramId: null,
+      currentSpec: null,
+      currentOverlays: new Set(),
+      currentStep: 0,
+      isPlaying: false,
+      theme: 'light',
+      progress: null,
+      achievements: [],
+      sessionStart: Date.now(),
+      diagramViewCount: 0
+    };
+
+    this.history = [];
+    this.notify('*', this.state, null);
+  }
+}
+
+// Make it a singleton
+const appState = new AppState();
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { AppState, appState };
+} else {
+  window.AppState = AppState;
+  window.appState = appState;
+}class SceneComposer {
   constructor() {
     this.debug = false;
   }
@@ -687,351 +1066,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = MermaidRenderer;
 } else {
   window.MermaidRenderer = MermaidRenderer;
-}/**
- * Unified State Manager
- * Combines steps, overlays, and scenes into a single state system
- */
-class StateManager {
-  constructor() {
-    this.states = [];
-    this.layers = new Map();
-    this.currentStateIndex = 0;
-    this.customLayers = new Set();
-    this.isPlaying = false;
-    this.playSpeed = 2000;
-    this.playInterval = null;
-  }
-
-  /**
-   * Initialize from spec data
-   * Converts old format (steps/scenes/overlays) to unified states
-   */
-  initialize(spec) {
-    this.states = [];
-    this.layers.clear();
-
-    // Convert overlays to layers
-    if (spec.overlays) {
-      spec.overlays.forEach(overlay => {
-        this.layers.set(overlay.id, {
-          id: overlay.id,
-          name: overlay.caption || overlay.id,
-          diff: overlay.diff || {},
-          type: 'modifier'
-        });
-      });
-    }
-
-    // Convert steps to sequential states (if they exist)
-    if (spec.steps && spec.steps.length > 0) {
-      const totalSteps = spec.steps.length;
-      spec.steps.forEach((step, index) => {
-        const position = totalSteps > 1 ? (index / (totalSteps - 1)) * 100 : 50;
-
-        // Determine active layers from step overlays
-        const activeLayers = new Set();
-        if (step.overlays) {
-          step.overlays.forEach(overlayId => activeLayers.add(overlayId));
-        }
-
-        this.states.push({
-          id: `step-${index}`,
-          type: 'sequential',
-          position: position,
-          layers: activeLayers,
-          caption: step.caption || `Step ${index + 1}`,
-          narrative: step.narrative || '',
-          index: index
-        });
-      });
-    }
-    // If no steps but we have scenes, create sequential states from scenes
-    else if (spec.scenes && spec.scenes.length > 0) {
-      // First, add an initial state with no overlays
-      this.states.push({
-        id: 'initial',
-        type: 'sequential',
-        position: 0,
-        layers: new Set(),
-        caption: 'Initial State',
-        narrative: spec.narrative || '',
-        index: 0
-      });
-
-      // Then convert scenes to sequential states
-      const totalScenes = spec.scenes.length;
-      spec.scenes.forEach((scene, index) => {
-        const position = ((index + 1) / (totalScenes + 1)) * 100;
-
-        this.states.push({
-          id: scene.id || `scene-${index}`,
-          type: 'sequential',
-          position: position,
-          layers: new Set(scene.overlays || []),
-          caption: scene.title || scene.name || `Scene ${index + 1}`,
-          narrative: scene.narrative || '',
-          index: index + 1,
-          isScene: true
-        });
-      });
-    }
-    // If we have neither steps nor scenes, create states from overlays
-    else if (spec.overlays && spec.overlays.length > 0) {
-      // Initial state with no overlays
-      this.states.push({
-        id: 'initial',
-        type: 'sequential',
-        position: 0,
-        layers: new Set(),
-        caption: 'Base Diagram',
-        narrative: spec.narrative || '',
-        index: 0
-      });
-
-      // Create a state for each overlay
-      spec.overlays.forEach((overlay, index) => {
-        const position = ((index + 1) / (spec.overlays.length + 1)) * 100;
-
-        this.states.push({
-          id: `overlay-${overlay.id}`,
-          type: 'sequential',
-          position: position,
-          layers: new Set([overlay.id]),
-          caption: overlay.caption || overlay.id,
-          narrative: '',
-          index: index + 1
-        });
-      });
-    }
-
-    // Sort states by position
-    this.states.sort((a, b) => a.position - b.position);
-
-    // Set initial state
-    this.currentStateIndex = 0;
-    if (this.states.length > 0) {
-      this.applyState(this.states[0]);
-    }
-  }
-
-  /**
-   * Find appropriate timeline position for a scene
-   */
-  findScenePosition(scene) {
-    // Try to intelligently place scenes based on their overlays
-    // This is a heuristic - scenes with more overlays come later
-    const overlayCount = (scene.overlays || []).length;
-    const maxOverlays = 3; // Assume max 3 overlays
-    return Math.min(25 + (overlayCount * 25), 90);
-  }
-
-  /**
-   * Get current state
-   */
-  getCurrentState() {
-    return this.states[this.currentStateIndex];
-  }
-
-  /**
-   * Apply a state (activate its layers and update UI)
-   */
-  applyState(state) {
-    if (!state) return;
-
-    // Clear custom layers if moving to a defined state
-    if (state.type !== 'custom') {
-      this.customLayers.clear();
-    }
-
-    // Apply state layers
-    this.customLayers = new Set(state.layers);
-
-    // Emit state change event
-    this.emitStateChange(state);
-  }
-
-  /**
-   * Navigate to next state
-   */
-  next() {
-    if (this.currentStateIndex < this.states.length - 1) {
-      this.currentStateIndex++;
-      this.applyState(this.states[this.currentStateIndex]);
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Navigate to previous state
-   */
-  previous() {
-    if (this.currentStateIndex > 0) {
-      this.currentStateIndex--;
-      this.applyState(this.states[this.currentStateIndex]);
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Jump to specific state by ID
-   */
-  jumpToState(stateId) {
-    const index = this.states.findIndex(s => s.id === stateId);
-    if (index !== -1) {
-      this.currentStateIndex = index;
-      this.applyState(this.states[index]);
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Jump to position on timeline (0-100)
-   */
-  jumpToPosition(position) {
-    // Find closest state to this position
-    let closestIndex = 0;
-    let closestDistance = Math.abs(this.states[0].position - position);
-
-    this.states.forEach((state, index) => {
-      const distance = Math.abs(state.position - position);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
-    });
-
-    this.currentStateIndex = closestIndex;
-    this.applyState(this.states[closestIndex]);
-  }
-
-  /**
-   * Toggle a layer on current state
-   */
-  toggleLayer(layerId) {
-    if (this.customLayers.has(layerId)) {
-      this.customLayers.delete(layerId);
-    } else {
-      this.customLayers.add(layerId);
-    }
-
-    // Create custom state
-    const customState = {
-      id: 'custom',
-      type: 'custom',
-      position: this.getCurrentState().position,
-      layers: new Set(this.customLayers),
-      caption: 'Custom View',
-      narrative: ''
-    };
-
-    this.emitStateChange(customState);
-  }
-
-  /**
-   * Get all named states (for quick jump menu)
-   */
-  getNamedStates() {
-    return this.states.filter(s => s.type === 'named' || s.isScene);
-  }
-
-  /**
-   * Get active layers
-   */
-  getActiveLayers() {
-    return Array.from(this.customLayers);
-  }
-
-  /**
-   * Start auto-play through states
-   */
-  play() {
-    if (this.isPlaying) return;
-
-    this.isPlaying = true;
-    this.playInterval = setInterval(() => {
-      if (!this.next()) {
-        this.pause();
-      }
-    }, this.playSpeed);
-
-    this.emitPlayStateChange(true);
-  }
-
-  /**
-   * Pause auto-play
-   */
-  pause() {
-    this.isPlaying = false;
-    if (this.playInterval) {
-      clearInterval(this.playInterval);
-      this.playInterval = null;
-    }
-    this.emitPlayStateChange(false);
-  }
-
-  /**
-   * Toggle play/pause
-   */
-  togglePlay() {
-    if (this.isPlaying) {
-      this.pause();
-    } else {
-      this.play();
-    }
-  }
-
-  /**
-   * Set playback speed
-   */
-  setSpeed(ms) {
-    this.playSpeed = ms;
-    if (this.isPlaying) {
-      this.pause();
-      this.play();
-    }
-  }
-
-  /**
-   * Emit state change event
-   */
-  emitStateChange(state) {
-    document.dispatchEvent(new CustomEvent('stateChange', {
-      detail: {
-        state: state,
-        index: this.currentStateIndex,
-        total: this.states.length,
-        layers: Array.from(state.layers || this.customLayers),
-        position: state.position
-      }
-    }));
-  }
-
-  /**
-   * Emit play state change
-   */
-  emitPlayStateChange(isPlaying) {
-    document.dispatchEvent(new CustomEvent('playStateChange', {
-      detail: { isPlaying }
-    }));
-  }
-
-  /**
-   * Get progress percentage
-   */
-  getProgress() {
-    if (this.states.length === 0) return 0;
-    return (this.currentStateIndex / (this.states.length - 1)) * 100;
-  }
-}
-
-// Export for module systems
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = StateManager;
-} else {
-  window.StateManager = StateManager;
 }class ValidationError extends Error {
   constructor(rule, errors) {
     super(`Validation failed for ${rule}: ${errors.join(', ')}`);
@@ -2583,6 +2617,16 @@ if (typeof module !== 'undefined' && module.exports) {
       this.renderStep(0);
     }
   }
+
+  // Cleanup method to prevent memory leaks
+  destroy() {
+    this.stopAutoPlay();
+    this.steps = [];
+    this.spec = null;
+    this.currentStep = 0;
+    this.renderer = null;
+    this.composer = null;
+  }
 }
 
 // Export for module systems, or make global
@@ -3765,18 +3809,9 @@ if (typeof module !== 'undefined' && module.exports) {
       );
     });
 
-    // Listen for drill completion
+    // Listen for drill completion - just refresh UI, ProgressTracker already updated learning progress
     document.addEventListener('drillComplete', (e) => {
-      const drills = this.currentSpec.drills || [];
-      const completed = drills.filter(d =>
-        this.drillSystem.progress.isDrillComplete(this.currentDiagramId, d.id)
-      ).length;
-
-      this.learningProgress.updateDrillProgress(
-        this.currentDiagramId,
-        completed,
-        drills.length
-      );
+      this.updateProgressDisplay();
     });
 
     // Theme toggle

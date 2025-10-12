@@ -7,7 +7,7 @@
     "start": "npx http-server docs -p 8000",
     "start:test": "npx http-server docs -p 8888",
     "build": "npm run bundle && npm run copy-data",
-    "bundle": "cat src/core/*.js src/learning/*.js src/ui/*.js > docs/app.js",
+    "bundle": "cat src/utils/sanitizer.js src/core/app-state.js src/core/composer.js src/core/renderer.js src/core/validator.js src/learning/*.js src/ui/*.js > docs/app.js",
     "copy-data": "cp -r data/specs docs/data/ && cp data/manifest.json docs/data/ && cp data/schema.json docs/data/",
     "validate": "node scripts/validate-all.js",
     "test": "node tests/run-all-tests.js",

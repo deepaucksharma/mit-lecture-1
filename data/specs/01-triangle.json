@@ -1,7 +1,7 @@
 {
   "id": "01-triangle",
   "title": "The Impossible Triangle",
-  "narrative": "You stand at the crossroads of distributed systems. Three paths beckon: blazing Performance, unwavering Reliability, perfect Consistency. Choose two—the third will haunt you. GFS chose wisely for its world: billions of bytes flowing like water need speed and survival, not perfect synchronization. This triangle is a simplified view of the CAP theorem (Brewer, 2000), which formally proves you cannot have Consistency, Availability, and Partition tolerance simultaneously.",
+  "narrative": "You stand at the crossroads of distributed systems. Three paths beckon: blazing Performance, unwavering Reliability, perfect Consistency. Choose two—the third will haunt you. GFS chose wisely for its world: billions of bytes flowing like water need speed and survival, not perfect synchronization. This triangle is a simplified view of the CAP theorem (Brewer, 2000), which formally proves you cannot have Consistency, Availability, and Partition tolerance simultaneously. In Google's production clusters, this choice enabled 580 MB/s sustained read rates with 342 chunkservers while tolerating daily hardware failures.",
   "crystallizedInsight": "You cannot escape trade-offs, only choose them wisely—CAP theorem makes this mathematical law",
   "firstPrinciples": {
     "theoreticalFoundation": "CAP Theorem (Gilbert & Lynch, 2002): Under network partitions (P), you must sacrifice either consistency (C—all nodes see same data) or availability (A—every request gets response). FLP Impossibility (1985) goes further: even without failures, consensus is impossible in asynchronous networks with one faulty process.",
@@ -139,16 +139,16 @@
   ],
   "contracts": {
     "invariants": [
-      "At most 2 of 3 properties can be fully optimized",
-      "Every design choice involves trade-offs"
+      "At most 2 of 3 properties can be fully optimized (CAP theorem: cannot have C+A under Partitions)",
+      "Every design choice involves trade-offs (mathematical impossibility, not engineering limitation)"
     ],
     "guarantees": [
-      "GFS prioritizes Performance and Reliability",
-      "Applications handle weak consistency"
+      "GFS prioritizes Performance and Reliability (AP system: available and partition-tolerant)",
+      "Applications handle weak consistency (define d regions with record IDs, checksums for validation)"
     ],
     "caveats": [
-      "Consistency is relaxed for better performance",
-      "Applications must be designed for eventual consistency"
+      "Consistency is relaxed for better performance (stale reads possible, record appends at-least-once)",
+      "Applications must be designed for eventual consistency (use unique IDs for deduplication, checkpointing for recovery)"
     ]
   },
   "drills": [

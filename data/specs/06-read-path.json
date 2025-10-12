@@ -9,7 +9,7 @@
     ],
     "checkYourself": "Can you explain why the Master never touches file data? Do you understand what happens when a single component becomes a bottleneck?"
   },
-  "narrative": "Watch how caching transforms the system. Not for speed—the time saved is trivial. But for survival—without it, the Master drowns in requests. This is the dance between memory and scalability. Caching is load shedding, not optimization—it's about system survival, not user experience.",
+  "narrative": "Watch how caching transforms the system. Not for speed—the time saved is trivial (2ms out of 107ms). But for survival—without it, the Master drowns in requests. This is the dance between memory and scalability. Caching is load shedding, not optimization—it's about system survival, not user experience. In production: 90% cache hit rate reduces Master load by 10x, enabling it to handle 200-500 ops/sec sustainably.",
   "crystallizedInsight": "Cache for load reduction, not latency. The Master is precious—protect it. This is Little's Law in action: L = λW",
   "firstPrinciples": {
     "cachingTheory": {
@@ -171,19 +171,19 @@
   ],
   "contracts": {
     "invariants": [
-      "Master never transfers file data",
-      "Client always validates chunk version",
-      "Cache entries have bounded TTL"
+      "Master never transfers file data (preserves control/data separation, Amdahl's Law constraint)",
+      "Client always validates chunk version (stale replica detection via monotonic version numbers)",
+      "Cache entries have bounded TTL (typically 60s, balances staleness vs Master load)"
     ],
     "guarantees": [
-      "Master returns only current-version replicas",
-      "Read will succeed if any replica is available",
-      "Cached locations valid within TTL window"
+      "Master returns only current-version replicas (version tracking in master metadata)",
+      "Read will succeed if any replica is available (3-way replication tolerates 2 failures)",
+      "Cached locations valid within TTL window (bounded staleness guarantee)"
     ],
     "caveats": [
-      "Stale reads possible from lagging replicas",
-      "Cache invalidation is not immediate",
-      "Network partitions may prevent reaching all replicas"
+      "Stale reads possible from lagging replicas (eventual consistency model, replica may miss recent mutations)",
+      "Cache invalidation is not immediate (TTL-based, not event-driven for scalability)",
+      "Network partitions may prevent reaching all replicas (client retries with different replica, may fail if all unreachable)"
     ]
   },
   "drills": [

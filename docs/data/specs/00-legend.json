@@ -1,7 +1,7 @@
 {
   "id": "00-legend",
   "title": "Master Legend & System Contracts",
-  "narrative": "Before we begin: These three components and their sacred separation define everything that follows. The Master thinks but never lifts. The Chunkserver lifts but never thinks. The Client orchestrates both. Break these roles, and GFS breaks. This architecture emerges from the end-to-end argument (Saltzer, Reed, Clark, 1984): reliability and performance should be ensured at endpoints, not intermediaries.",
+  "narrative": "Before we begin: These three components and their sacred separation define everything that follows. The Master thinks but never lifts. The Chunkserver lifts but never thinks. The Client orchestrates both. Break these roles, and GFS breaks. This architecture emerges from the end-to-end argument (Saltzer, Reed, Clark, 1984): reliability and performance should be ensured at endpoints, not intermediaries. In production at Google, this separation enabled scaling to 1000+ storage nodes with 300TB+ of disk space, handling 100s of clients concurrently.",
   "crystallizedInsight": "The separation of control and data is the foundation of all scalable systems—it's Amdahl's Law applied to distributed architecture",
   "firstPrinciples": {
     "theoreticalFoundation": "From the asynchronous network model and FLP Impossibility (Fischer, Lynch, Paterson, 1985), deterministic consensus is impossible with even one faulty process. GFS's separation sidesteps this by minimizing consensus scope to metadata only.",
@@ -70,7 +70,9 @@
       "kind": "heartbeat",
       "label": "Heartbeat (Health Monitoring)",
       "metrics": {
-        "frequency": "Every few seconds"
+        "frequency": "Every 10 seconds (typical)",
+        "payload": "~100 bytes per heartbeat",
+        "purpose": "Chunk location updates, failure detection, load reporting"
       }
     }
   ],
@@ -143,20 +145,20 @@
   ],
   "contracts": {
     "invariants": [
-      "Master never touches file data - it would create an impossible bottleneck",
-      "Version numbers only increase - time flows forward, never backward",
-      "At most one primary per chunk - prevents conflicting updates",
-      "Chunks have exactly 3 replicas - balancing safety and cost"
+      "Master never touches file data - it would create an impossible bottleneck (would limit to ~100 Mbps single NIC bandwidth vs 100+ Gbps aggregate)",
+      "Version numbers only increase - time flows forward, never backward (monotonic versioning enables stale replica detection)",
+      "At most one primary per chunk at any time - prevents conflicting updates (lease mechanism with 60s timeout ensures single writer)",
+      "Chunks have exactly 3 replicas by default - balancing safety and cost (tolerates 2 simultaneous failures, 3x storage overhead)"
     ],
     "guarantees": [
-      "Metadata operations are atomic - no partial states",
-      "All chunks are replicated - hardware failures don't lose data",
-      "System continues with failures - designed for continuous operation"
+      "Metadata operations are atomic - no partial states (namespace locking + operation log provides atomicity)",
+      "All chunks are replicated - hardware failures don't lose data (3-way replication with checksums detects corruption)",
+      "System continues with failures - designed for continuous operation (master recovery in seconds, chunk re-replication automatic, 600GB recovered in ~23 minutes)"
     ],
     "caveats": [
-      "Replicas may diverge temporarily - consistency is eventual, not immediate",
-      "You might read old data - freshness is not guaranteed",
-      "Changes propagate slowly - this is a feature, not a bug"
+      "Replicas may diverge temporarily - consistency is eventual, not immediate (record appends are at-least-once, may contain duplicates and padding)",
+      "You might read old data - freshness is not guaranteed (stale reads possible until client cache expires or file reopened)",
+      "Changes propagate slowly - this is a feature, not a bug (lazy garbage collection with 3-day grace period for deleted files)"
     ]
   },
   "drills": [
@@ -254,9 +256,9 @@
       "formalVerification": "TLA+ specifications can prove safety properties (no split-brain) and liveness under partial synchrony assumptions"
     },
     "modernEvolutions": {
-      "shardedMetadata": "Colossus shards the namespace, each shard runs Paxos—trades simplicity for scalability",
-      "erasureCoding": "Reed-Solomon (k+m) coding reduces storage from 3x to 1.5x but increases repair bandwidth",
-      "tieredStorage": "Hot data on SSD with replication, cold on HDD with erasure coding—optimize cost per byte"
+      "shardedMetadata": "Colossus shards the namespace, each shard runs Paxos—trades simplicity for scalability. Each metadata shard can handle 10K+ ops/sec vs GFS single master at 200-500 ops/sec",
+      "erasureCoding": "Reed-Solomon (k+m) coding reduces storage from 3x to 1.5x but increases repair bandwidth. Example: RS(6,3) provides similar durability with 1.5x overhead instead of 3x",
+      "tieredStorage": "Hot data on SSD with replication, cold on HDD with erasure coding—optimize cost per byte. Production systems use 90% cold storage on erasure-coded HDD, 10% hot on replicated SSD"
     },
     "openProblems": [
       "Can we achieve linearizable consistency without global coordination? (Hint: CRDTs for specific data types)",
