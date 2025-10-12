@@ -1,195 +1,4 @@
-class ValidationError extends Error {
-  constructor(rule, errors) {
-    super(`Validation failed for ${rule}: ${errors.join(', ')}`);
-    this.rule = rule;
-    this.errors = errors;
-  }
-}
-
-class DiagramValidator {
-  constructor() {
-    this.ajv = null;
-    this.schema = null;
-    this.validate = null;
-    this.semanticRules = [
-      this.validateMasterNotOnDataPath,
-      this.validatePrimarySecondaryConsistency,
-      this.validateVersionMonotonicity,
-      this.validateReplicationFactor,
-      this.validateOverlayReferences
-    ];
-  }
-
-  async initialize() {
-    try {
-      // In browser environment, Ajv should be loaded via CDN
-      if (typeof Ajv === 'undefined') {
-        console.warn('Ajv not loaded. Schema validation will be skipped.');
-        return;
-      }
-
-      this.ajv = new Ajv({ allErrors: true });
-      this.schema = await fetch('/data/schema.json').then(r => r.json());
-      this.validate = this.ajv.compile(this.schema);
-    } catch (error) {
-      console.error('Failed to initialize validator:', error);
-    }
-  }
-
-  validateSpec(spec) {
-    const errors = [];
-
-    // Schema validation if available
-    if (this.validate && !this.validate(spec)) {
-      const schemaErrors = this.ajv && this.ajv.errors
-        ? this.ajv.errors.map(e => e.message || 'Unknown schema error')
-        : ['Schema validation failed'];
-      throw new ValidationError('Schema', schemaErrors);
-    }
-
-    // Semantic validation
-    for (const rule of this.semanticRules) {
-      const result = rule.call(this, spec);
-      if (!result.valid) {
-        errors.push(...result.errors);
-      }
-    }
-
-    if (errors.length > 0) {
-      throw new ValidationError('Semantic', errors);
-    }
-
-    return true;
-  }
-
-  validateMasterNotOnDataPath(spec) {
-    const masters = new Set(
-      (spec.nodes || []).filter(n => n.type === 'master').map(n => n.id)
-    );
-
-    const violations = (spec.edges || []).filter(e =>
-      e.kind === 'data' && (masters.has(e.from) || masters.has(e.to))
-    );
-
-    return {
-      valid: violations.length === 0,
-      rule: 'MasterNotOnDataPath',
-      errors: violations.map(e => `Data edge ${e.id} touches master`)
-    };
-  }
-
-  validatePrimarySecondaryConsistency(spec) {
-    // Check that if there's a primary, there are secondaries
-    const nodes = spec.nodes || [];
-    const primaryCount = nodes.filter(n => n.label && n.label.includes('Primary')).length;
-    const secondaryCount = nodes.filter(n => n.label && n.label.includes('Secondary')).length;
-
-    if (primaryCount > 0 && secondaryCount === 0) {
-      return {
-        valid: false,
-        rule: 'PrimarySecondaryConsistency',
-        errors: ['Primary exists without secondaries']
-      };
-    }
-
-    return { valid: true, errors: [] };
-  }
-
-  validateVersionMonotonicity(spec) {
-    // Check version numbers are consistent
-    const versionedNodes = (spec.nodes || []).filter(n => n.metadata && n.metadata.version);
-    const errors = [];
-
-    // Just ensure versions are positive
-    versionedNodes.forEach(node => {
-      if (node.metadata.version < 0) {
-        errors.push(`Node ${node.id} has negative version ${node.metadata.version}`);
-      }
-    });
-
-    return {
-      valid: errors.length === 0,
-      rule: 'VersionMonotonicity',
-      errors
-    };
-  }
-
-  validateReplicationFactor(spec) {
-    // This is more of a warning than an error for educational purposes
-    const chunkservers = (spec.nodes || []).filter(n => n.type === 'chunkserver');
-
-    if (chunkservers.length > 0 && chunkservers.length < 3) {
-      return {
-        valid: true, // Warning only
-        rule: 'ReplicationFactor',
-        errors: []
-      };
-    }
-
-    return { valid: true, errors: [] };
-  }
-
-  validateOverlayReferences(spec) {
-    const nodeIds = new Set((spec.nodes || []).map(n => n.id));
-    const edgeIds = new Set((spec.edges || []).map(e => e.id));
-    const errors = [];
-
-    for (const overlay of spec.overlays || []) {
-      // Check removals reference existing elements
-      overlay.diff?.remove?.nodeIds?.forEach(id => {
-        if (!nodeIds.has(id)) {
-          errors.push(`Overlay ${overlay.id} removes non-existent node ${id}`);
-        }
-      });
-
-      overlay.diff?.remove?.edgeIds?.forEach(id => {
-        if (!edgeIds.has(id)) {
-          errors.push(`Overlay ${overlay.id} removes non-existent edge ${id}`);
-        }
-      });
-
-      // Check highlights reference existing elements
-      overlay.diff?.highlight?.nodeIds?.forEach(id => {
-        if (!nodeIds.has(id)) {
-          errors.push(`Overlay ${overlay.id} highlights non-existent node ${id}`);
-        }
-      });
-
-      overlay.diff?.highlight?.edgeIds?.forEach(id => {
-        if (!edgeIds.has(id)) {
-          errors.push(`Overlay ${overlay.id} highlights non-existent edge ${id}`);
-        }
-      });
-
-      // Check modifications reference existing elements
-      overlay.diff?.modify?.nodes?.forEach(node => {
-        if (!nodeIds.has(node.id)) {
-          errors.push(`Overlay ${overlay.id} modifies non-existent node ${node.id}`);
-        }
-      });
-
-      overlay.diff?.modify?.edges?.forEach(edge => {
-        if (!edgeIds.has(edge.id)) {
-          errors.push(`Overlay ${overlay.id} modifies non-existent edge ${edge.id}`);
-        }
-      });
-    }
-
-    return {
-      valid: errors.length === 0,
-      rule: 'OverlayReferences',
-      errors
-    };
-  }
-}
-
-// Export for module systems, or make global
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { DiagramValidator, ValidationError };
-} else {
-  window.DiagramValidator = DiagramValidator;
-  window.ValidationError = ValidationError;
-}class SceneComposer {
+class SceneComposer {
   constructor() {
     this.debug = false;
   }
@@ -197,11 +6,6 @@ if (typeof module !== 'undefined' && module.exports) {
   composeScene(spec, overlayIds = []) {
     // Deep clone the spec to avoid mutations
     const composed = this.deepClone(spec);
-
-    // Add defensive null checks for nodes and edges
-    if (!composed.nodes) composed.nodes = [];
-    if (!composed.edges) composed.edges = [];
-
     const nodeMap = new Map(composed.nodes.map(n => [n.id, n]));
     const edgeMap = new Map(composed.edges.map(e => [e.id, e]));
 
@@ -553,22 +357,14 @@ if (typeof module !== 'undefined' && module.exports) {
       const shape = this.getNodeShape(node);
       const style = node._highlighted ? ':::highlight' :
                    node._added ? ':::added' : '';
-      // Sanitize node labels to avoid Mermaid parsing conflicts
-      // Parentheses inside special shapes like [()] cause parse errors
-      const sanitizedLabel = node.label
-        .replace(/\(/g, '')  // Remove parentheses
-        .replace(/\)/g, '')
-        .replace(/\[/g, '')  // Remove brackets
-        .replace(/\]/g, '')
-        .replace(/\s+/g, ' ') // Normalize whitespace
-        .trim();
-      lines.push(`  ${node.id}${shape.open}${sanitizedLabel}${shape.close}${style}`);
+      // Don't use icons in flowchart - they cause parsing issues with some shapes
+      lines.push(`  ${node.id}${shape.open}"${node.label}"${shape.close}${style}`);
     }
 
     // Define edges
     for (const edge of spec.edges || []) {
       const arrow = this.getFlowArrow(edge);
-      const label = edge.label ? `|${this.formatEdgeLabel(edge)}|` : '';
+      const label = edge.label ? `|${this.formatFlowchartEdgeLabel(edge)}|` : '';
       const style = edge._highlighted ? ':::highlightEdge' :
                    edge._added ? ':::addedEdge' : '';
       lines.push(`  ${edge.from} ${arrow}${label} ${edge.to}${style}`);
@@ -669,12 +465,12 @@ if (typeof module !== 'undefined' && module.exports) {
 
   getNodeShape(node) {
     const shapes = {
-      'master': { open: '[(', close: ')]' },      // Diamond
-      'chunkserver': { open: '[(', close: ')]' }, // Cylinder
+      'master': { open: '{{', close: '}}' },      // Hexagon (control/coordination)
+      'chunkserver': { open: '[(', close: ')]' }, // Cylinder (storage)
       'client': { open: '[', close: ']' },        // Rectangle
       'rack': { open: '{{', close: '}}' },        // Hexagon
       'switch': { open: '((', close: '))' },      // Circle
-      'note': { open: '[', close: ']' },          // Rectangle with style
+      'note': { open: '[', close: ']' },          // Rectangle
       'state': { open: '[', close: ']' },
       'event': { open: '(', close: ')' }
     };
@@ -721,38 +517,48 @@ if (typeof module !== 'undefined' && module.exports) {
   formatEdgeLabel(edge) {
     const parts = [];
 
-    // For flowchart labels, avoid emojis and special chars that break Mermaid parser
-    // when used inside pipe delimiters |label|
-    const isFlowchart = true; // Currently all non-sequence diagrams use flowchart
+    // Add kind indicator
+    const kindEmoji = {
+      'control': '⚡',
+      'data': '📦',
+      'cache': '💾',
+      'heartbeat': '💓'
+    };
 
-    // Add basic label (sanitized for flowcharts)
-    if (edge.label) {
-      let label = edge.label;
-      if (isFlowchart) {
-        // Remove problematic characters for Mermaid parsing
-        label = label
-          .replace(/\(/g, '')  // Remove parentheses
-          .replace(/\)/g, '')
-          .replace(/\[/g, '')  // Remove brackets
-          .replace(/\]/g, '')
-          .replace(/\s+/g, ' ') // Normalize whitespace
-          .trim();
-      }
-      parts.push(label);
+    if (kindEmoji[edge.kind]) {
+      parts.push(kindEmoji[edge.kind]);
     }
 
-    // Add metrics if available (keep these simple too)
-    if (edge.metrics && isFlowchart) {
+    parts.push(edge.label || '');
+
+    // Add metrics if available
+    if (edge.metrics) {
       const metrics = [];
-      if (edge.metrics.size) metrics.push(edge.metrics.size.replace(/[()[\]]/g, ''));
-      if (edge.metrics.latency) metrics.push(edge.metrics.latency.replace(/[()[\]]/g, ''));
+      if (edge.metrics.size) metrics.push(edge.metrics.size);
+      if (edge.metrics.latency) metrics.push(edge.metrics.latency);
+      if (edge.metrics.throughput) metrics.push(`@${edge.metrics.throughput}`);
 
       if (metrics.length > 0) {
-        parts.push(metrics.join(' '));
+        parts.push(`[${metrics.join(', ')}]`);
       }
     }
 
     return parts.filter(Boolean).join(' ');
+  }
+
+  formatFlowchartEdgeLabel(edge) {
+    // Simplified label format for flowcharts (no emojis, no special chars)
+    // Only use basic text to avoid Mermaid parsing conflicts
+    // Remove or escape problematic characters: parentheses, pipes, brackets
+    const label = edge.label || '';
+    return label
+      .replace(/\(/g, '')  // Remove opening parentheses
+      .replace(/\)/g, '')  // Remove closing parentheses
+      .replace(/\|/g, '')  // Remove pipe characters
+      .replace(/\[/g, '')  // Remove brackets
+      .replace(/\]/g, '')
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim();
   }
 
   groupEdgesByPhase(edges) {
@@ -881,6 +687,539 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = MermaidRenderer;
 } else {
   window.MermaidRenderer = MermaidRenderer;
+}/**
+ * Unified State Manager
+ * Combines steps, overlays, and scenes into a single state system
+ */
+class StateManager {
+  constructor() {
+    this.states = [];
+    this.layers = new Map();
+    this.currentStateIndex = 0;
+    this.customLayers = new Set();
+    this.isPlaying = false;
+    this.playSpeed = 2000;
+    this.playInterval = null;
+  }
+
+  /**
+   * Initialize from spec data
+   * Converts old format (steps/scenes/overlays) to unified states
+   */
+  initialize(spec) {
+    this.states = [];
+    this.layers.clear();
+
+    // Convert overlays to layers
+    if (spec.overlays) {
+      spec.overlays.forEach(overlay => {
+        this.layers.set(overlay.id, {
+          id: overlay.id,
+          name: overlay.caption || overlay.id,
+          diff: overlay.diff || {},
+          type: 'modifier'
+        });
+      });
+    }
+
+    // Convert steps to sequential states (if they exist)
+    if (spec.steps && spec.steps.length > 0) {
+      const totalSteps = spec.steps.length;
+      spec.steps.forEach((step, index) => {
+        const position = totalSteps > 1 ? (index / (totalSteps - 1)) * 100 : 50;
+
+        // Determine active layers from step overlays
+        const activeLayers = new Set();
+        if (step.overlays) {
+          step.overlays.forEach(overlayId => activeLayers.add(overlayId));
+        }
+
+        this.states.push({
+          id: `step-${index}`,
+          type: 'sequential',
+          position: position,
+          layers: activeLayers,
+          caption: step.caption || `Step ${index + 1}`,
+          narrative: step.narrative || '',
+          index: index
+        });
+      });
+    }
+    // If no steps but we have scenes, create sequential states from scenes
+    else if (spec.scenes && spec.scenes.length > 0) {
+      // First, add an initial state with no overlays
+      this.states.push({
+        id: 'initial',
+        type: 'sequential',
+        position: 0,
+        layers: new Set(),
+        caption: 'Initial State',
+        narrative: spec.narrative || '',
+        index: 0
+      });
+
+      // Then convert scenes to sequential states
+      const totalScenes = spec.scenes.length;
+      spec.scenes.forEach((scene, index) => {
+        const position = ((index + 1) / (totalScenes + 1)) * 100;
+
+        this.states.push({
+          id: scene.id || `scene-${index}`,
+          type: 'sequential',
+          position: position,
+          layers: new Set(scene.overlays || []),
+          caption: scene.title || scene.name || `Scene ${index + 1}`,
+          narrative: scene.narrative || '',
+          index: index + 1,
+          isScene: true
+        });
+      });
+    }
+    // If we have neither steps nor scenes, create states from overlays
+    else if (spec.overlays && spec.overlays.length > 0) {
+      // Initial state with no overlays
+      this.states.push({
+        id: 'initial',
+        type: 'sequential',
+        position: 0,
+        layers: new Set(),
+        caption: 'Base Diagram',
+        narrative: spec.narrative || '',
+        index: 0
+      });
+
+      // Create a state for each overlay
+      spec.overlays.forEach((overlay, index) => {
+        const position = ((index + 1) / (spec.overlays.length + 1)) * 100;
+
+        this.states.push({
+          id: `overlay-${overlay.id}`,
+          type: 'sequential',
+          position: position,
+          layers: new Set([overlay.id]),
+          caption: overlay.caption || overlay.id,
+          narrative: '',
+          index: index + 1
+        });
+      });
+    }
+
+    // Sort states by position
+    this.states.sort((a, b) => a.position - b.position);
+
+    // Set initial state
+    this.currentStateIndex = 0;
+    if (this.states.length > 0) {
+      this.applyState(this.states[0]);
+    }
+  }
+
+  /**
+   * Find appropriate timeline position for a scene
+   */
+  findScenePosition(scene) {
+    // Try to intelligently place scenes based on their overlays
+    // This is a heuristic - scenes with more overlays come later
+    const overlayCount = (scene.overlays || []).length;
+    const maxOverlays = 3; // Assume max 3 overlays
+    return Math.min(25 + (overlayCount * 25), 90);
+  }
+
+  /**
+   * Get current state
+   */
+  getCurrentState() {
+    return this.states[this.currentStateIndex];
+  }
+
+  /**
+   * Apply a state (activate its layers and update UI)
+   */
+  applyState(state) {
+    if (!state) return;
+
+    // Clear custom layers if moving to a defined state
+    if (state.type !== 'custom') {
+      this.customLayers.clear();
+    }
+
+    // Apply state layers
+    this.customLayers = new Set(state.layers);
+
+    // Emit state change event
+    this.emitStateChange(state);
+  }
+
+  /**
+   * Navigate to next state
+   */
+  next() {
+    if (this.currentStateIndex < this.states.length - 1) {
+      this.currentStateIndex++;
+      this.applyState(this.states[this.currentStateIndex]);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Navigate to previous state
+   */
+  previous() {
+    if (this.currentStateIndex > 0) {
+      this.currentStateIndex--;
+      this.applyState(this.states[this.currentStateIndex]);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Jump to specific state by ID
+   */
+  jumpToState(stateId) {
+    const index = this.states.findIndex(s => s.id === stateId);
+    if (index !== -1) {
+      this.currentStateIndex = index;
+      this.applyState(this.states[index]);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Jump to position on timeline (0-100)
+   */
+  jumpToPosition(position) {
+    // Find closest state to this position
+    let closestIndex = 0;
+    let closestDistance = Math.abs(this.states[0].position - position);
+
+    this.states.forEach((state, index) => {
+      const distance = Math.abs(state.position - position);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    this.currentStateIndex = closestIndex;
+    this.applyState(this.states[closestIndex]);
+  }
+
+  /**
+   * Toggle a layer on current state
+   */
+  toggleLayer(layerId) {
+    if (this.customLayers.has(layerId)) {
+      this.customLayers.delete(layerId);
+    } else {
+      this.customLayers.add(layerId);
+    }
+
+    // Create custom state
+    const customState = {
+      id: 'custom',
+      type: 'custom',
+      position: this.getCurrentState().position,
+      layers: new Set(this.customLayers),
+      caption: 'Custom View',
+      narrative: ''
+    };
+
+    this.emitStateChange(customState);
+  }
+
+  /**
+   * Get all named states (for quick jump menu)
+   */
+  getNamedStates() {
+    return this.states.filter(s => s.type === 'named' || s.isScene);
+  }
+
+  /**
+   * Get active layers
+   */
+  getActiveLayers() {
+    return Array.from(this.customLayers);
+  }
+
+  /**
+   * Start auto-play through states
+   */
+  play() {
+    if (this.isPlaying) return;
+
+    this.isPlaying = true;
+    this.playInterval = setInterval(() => {
+      if (!this.next()) {
+        this.pause();
+      }
+    }, this.playSpeed);
+
+    this.emitPlayStateChange(true);
+  }
+
+  /**
+   * Pause auto-play
+   */
+  pause() {
+    this.isPlaying = false;
+    if (this.playInterval) {
+      clearInterval(this.playInterval);
+      this.playInterval = null;
+    }
+    this.emitPlayStateChange(false);
+  }
+
+  /**
+   * Toggle play/pause
+   */
+  togglePlay() {
+    if (this.isPlaying) {
+      this.pause();
+    } else {
+      this.play();
+    }
+  }
+
+  /**
+   * Set playback speed
+   */
+  setSpeed(ms) {
+    this.playSpeed = ms;
+    if (this.isPlaying) {
+      this.pause();
+      this.play();
+    }
+  }
+
+  /**
+   * Emit state change event
+   */
+  emitStateChange(state) {
+    document.dispatchEvent(new CustomEvent('stateChange', {
+      detail: {
+        state: state,
+        index: this.currentStateIndex,
+        total: this.states.length,
+        layers: Array.from(state.layers || this.customLayers),
+        position: state.position
+      }
+    }));
+  }
+
+  /**
+   * Emit play state change
+   */
+  emitPlayStateChange(isPlaying) {
+    document.dispatchEvent(new CustomEvent('playStateChange', {
+      detail: { isPlaying }
+    }));
+  }
+
+  /**
+   * Get progress percentage
+   */
+  getProgress() {
+    if (this.states.length === 0) return 0;
+    return (this.currentStateIndex / (this.states.length - 1)) * 100;
+  }
+}
+
+// Export for module systems
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = StateManager;
+} else {
+  window.StateManager = StateManager;
+}class ValidationError extends Error {
+  constructor(rule, errors) {
+    super(`Validation failed for ${rule}: ${errors.join(', ')}`);
+    this.rule = rule;
+    this.errors = errors;
+  }
+}
+
+class DiagramValidator {
+  constructor() {
+    this.ajv = null;
+    this.schema = null;
+    this.validate = null;
+    this.semanticRules = [
+      this.validateMasterNotOnDataPath,
+      this.validatePrimarySecondaryConsistency,
+      this.validateVersionMonotonicity,
+      this.validateReplicationFactor,
+      this.validateOverlayReferences
+    ];
+  }
+
+  async initialize() {
+    try {
+      // In browser environment, Ajv should be loaded via CDN
+      if (typeof Ajv === 'undefined') {
+        console.warn('Ajv not loaded. Schema validation will be skipped.');
+        return;
+      }
+
+      this.ajv = new Ajv({ allErrors: true });
+      this.schema = await fetch('/data/schema.json').then(r => r.json());
+      this.validate = this.ajv.compile(this.schema);
+    } catch (error) {
+      console.error('Failed to initialize validator:', error);
+    }
+  }
+
+  validateSpec(spec) {
+    const errors = [];
+
+    // Schema validation if available
+    if (this.validate && !this.validate(spec)) {
+      throw new ValidationError('Schema', this.ajv.errors.map(e => e.message));
+    }
+
+    // Semantic validation
+    for (const rule of this.semanticRules) {
+      const result = rule.call(this, spec);
+      if (!result.valid) {
+        errors.push(...result.errors);
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new ValidationError('Semantic', errors);
+    }
+
+    return true;
+  }
+
+  validateMasterNotOnDataPath(spec) {
+    const masters = new Set(
+      (spec.nodes || []).filter(n => n.type === 'master').map(n => n.id)
+    );
+
+    const violations = (spec.edges || []).filter(e =>
+      e.kind === 'data' && (masters.has(e.from) || masters.has(e.to))
+    );
+
+    return {
+      valid: violations.length === 0,
+      rule: 'MasterNotOnDataPath',
+      errors: violations.map(e => `Data edge ${e.id} touches master`)
+    };
+  }
+
+  validatePrimarySecondaryConsistency(spec) {
+    // Check that if there's a primary, there are secondaries
+    const nodes = spec.nodes || [];
+    const primaryCount = nodes.filter(n => n.label && n.label.includes('Primary')).length;
+    const secondaryCount = nodes.filter(n => n.label && n.label.includes('Secondary')).length;
+
+    if (primaryCount > 0 && secondaryCount === 0) {
+      return {
+        valid: false,
+        rule: 'PrimarySecondaryConsistency',
+        errors: ['Primary exists without secondaries']
+      };
+    }
+
+    return { valid: true, errors: [] };
+  }
+
+  validateVersionMonotonicity(spec) {
+    // Check version numbers are consistent
+    const versionedNodes = (spec.nodes || []).filter(n => n.metadata && n.metadata.version);
+    const errors = [];
+
+    // Just ensure versions are positive
+    versionedNodes.forEach(node => {
+      if (node.metadata.version < 0) {
+        errors.push(`Node ${node.id} has negative version ${node.metadata.version}`);
+      }
+    });
+
+    return {
+      valid: errors.length === 0,
+      rule: 'VersionMonotonicity',
+      errors
+    };
+  }
+
+  validateReplicationFactor(spec) {
+    // This is more of a warning than an error for educational purposes
+    const chunkservers = (spec.nodes || []).filter(n => n.type === 'chunkserver');
+
+    if (chunkservers.length > 0 && chunkservers.length < 3) {
+      return {
+        valid: true, // Warning only
+        rule: 'ReplicationFactor',
+        errors: []
+      };
+    }
+
+    return { valid: true, errors: [] };
+  }
+
+  validateOverlayReferences(spec) {
+    const nodeIds = new Set((spec.nodes || []).map(n => n.id));
+    const edgeIds = new Set((spec.edges || []).map(e => e.id));
+    const errors = [];
+
+    for (const overlay of spec.overlays || []) {
+      // Check removals reference existing elements
+      overlay.diff?.remove?.nodeIds?.forEach(id => {
+        if (!nodeIds.has(id)) {
+          errors.push(`Overlay ${overlay.id} removes non-existent node ${id}`);
+        }
+      });
+
+      overlay.diff?.remove?.edgeIds?.forEach(id => {
+        if (!edgeIds.has(id)) {
+          errors.push(`Overlay ${overlay.id} removes non-existent edge ${id}`);
+        }
+      });
+
+      // Check highlights reference existing elements
+      overlay.diff?.highlight?.nodeIds?.forEach(id => {
+        if (!nodeIds.has(id)) {
+          errors.push(`Overlay ${overlay.id} highlights non-existent node ${id}`);
+        }
+      });
+
+      overlay.diff?.highlight?.edgeIds?.forEach(id => {
+        if (!edgeIds.has(id)) {
+          errors.push(`Overlay ${overlay.id} highlights non-existent edge ${id}`);
+        }
+      });
+
+      // Check modifications reference existing elements
+      overlay.diff?.modify?.nodes?.forEach(node => {
+        if (!nodeIds.has(node.id)) {
+          errors.push(`Overlay ${overlay.id} modifies non-existent node ${node.id}`);
+        }
+      });
+
+      overlay.diff?.modify?.edges?.forEach(edge => {
+        if (!edgeIds.has(edge.id)) {
+          errors.push(`Overlay ${overlay.id} modifies non-existent edge ${edge.id}`);
+        }
+      });
+    }
+
+    return {
+      valid: errors.length === 0,
+      rule: 'OverlayReferences',
+      errors
+    };
+  }
+}
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { DiagramValidator, ValidationError };
+} else {
+  window.DiagramValidator = DiagramValidator;
+  window.ValidationError = ValidationError;
 }class ProgressTracker {
   constructor() {
     this.storageKey = 'gfs-learning-progress';
@@ -901,31 +1240,7 @@ if (typeof module !== 'undefined' && module.exports) {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
     } catch (error) {
-      if (error.name === 'QuotaExceededError') {
-        // Try to clear old data and retry
-        console.warn('localStorage quota exceeded, clearing old progress data');
-        this.clearOldProgress();
-        try {
-          localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
-        } catch (retryError) {
-          console.error('Still cannot save progress after clearing:', retryError);
-          alert('Storage quota exceeded. Please clear browser data.');
-        }
-      } else {
-        console.error('Failed to save progress:', error);
-      }
-    }
-  }
-
-  clearOldProgress() {
-    // Remove oldest entries (keep only last 20 drills)
-    const entries = Object.entries(this.progress);
-    if (entries.length > 20) {
-      // Sort by timestamp and keep only recent ones
-      const sorted = entries.sort((a, b) =>
-        (b[1].timestamp || 0) - (a[1].timestamp || 0)
-      );
-      this.progress = Object.fromEntries(sorted.slice(0, 20));
+      console.error('Failed to save progress:', error);
     }
   }
 
@@ -970,17 +1285,40 @@ class DrillSystem {
     this.progress = new ProgressTracker();
     this.currentDrill = null;
     this.currentDiagramId = null;
+    this.stateManager = null;
+    this.stateDrills = new Map(); // Maps state IDs to relevant drills
   }
 
-  // Sanitize user input to prevent XSS
-  sanitizeInput(input) {
-    if (typeof input !== 'string') return '';
-    return input
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;')
-      .replace(/&(?!(lt|gt|quot|#039);)/g, '&amp;');
+  // Set reference to state manager for state-aware drills
+  setStateManager(stateManager) {
+    this.stateManager = stateManager;
+
+    // Listen for state changes to highlight relevant drills
+    if (this.stateManager) {
+      document.addEventListener('stateChange', (e) => {
+        this.onStateChange(e.detail);
+      });
+    }
+  }
+
+  // Handle state changes - highlight drills relevant to current state
+  onStateChange(stateDetail) {
+    const currentState = stateDetail.state;
+    if (!currentState) return;
+
+    // Update drill visibility based on state
+    const drillElements = document.querySelectorAll('.drill');
+    drillElements.forEach(element => {
+      const drillId = element.dataset.drillId;
+      const stateId = element.dataset.stateId;
+
+      // Highlight drills associated with current state
+      if (stateId && stateId === currentState.id) {
+        element.classList.add('state-relevant');
+      } else {
+        element.classList.remove('state-relevant');
+      }
+    });
   }
 
   renderDrills(spec, containerId = 'drills-container') {
@@ -1023,7 +1361,7 @@ class DrillSystem {
         <div class="progress-fill" style="width: ${percentage}%"></div>
       </div>
       <div class="progress-text">${progress.completed} of ${totalDrills} completed (${percentage}%)</div>
-      <button class="reset-btn" onclick="drillSystem.resetDiagramProgress()">Reset Progress</button>
+      <button class="reset-btn" onclick="window.viewer.drillSystem.resetDiagramProgress()">Reset Progress</button>
     `;
 
     return header;
@@ -1141,10 +1479,10 @@ class DrillSystem {
           class="drill-answer"
         ></textarea>
         <div class="drill-actions">
-          <button onclick="drillSystem.checkRecall('${drill.id}')">
+          <button onclick="window.viewer.drillSystem.checkRecall('${drill.id}')">
             Check Answer
           </button>
-          <button onclick="drillSystem.revealAnswer('${drill.id}')" class="secondary">
+          <button onclick="window.viewer.drillSystem.revealAnswer('${drill.id}')" class="secondary">
             Show Answer
           </button>
         </div>
@@ -1152,19 +1490,6 @@ class DrillSystem {
           <div class="correct-answer">
             <strong>Answer:</strong> ${drill.answer || 'No answer provided'}
           </div>
-          ${drill.thoughtProcess && drill.thoughtProcess.length > 0 ? `
-            <div class="thought-process">
-              <h4>💭 Thought Process:</h4>
-              <ol class="thought-steps">
-                ${drill.thoughtProcess.map(step => `<li>${step}</li>`).join('')}
-              </ol>
-            </div>
-          ` : ''}
-          ${drill.insight ? `
-            <div class="drill-insight">
-              <strong>💡 Key Insight:</strong> ${drill.insight}
-            </div>
-          ` : ''}
         </div>
       </div>
     `;
@@ -1185,10 +1510,10 @@ class DrillSystem {
           class="drill-solution"
         ></textarea>
         <div class="drill-actions">
-          <button onclick="drillSystem.checkApply('${drill.id}')">
+          <button onclick="window.viewer.drillSystem.checkApply('${drill.id}')">
             Check Approach
           </button>
-          <button onclick="drillSystem.revealRubric('${drill.id}')" class="secondary">
+          <button onclick="window.viewer.drillSystem.revealRubric('${drill.id}')" class="secondary">
             Show Rubric
           </button>
         </div>
@@ -1202,19 +1527,6 @@ class DrillSystem {
               </li>`
             ).join('')}
           </ul>
-          ${drill.thoughtProcess && drill.thoughtProcess.length > 0 ? `
-            <div class="thought-process">
-              <h4>💭 Thought Process:</h4>
-              <ol class="thought-steps">
-                ${drill.thoughtProcess.map(step => `<li>${step}</li>`).join('')}
-              </ol>
-            </div>
-          ` : ''}
-          ${drill.insight ? `
-            <div class="drill-insight">
-              <strong>💡 Key Insight:</strong> ${drill.insight}
-            </div>
-          ` : ''}
         </div>
       </div>
     `;
@@ -1250,10 +1562,10 @@ class DrillSystem {
           </div>
         </div>
         <div class="drill-actions">
-          <button onclick="drillSystem.checkAnalysis('${drill.id}')">
+          <button onclick="window.viewer.drillSystem.checkAnalysis('${drill.id}')">
             Check Analysis
           </button>
-          <button onclick="drillSystem.revealAnalysis('${drill.id}')" class="secondary">
+          <button onclick="window.viewer.drillSystem.revealAnalysis('${drill.id}')" class="secondary">
             Show Analysis Points
           </button>
         </div>
@@ -1262,19 +1574,6 @@ class DrillSystem {
           <ul>
             ${(drill.rubric || []).map(point => `<li>${point}</li>`).join('')}
           </ul>
-          ${drill.thoughtProcess && drill.thoughtProcess.length > 0 ? `
-            <div class="thought-process">
-              <h4>💭 Thought Process:</h4>
-              <ol class="thought-steps">
-                ${drill.thoughtProcess.map(step => `<li>${step}</li>`).join('')}
-              </ol>
-            </div>
-          ` : ''}
-          ${drill.insight ? `
-            <div class="drill-insight">
-              <strong>💡 Key Insight:</strong> ${drill.insight}
-            </div>
-          ` : ''}
         </div>
       </div>
     `;
@@ -1293,10 +1592,10 @@ class DrillSystem {
           class="drill-design"
         ></textarea>
         <div class="drill-actions">
-          <button onclick="drillSystem.evaluateDesign('${drill.id}')">
+          <button onclick="window.viewer.drillSystem.evaluateDesign('${drill.id}')">
             Self-Evaluate
           </button>
-          <button onclick="drillSystem.showDesignCriteria('${drill.id}')" class="secondary">
+          <button onclick="window.viewer.drillSystem.showDesignCriteria('${drill.id}')" class="secondary">
             Show Design Criteria
           </button>
         </div>
@@ -1310,20 +1609,7 @@ class DrillSystem {
               </li>`
             ).join('')}
           </ul>
-          ${drill.thoughtProcess && drill.thoughtProcess.length > 0 ? `
-            <div class="thought-process">
-              <h4>💭 Thought Process:</h4>
-              <ol class="thought-steps">
-                ${drill.thoughtProcess.map(step => `<li>${step}</li>`).join('')}
-              </ol>
-            </div>
-          ` : ''}
-          ${drill.insight ? `
-            <div class="drill-insight">
-              <strong>💡 Key Insight:</strong> ${drill.insight}
-            </div>
-          ` : ''}
-          <button onclick="drillSystem.markComplete('${drill.id}')" class="primary">
+          <button onclick="window.viewer.drillSystem.markComplete('${drill.id}')" class="primary">
             Mark as Complete
           </button>
         </div>
@@ -1352,10 +1638,7 @@ class DrillSystem {
   }
 
   checkApply(drillId) {
-    const solutionEl = document.getElementById(`solution-${drillId}`);
-    if (!solutionEl) return;
-
-    const solution = this.sanitizeInput(solutionEl.value);
+    const solution = document.getElementById(`solution-${drillId}`).value;
 
     if (!solution.trim()) {
       alert('Please enter your solution');
@@ -1373,15 +1656,9 @@ class DrillSystem {
   }
 
   checkAnalysis(drillId) {
-    const simEl = document.getElementById(`similarities-${drillId}`);
-    const diffEl = document.getElementById(`differences-${drillId}`);
-    const tradeEl = document.getElementById(`tradeoffs-${drillId}`);
-
-    if (!simEl || !diffEl || !tradeEl) return;
-
-    const similarities = this.sanitizeInput(simEl.value);
-    const differences = this.sanitizeInput(diffEl.value);
-    const tradeoffs = this.sanitizeInput(tradeEl.value);
+    const similarities = document.getElementById(`similarities-${drillId}`).value;
+    const differences = document.getElementById(`differences-${drillId}`).value;
+    const tradeoffs = document.getElementById(`tradeoffs-${drillId}`).value;
 
     if (!similarities.trim() || !differences.trim() || !tradeoffs.trim()) {
       alert('Please complete all three analysis sections');
@@ -1417,7 +1694,34 @@ class DrillSystem {
   markComplete(drillId) {
     this.progress.markDrillComplete(this.currentDiagramId, drillId);
     this.updateDrillStatus(drillId);
+
+    // Check if all drills for current state are complete and auto-advance
+    if (this.stateManager && this.shouldAdvanceState()) {
+      setTimeout(() => {
+        this.stateManager.next();
+      }, 1500); // Small delay to let user see completion
+    }
+
     alert('Well done! Design drill marked as complete.');
+  }
+
+  // Check if we should advance to next state based on drill completion
+  shouldAdvanceState() {
+    const currentState = this.stateManager.getCurrentState();
+    if (!currentState) return false;
+
+    // Get all drills associated with current state
+    const stateDrills = document.querySelectorAll(`.drill[data-state-id="${currentState.id}"]`);
+    if (stateDrills.length === 0) return false;
+
+    // Check if all state drills are complete
+    for (const drill of stateDrills) {
+      if (!drill.classList.contains('completed')) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   updateDrillStatus(drillId) {
@@ -1458,6 +1762,425 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
   window.DrillSystem = DrillSystem;
   window.ProgressTracker = ProgressTracker;
+}class LearningProgress {
+  constructor() {
+    this.storageKey = 'gfs-learning-overall-progress';
+    this.sessionKey = 'gfs-learning-session';
+    this.data = this.load();
+    this.session = this.loadSession();
+    this.initSession();
+  }
+
+  load() {
+    try {
+      const saved = localStorage.getItem(this.storageKey);
+      return saved ? JSON.parse(saved) : {
+        diagrams: {},
+        achievements: [],
+        totalTime: 0,
+        startDate: Date.now(),
+        lastActive: Date.now()
+      };
+    } catch (error) {
+      console.error('Failed to load progress:', error);
+      return this.getDefaultData();
+    }
+  }
+
+  loadSession() {
+    try {
+      const saved = sessionStorage.getItem(this.sessionKey);
+      return saved ? JSON.parse(saved) : this.getDefaultSession();
+    } catch (error) {
+      return this.getDefaultSession();
+    }
+  }
+
+  getDefaultData() {
+    return {
+      diagrams: {},
+      achievements: [],
+      totalTime: 0,
+      startDate: Date.now(),
+      lastActive: Date.now()
+    };
+  }
+
+  getDefaultSession() {
+    return {
+      startTime: Date.now(),
+      diagramsViewed: [],
+      drillsCompleted: 0,
+      stepsViewed: 0
+    };
+  }
+
+  initSession() {
+    // Track page visibility for accurate time tracking
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.pauseSession();
+      } else {
+        this.resumeSession();
+      }
+    });
+
+    // Save on page unload
+    window.addEventListener('beforeunload', () => {
+      this.saveSession();
+      this.save();
+    });
+
+    // Auto-save every minute
+    setInterval(() => {
+      this.save();
+    }, 60000);
+  }
+
+  save() {
+    try {
+      this.data.lastActive = Date.now();
+      localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+    }
+  }
+
+  saveSession() {
+    try {
+      sessionStorage.setItem(this.sessionKey, JSON.stringify(this.session));
+    } catch (error) {
+      console.error('Failed to save session:', error);
+    }
+  }
+
+  pauseSession() {
+    if (this.session.pauseTime) return;
+    this.session.pauseTime = Date.now();
+  }
+
+  resumeSession() {
+    if (!this.session.pauseTime) return;
+    const pauseDuration = Date.now() - this.session.pauseTime;
+    this.session.startTime += pauseDuration; // Adjust start time to exclude pause
+    delete this.session.pauseTime;
+  }
+
+  // Diagram progress tracking
+  markDiagramViewed(diagramId) {
+    if (!this.data.diagrams[diagramId]) {
+      this.data.diagrams[diagramId] = {
+        firstViewed: Date.now(),
+        lastViewed: Date.now(),
+        viewCount: 0,
+        timeSpent: 0,
+        drillsCompleted: 0,
+        totalDrills: 0,
+        stepsCompleted: 0,
+        totalSteps: 0
+      };
+    }
+
+    this.data.diagrams[diagramId].viewCount++;
+    this.data.diagrams[diagramId].lastViewed = Date.now();
+
+    if (!this.session.diagramsViewed.includes(diagramId)) {
+      this.session.diagramsViewed.push(diagramId);
+    }
+
+    this.save();
+  }
+
+  updateDiagramTime(diagramId, seconds) {
+    if (!this.data.diagrams[diagramId]) {
+      this.markDiagramViewed(diagramId);
+    }
+
+    this.data.diagrams[diagramId].timeSpent += seconds;
+    this.data.totalTime += seconds;
+    this.save();
+  }
+
+  updateDrillProgress(diagramId, completed, total) {
+    if (!this.data.diagrams[diagramId]) {
+      this.markDiagramViewed(diagramId);
+    }
+
+    this.data.diagrams[diagramId].drillsCompleted = completed;
+    this.data.diagrams[diagramId].totalDrills = total;
+
+    // Check for achievements
+    this.checkDrillAchievements(diagramId, completed, total);
+
+    this.save();
+  }
+
+  updateStepProgress(diagramId, currentStep, totalSteps) {
+    if (!this.data.diagrams[diagramId]) {
+      this.markDiagramViewed(diagramId);
+    }
+
+    this.data.diagrams[diagramId].stepsCompleted = Math.max(
+      currentStep,
+      this.data.diagrams[diagramId].stepsCompleted || 0
+    );
+    this.data.diagrams[diagramId].totalSteps = totalSteps;
+
+    this.session.stepsViewed++;
+    this.saveSession();
+    this.save();
+  }
+
+  // Achievement system
+  checkDrillAchievements(diagramId, completed, total) {
+    const achievements = [];
+
+    // First drill completed
+    if (completed === 1 && !this.hasAchievement('first-drill')) {
+      achievements.push({
+        id: 'first-drill',
+        title: 'First Steps',
+        description: 'Completed your first drill',
+        icon: '🎯',
+        timestamp: Date.now()
+      });
+    }
+
+    // Complete all drills for a diagram
+    if (completed === total && total > 0 && !this.hasAchievement(`master-${diagramId}`)) {
+      achievements.push({
+        id: `master-${diagramId}`,
+        title: 'Diagram Master',
+        description: `Completed all drills for ${diagramId}`,
+        icon: '🏆',
+        timestamp: Date.now()
+      });
+    }
+
+    // Speed learner (complete 5 drills in one session)
+    if (this.session.drillsCompleted >= 5 && !this.hasAchievement('speed-learner')) {
+      achievements.push({
+        id: 'speed-learner',
+        title: 'Speed Learner',
+        description: 'Completed 5 drills in one session',
+        icon: '⚡',
+        timestamp: Date.now()
+      });
+    }
+
+    // Add new achievements
+    achievements.forEach(achievement => {
+      this.addAchievement(achievement);
+    });
+
+    return achievements;
+  }
+
+  hasAchievement(id) {
+    return this.data.achievements.some(a => a.id === id);
+  }
+
+  addAchievement(achievement) {
+    if (!this.hasAchievement(achievement.id)) {
+      this.data.achievements.push(achievement);
+      this.save();
+      this.notifyAchievement(achievement);
+    }
+  }
+
+  notifyAchievement(achievement) {
+    // Emit event for UI to handle
+    const event = new CustomEvent('achievement', {
+      detail: achievement
+    });
+    document.dispatchEvent(event);
+  }
+
+  // Statistics and reporting
+  getOverallProgress() {
+    const stats = {
+      totalDiagrams: 0,
+      completedDiagrams: 0,
+      totalDrills: 0,
+      completedDrills: 0,
+      totalTime: this.data.totalTime,
+      achievements: this.data.achievements.length,
+      daysActive: this.getDaysActive()
+    };
+
+    Object.values(this.data.diagrams).forEach(diagram => {
+      stats.totalDiagrams++;
+      stats.totalDrills += diagram.totalDrills || 0;
+      stats.completedDrills += diagram.drillsCompleted || 0;
+
+      if (diagram.totalDrills > 0 && diagram.drillsCompleted === diagram.totalDrills) {
+        stats.completedDiagrams++;
+      }
+    });
+
+    stats.completionPercentage = stats.totalDrills > 0
+      ? Math.round((stats.completedDrills / stats.totalDrills) * 100)
+      : 0;
+
+    return stats;
+  }
+
+  getDiagramStats(diagramId) {
+    const diagram = this.data.diagrams[diagramId] || {
+      viewCount: 0,
+      timeSpent: 0,
+      drillsCompleted: 0,
+      totalDrills: 0,
+      stepsCompleted: 0,
+      totalSteps: 0
+    };
+
+    return {
+      ...diagram,
+      completionPercentage: diagram.totalDrills > 0
+        ? Math.round((diagram.drillsCompleted / diagram.totalDrills) * 100)
+        : 0,
+      formattedTime: this.formatTime(diagram.timeSpent)
+    };
+  }
+
+  getSessionStats() {
+    const duration = Date.now() - this.session.startTime;
+
+    return {
+      duration: this.formatTime(Math.floor(duration / 1000)),
+      diagramsViewed: this.session.diagramsViewed.length,
+      drillsCompleted: this.session.drillsCompleted,
+      stepsViewed: this.session.stepsViewed
+    };
+  }
+
+  getDaysActive() {
+    const daysSinceStart = Math.floor((Date.now() - this.data.startDate) / (1000 * 60 * 60 * 24));
+    return Math.max(1, daysSinceStart);
+  }
+
+  formatTime(seconds) {
+    if (seconds < 60) {
+      return `${seconds}s`;
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}m ${remainingSeconds}s`;
+    } else {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return `${hours}h ${minutes}m`;
+    }
+  }
+
+  // Export/Import functionality
+  exportProgress() {
+    return {
+      version: '1.0',
+      exportDate: Date.now(),
+      data: this.data
+    };
+  }
+
+  importProgress(exportedData) {
+    if (exportedData.version === '1.0' && exportedData.data) {
+      this.data = exportedData.data;
+      this.save();
+      return true;
+    }
+    return false;
+  }
+
+  // Reset functionality
+  resetDiagram(diagramId) {
+    if (this.data.diagrams[diagramId]) {
+      delete this.data.diagrams[diagramId];
+      this.save();
+    }
+  }
+
+  resetAll() {
+    if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+      this.data = this.getDefaultData();
+      this.session = this.getDefaultSession();
+      this.save();
+      this.saveSession();
+      location.reload();
+    }
+  }
+
+  // Learning path recommendations
+  getRecommendations() {
+    const recommendations = [];
+    const stats = this.getOverallProgress();
+
+    // Suggest unviewed diagrams
+    const allDiagramIds = [
+      '00-legend', '01-triangle', '02-scale', '03-chunk-size',
+      '04-architecture', '05-planes', '06-read-path', '07-write-path',
+      '08-lease', '09-consistency', '10-recovery', '11-evolution', '12-dna'
+    ];
+
+    const unviewed = allDiagramIds.filter(id => !this.data.diagrams[id]);
+    if (unviewed.length > 0) {
+      recommendations.push({
+        type: 'explore',
+        title: 'Explore New Diagrams',
+        description: `You have ${unviewed.length} diagrams yet to explore`,
+        action: 'view',
+        target: unviewed[0]
+      });
+    }
+
+    // Suggest incomplete drills
+    const incomplete = Object.entries(this.data.diagrams)
+      .filter(([id, data]) => data.totalDrills > data.drillsCompleted)
+      .map(([id, data]) => ({
+        id,
+        remaining: data.totalDrills - data.drillsCompleted
+      }));
+
+    if (incomplete.length > 0) {
+      const next = incomplete[0];
+      recommendations.push({
+        type: 'practice',
+        title: 'Complete Drills',
+        description: `${next.remaining} drills remaining in ${next.id}`,
+        action: 'drill',
+        target: next.id
+      });
+    }
+
+    // Suggest review based on time
+    const oldestViewed = Object.entries(this.data.diagrams)
+      .sort(([, a], [, b]) => a.lastViewed - b.lastViewed)
+      .slice(0, 3);
+
+    if (oldestViewed.length > 0) {
+      const [id, data] = oldestViewed[0];
+      const daysSince = Math.floor((Date.now() - data.lastViewed) / (1000 * 60 * 60 * 24));
+
+      if (daysSince > 7) {
+        recommendations.push({
+          type: 'review',
+          title: 'Time for Review',
+          description: `Review ${id} (last viewed ${daysSince} days ago)`,
+          action: 'review',
+          target: id
+        });
+      }
+    }
+
+    return recommendations;
+  }
+}
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = LearningProgress;
+} else {
+  window.LearningProgress = LearningProgress;
 }class StepThroughEngine {
   constructor(renderer, composer) {
     this.renderer = renderer;
@@ -1849,10 +2572,464 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = StepThroughEngine;
 } else {
   window.StepThroughEngine = StepThroughEngine;
+}class ExportManager {
+  constructor(viewer) {
+    this.viewer = viewer;
+  }
+
+  showExportDialog() {
+    const modal = document.createElement('div');
+    modal.className = 'modal export-modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Export Diagram</h2>
+          <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="export-options">
+            <button class="export-option" onclick="viewer.exportManager.exportSVG()">
+              <span class="export-icon">🖼️</span>
+              <span class="export-label">Export as SVG</span>
+              <span class="export-desc">Vector image for presentations</span>
+            </button>
+            <button class="export-option" onclick="viewer.exportManager.exportPNG()">
+              <span class="export-icon">📷</span>
+              <span class="export-label">Export as PNG</span>
+              <span class="export-desc">Image for documents</span>
+            </button>
+            <button class="export-option" onclick="viewer.exportManager.exportJSON()">
+              <span class="export-icon">📄</span>
+              <span class="export-label">Export as JSON</span>
+              <span class="export-desc">Raw specification data</span>
+            </button>
+            <button class="export-option" onclick="viewer.exportManager.exportMermaid()">
+              <span class="export-icon">📝</span>
+              <span class="export-label">Export Mermaid Code</span>
+              <span class="export-desc">Editable diagram source</span>
+            </button>
+            <button class="export-option" onclick="viewer.exportManager.exportProgress()">
+              <span class="export-icon">📊</span>
+              <span class="export-label">Export Progress</span>
+              <span class="export-desc">Backup learning progress</span>
+            </button>
+            <button class="export-option" onclick="viewer.exportManager.printDiagram()">
+              <span class="export-icon">🖨️</span>
+              <span class="export-label">Print Diagram</span>
+              <span class="export-desc">Send to printer or PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+  }
+
+  exportSVG() {
+    const svg = document.querySelector('#diagram-container svg');
+    if (!svg) {
+      alert('No diagram to export');
+      return;
+    }
+
+    // Clone and prepare SVG
+    const svgClone = svg.cloneNode(true);
+    this.addSVGStyles(svgClone);
+
+    // Add title and metadata
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    title.textContent = this.viewer.currentSpec.title || 'GFS Diagram';
+    svgClone.insertBefore(title, svgClone.firstChild);
+
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgClone);
+
+    // Create blob and download
+    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    this.downloadBlob(blob, `${this.viewer.currentDiagramId}.svg`);
+
+    // Close modal
+    this.closeModal();
+  }
+
+  exportPNG() {
+    const svg = document.querySelector('#diagram-container svg');
+    if (!svg) {
+      alert('No diagram to export');
+      return;
+    }
+
+    // Get SVG dimensions
+    const bbox = svg.getBBox();
+    const width = bbox.width + bbox.x * 2;
+    const height = bbox.height + bbox.y * 2;
+
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    const scale = 2; // Higher resolution
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+
+    // Set white background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, width, height);
+
+    // Convert SVG to data URL
+    const svgClone = svg.cloneNode(true);
+    this.addSVGStyles(svgClone);
+
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgClone);
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+
+    // Create image and draw to canvas
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(svgUrl);
+
+      // Export canvas as PNG
+      canvas.toBlob((blob) => {
+        this.downloadBlob(blob, `${this.viewer.currentDiagramId}.png`);
+        this.closeModal();
+      }, 'image/png');
+    };
+
+    img.src = svgUrl;
+  }
+
+  exportJSON() {
+    if (!this.viewer.currentSpec) {
+      alert('No diagram to export');
+      return;
+    }
+
+    // Include current state
+    const exportData = {
+      ...this.viewer.currentSpec,
+      _export: {
+        timestamp: Date.now(),
+        version: '1.0',
+        activeOverlays: Array.from(this.viewer.currentOverlays)
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json;charset=utf-8'
+    });
+
+    this.downloadBlob(blob, `${this.viewer.currentDiagramId}.json`);
+    this.closeModal();
+  }
+
+  exportMermaid() {
+    if (!this.viewer.currentSpec) {
+      alert('No diagram to export');
+      return;
+    }
+
+    // Generate Mermaid code
+    const composed = this.viewer.composer.composeScene(
+      this.viewer.currentSpec,
+      Array.from(this.viewer.currentOverlays)
+    );
+
+    const mermaidCode = this.viewer.renderer.generateMermaidCode(composed);
+
+    // Add header comment
+    const exportContent = `# ${this.viewer.currentSpec.title}
+# Generated: ${new Date().toISOString()}
+# Overlays: ${Array.from(this.viewer.currentOverlays).join(', ') || 'none'}
+
+${mermaidCode}`;
+
+    const blob = new Blob([exportContent], {
+      type: 'text/plain;charset=utf-8'
+    });
+
+    this.downloadBlob(blob, `${this.viewer.currentDiagramId}.mmd`);
+    this.closeModal();
+  }
+
+  exportProgress() {
+    const progressData = this.viewer.learningProgress.exportProgress();
+    const blob = new Blob([JSON.stringify(progressData, null, 2)], {
+      type: 'application/json;charset=utf-8'
+    });
+
+    const date = new Date().toISOString().split('T')[0];
+    this.downloadBlob(blob, `gfs-progress-${date}.json`);
+    this.closeModal();
+  }
+
+  printDiagram() {
+    // Create print-specific styles
+    const printStyles = `
+      @media print {
+        body > *:not(.print-content) {
+          display: none !important;
+        }
+        .print-content {
+          display: block !important;
+          padding: 20px;
+        }
+        .print-header {
+          margin-bottom: 20px;
+          border-bottom: 2px solid #333;
+          padding-bottom: 10px;
+        }
+        .print-diagram {
+          max-width: 100%;
+          page-break-inside: avoid;
+        }
+        .print-contracts {
+          margin-top: 20px;
+          page-break-inside: avoid;
+        }
+        .print-contracts h3 {
+          margin-top: 15px;
+        }
+        .print-contracts ul {
+          margin-left: 20px;
+        }
+      }
+    `;
+
+    // Add print styles to head
+    const styleEl = document.createElement('style');
+    styleEl.textContent = printStyles;
+    document.head.appendChild(styleEl);
+
+    // Create print content
+    const printContent = document.createElement('div');
+    printContent.className = 'print-content';
+    printContent.style.display = 'none';
+
+    // Add header
+    const header = document.createElement('div');
+    header.className = 'print-header';
+    header.innerHTML = `
+      <h1>${this.viewer.currentSpec.title}</h1>
+      <p>GFS Visual Learning System - ${new Date().toLocaleDateString()}</p>
+    `;
+    printContent.appendChild(header);
+
+    // Add diagram
+    const diagramContainer = document.createElement('div');
+    diagramContainer.className = 'print-diagram';
+    const svg = document.querySelector('#diagram-container svg');
+    if (svg) {
+      diagramContainer.appendChild(svg.cloneNode(true));
+    }
+    printContent.appendChild(diagramContainer);
+
+    // Add contracts if available
+    if (this.viewer.currentSpec.contracts) {
+      const contracts = document.createElement('div');
+      contracts.className = 'print-contracts';
+      contracts.innerHTML = `
+        <h2>System Contracts</h2>
+        ${this.viewer.currentSpec.contracts.invariants?.length > 0 ? `
+          <div>
+            <h3>Invariants</h3>
+            <ul>
+              ${this.viewer.currentSpec.contracts.invariants.map(i => `<li>${i}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        ${this.viewer.currentSpec.contracts.guarantees?.length > 0 ? `
+          <div>
+            <h3>Guarantees</h3>
+            <ul>
+              ${this.viewer.currentSpec.contracts.guarantees.map(g => `<li>${g}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        ${this.viewer.currentSpec.contracts.caveats?.length > 0 ? `
+          <div>
+            <h3>Caveats</h3>
+            <ul>
+              ${this.viewer.currentSpec.contracts.caveats.map(c => `<li>${c}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+      `;
+      printContent.appendChild(contracts);
+    }
+
+    // Add to body
+    document.body.appendChild(printContent);
+
+    // Print
+    window.print();
+
+    // Clean up
+    setTimeout(() => {
+      printContent.remove();
+      styleEl.remove();
+    }, 1000);
+
+    this.closeModal();
+  }
+
+  addSVGStyles(svg) {
+    // Embed styles directly in SVG for standalone export
+    const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.textContent = `
+      text {
+        font-family: 'Trebuchet MS', Arial, sans-serif;
+        font-size: 14px;
+      }
+      .node rect {
+        stroke-width: 2px;
+      }
+      .edgeLabel {
+        background-color: white;
+        padding: 2px 4px;
+      }
+      .highlight {
+        fill: #FFD700 !important;
+        stroke: #B8860B !important;
+        stroke-width: 4px !important;
+      }
+    `;
+    svg.insertBefore(style, svg.firstChild);
+
+    // Set viewBox if not present
+    if (!svg.getAttribute('viewBox')) {
+      const bbox = svg.getBBox();
+      svg.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+    }
+
+    // Set dimensions
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+  }
+
+  downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  closeModal() {
+    const modal = document.querySelector('.export-modal');
+    if (modal) {
+      modal.remove();
+    }
+  }
+
+  // Import functionality
+  showImportDialog() {
+    const modal = document.createElement('div');
+    modal.className = 'modal import-modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Import Data</h2>
+          <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="import-section">
+            <h3>Import Progress Data</h3>
+            <p>Restore your learning progress from a backup file.</p>
+            <input type="file" id="import-progress" accept=".json">
+            <button onclick="viewer.exportManager.importProgressFile()">Import Progress</button>
+          </div>
+          <div class="import-section">
+            <h3>Import Custom Diagram</h3>
+            <p>Load a custom diagram specification.</p>
+            <input type="file" id="import-diagram" accept=".json">
+            <button onclick="viewer.exportManager.importDiagramFile()">Import Diagram</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+  }
+
+  async importProgressFile() {
+    const input = document.getElementById('import-progress');
+    if (!input.files[0]) {
+      alert('Please select a file');
+      return;
+    }
+
+    try {
+      const text = await input.files[0].text();
+      const data = JSON.parse(text);
+
+      if (this.viewer.learningProgress.importProgress(data)) {
+        alert('Progress imported successfully!');
+        location.reload();
+      } else {
+        alert('Invalid progress file');
+      }
+    } catch (error) {
+      alert('Failed to import progress: ' + error.message);
+    }
+  }
+
+  async importDiagramFile() {
+    const input = document.getElementById('import-diagram');
+    if (!input.files[0]) {
+      alert('Please select a file');
+      return;
+    }
+
+    try {
+      const text = await input.files[0].text();
+      const spec = JSON.parse(text);
+
+      // Validate the spec
+      this.viewer.validator.validateSpec(spec);
+
+      // Load the diagram
+      this.viewer.currentSpec = spec;
+      this.viewer.currentDiagramId = spec.id || 'custom';
+
+      // Apply saved overlays if present
+      if (spec._export?.activeOverlays) {
+        this.viewer.currentOverlays = new Set(spec._export.activeOverlays);
+      }
+
+      // Render
+      await this.viewer.renderDiagram();
+      this.viewer.renderNarrative(spec);
+      this.viewer.renderContracts(spec);
+      this.viewer.drillSystem.renderDrills(spec);
+
+      alert('Diagram imported successfully!');
+      this.closeModal();
+    } catch (error) {
+      alert('Failed to import diagram: ' + error.message);
+    }
+  }
 }
 
-// OverlayManager class for handling diagram overlays
-class OverlayManager {
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = ExportManager;
+} else {
+  window.ExportManager = ExportManager;
+}class OverlayManager {
   constructor(viewer) {
     this.viewer = viewer;
     this.activeOverlays = new Set();
@@ -2059,444 +3236,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = OverlayManager;
 } else {
   window.OverlayManager = OverlayManager;
-}class ExportManager {
-  constructor(viewer) {
-    this.viewer = viewer;
-  }
-
-  showExportDialog() {
-    const modal = document.createElement('div');
-    modal.className = 'modal export-modal';
-    modal.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Export Diagram</h2>
-          <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
-        </div>
-        <div class="modal-body">
-          <div class="export-options">
-            <button class="export-option" onclick="viewer.exportManager.exportSVG()">
-              <span class="export-icon">🖼️</span>
-              <span class="export-label">Export as SVG</span>
-              <span class="export-desc">Vector image for presentations</span>
-            </button>
-            <button class="export-option" onclick="viewer.exportManager.exportPNG()">
-              <span class="export-icon">📷</span>
-              <span class="export-label">Export as PNG</span>
-              <span class="export-desc">Image for documents</span>
-            </button>
-            <button class="export-option" onclick="viewer.exportManager.exportJSON()">
-              <span class="export-icon">📄</span>
-              <span class="export-label">Export as JSON</span>
-              <span class="export-desc">Raw specification data</span>
-            </button>
-            <button class="export-option" onclick="viewer.exportManager.exportMermaid()">
-              <span class="export-icon">📝</span>
-              <span class="export-label">Export Mermaid Code</span>
-              <span class="export-desc">Editable diagram source</span>
-            </button>
-            <button class="export-option" onclick="viewer.exportManager.exportProgress()">
-              <span class="export-icon">📊</span>
-              <span class="export-label">Export Progress</span>
-              <span class="export-desc">Backup learning progress</span>
-            </button>
-            <button class="export-option" onclick="viewer.exportManager.printDiagram()">
-              <span class="export-icon">🖨️</span>
-              <span class="export-label">Print Diagram</span>
-              <span class="export-desc">Send to printer or PDF</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.remove();
-    });
-  }
-
-  exportSVG() {
-    const svg = document.querySelector('#diagram-container svg');
-    if (!svg) {
-      alert('No diagram to export');
-      return;
-    }
-
-    // Clone and prepare SVG
-    const svgClone = svg.cloneNode(true);
-    this.addSVGStyles(svgClone);
-
-    // Add title and metadata
-    const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-    title.textContent = this.viewer.currentSpec.title || 'GFS Diagram';
-    svgClone.insertBefore(title, svgClone.firstChild);
-
-    const serializer = new XMLSerializer();
-    const svgString = serializer.serializeToString(svgClone);
-
-    // Create blob and download
-    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-    this.downloadBlob(blob, `${this.viewer.currentDiagramId}.svg`);
-
-    // Close modal
-    this.closeModal();
-  }
-
-  exportPNG() {
-    const svg = document.querySelector('#diagram-container svg');
-    if (!svg) {
-      alert('No diagram to export');
-      return;
-    }
-
-    // Get SVG dimensions
-    const bbox = svg.getBBox();
-    const width = bbox.width + bbox.x * 2;
-    const height = bbox.height + bbox.y * 2;
-
-    // Create canvas
-    const canvas = document.createElement('canvas');
-    const scale = 2; // Higher resolution
-    canvas.width = width * scale;
-    canvas.height = height * scale;
-
-    const ctx = canvas.getContext('2d');
-    ctx.scale(scale, scale);
-
-    // Set white background
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, width, height);
-
-    // Convert SVG to data URL
-    const svgClone = svg.cloneNode(true);
-    this.addSVGStyles(svgClone);
-
-    const serializer = new XMLSerializer();
-    const svgString = serializer.serializeToString(svgClone);
-    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-    const svgUrl = URL.createObjectURL(svgBlob);
-
-    // Create image and draw to canvas
-    const img = new Image();
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, width, height);
-      URL.revokeObjectURL(svgUrl);
-
-      // Export canvas as PNG
-      canvas.toBlob((blob) => {
-        this.downloadBlob(blob, `${this.viewer.currentDiagramId}.png`);
-        this.closeModal();
-      }, 'image/png');
-    };
-
-    img.src = svgUrl;
-  }
-
-  exportJSON() {
-    if (!this.viewer.currentSpec) {
-      alert('No diagram to export');
-      return;
-    }
-
-    // Include current state
-    const exportData = {
-      ...this.viewer.currentSpec,
-      _export: {
-        timestamp: Date.now(),
-        version: '1.0',
-        activeOverlays: Array.from(this.viewer.currentOverlays)
-      }
-    };
-
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: 'application/json;charset=utf-8'
-    });
-
-    this.downloadBlob(blob, `${this.viewer.currentDiagramId}.json`);
-    this.closeModal();
-  }
-
-  exportMermaid() {
-    if (!this.viewer.currentSpec) {
-      alert('No diagram to export');
-      return;
-    }
-
-    // Generate Mermaid code
-    const composed = this.viewer.composer.composeScene(
-      this.viewer.currentSpec,
-      Array.from(this.viewer.currentOverlays)
-    );
-
-    const mermaidCode = this.viewer.renderer.generateMermaidCode(composed);
-
-    // Add header comment
-    const exportContent = `# ${this.viewer.currentSpec.title}
-# Generated: ${new Date().toISOString()}
-# Overlays: ${Array.from(this.viewer.currentOverlays).join(', ') || 'none'}
-
-${mermaidCode}`;
-
-    const blob = new Blob([exportContent], {
-      type: 'text/plain;charset=utf-8'
-    });
-
-    this.downloadBlob(blob, `${this.viewer.currentDiagramId}.mmd`);
-    this.closeModal();
-  }
-
-  exportProgress() {
-    // Progress tracking has been removed
-    alert('Progress tracking has been disabled');
-    this.closeModal();
-  }
-
-  printDiagram() {
-    // Create print-specific styles
-    const printStyles = `
-      @media print {
-        body > *:not(.print-content) {
-          display: none !important;
-        }
-        .print-content {
-          display: block !important;
-          padding: 20px;
-        }
-        .print-header {
-          margin-bottom: 20px;
-          border-bottom: 2px solid #333;
-          padding-bottom: 10px;
-        }
-        .print-diagram {
-          max-width: 100%;
-          page-break-inside: avoid;
-        }
-        .print-contracts {
-          margin-top: 20px;
-          page-break-inside: avoid;
-        }
-        .print-contracts h3 {
-          margin-top: 15px;
-        }
-        .print-contracts ul {
-          margin-left: 20px;
-        }
-      }
-    `;
-
-    // Add print styles to head
-    const styleEl = document.createElement('style');
-    styleEl.textContent = printStyles;
-    document.head.appendChild(styleEl);
-
-    // Create print content
-    const printContent = document.createElement('div');
-    printContent.className = 'print-content';
-    printContent.style.display = 'none';
-
-    // Add header
-    const header = document.createElement('div');
-    header.className = 'print-header';
-    header.innerHTML = `
-      <h1>${this.viewer.currentSpec.title}</h1>
-      <p>GFS Visual Learning System - ${new Date().toLocaleDateString()}</p>
-    `;
-    printContent.appendChild(header);
-
-    // Add diagram
-    const diagramContainer = document.createElement('div');
-    diagramContainer.className = 'print-diagram';
-    const svg = document.querySelector('#diagram-container svg');
-    if (svg) {
-      diagramContainer.appendChild(svg.cloneNode(true));
-    }
-    printContent.appendChild(diagramContainer);
-
-    // Add contracts if available
-    if (this.viewer.currentSpec.contracts) {
-      const contracts = document.createElement('div');
-      contracts.className = 'print-contracts';
-      contracts.innerHTML = `
-        <h2>System Contracts</h2>
-        ${this.viewer.currentSpec.contracts.invariants?.length > 0 ? `
-          <div>
-            <h3>Invariants</h3>
-            <ul>
-              ${this.viewer.currentSpec.contracts.invariants.map(i => `<li>${i}</li>`).join('')}
-            </ul>
-          </div>
-        ` : ''}
-        ${this.viewer.currentSpec.contracts.guarantees?.length > 0 ? `
-          <div>
-            <h3>Guarantees</h3>
-            <ul>
-              ${this.viewer.currentSpec.contracts.guarantees.map(g => `<li>${g}</li>`).join('')}
-            </ul>
-          </div>
-        ` : ''}
-        ${this.viewer.currentSpec.contracts.caveats?.length > 0 ? `
-          <div>
-            <h3>Caveats</h3>
-            <ul>
-              ${this.viewer.currentSpec.contracts.caveats.map(c => `<li>${c}</li>`).join('')}
-            </ul>
-          </div>
-        ` : ''}
-      `;
-      printContent.appendChild(contracts);
-    }
-
-    // Add to body
-    document.body.appendChild(printContent);
-
-    // Print
-    window.print();
-
-    // Clean up
-    setTimeout(() => {
-      printContent.remove();
-      styleEl.remove();
-    }, 1000);
-
-    this.closeModal();
-  }
-
-  addSVGStyles(svg) {
-    // Embed styles directly in SVG for standalone export
-    const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
-    style.textContent = `
-      text {
-        font-family: 'Trebuchet MS', Arial, sans-serif;
-        font-size: 14px;
-      }
-      .node rect {
-        stroke-width: 2px;
-      }
-      .edgeLabel {
-        background-color: white;
-        padding: 2px 4px;
-      }
-      .highlight {
-        fill: #FFD700 !important;
-        stroke: #B8860B !important;
-        stroke-width: 4px !important;
-      }
-    `;
-    svg.insertBefore(style, svg.firstChild);
-
-    // Set viewBox if not present
-    if (!svg.getAttribute('viewBox')) {
-      const bbox = svg.getBBox();
-      svg.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
-    }
-
-    // Set dimensions
-    svg.setAttribute('width', '100%');
-    svg.setAttribute('height', '100%');
-  }
-
-  downloadBlob(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  closeModal() {
-    const modal = document.querySelector('.export-modal');
-    if (modal) {
-      modal.remove();
-    }
-  }
-
-  // Import functionality
-  showImportDialog() {
-    const modal = document.createElement('div');
-    modal.className = 'modal import-modal';
-    modal.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Import Data</h2>
-          <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
-        </div>
-        <div class="modal-body">
-          <!-- Progress import removed - no longer tracking progress -->
-          <!--
-          <div class="import-section">
-            <h3>Import Progress Data</h3>
-            <p>Restore your learning progress from a backup file.</p>
-            <input type="file" id="import-progress" accept=".json">
-            <button onclick="viewer.exportManager.importProgressFile()">Import Progress</button>
-          </div>
-          -->
-          <div class="import-section">
-            <h3>Import Custom Diagram</h3>
-            <p>Load a custom diagram specification.</p>
-            <input type="file" id="import-diagram" accept=".json">
-            <button onclick="viewer.exportManager.importDiagramFile()">Import Diagram</button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(modal);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.remove();
-    });
-  }
-
-  async importProgressFile() {
-    // Progress tracking has been removed
-    alert('Progress tracking has been disabled');
-  }
-
-  async importDiagramFile() {
-    const input = document.getElementById('import-diagram');
-    if (!input.files[0]) {
-      alert('Please select a file');
-      return;
-    }
-
-    try {
-      const text = await input.files[0].text();
-      const spec = JSON.parse(text);
-
-      // Validate the spec
-      this.viewer.validator.validateSpec(spec);
-
-      // Load the diagram
-      this.viewer.currentSpec = spec;
-      this.viewer.currentDiagramId = spec.id || 'custom';
-
-      // Apply saved overlays if present
-      if (spec._export?.activeOverlays) {
-        this.viewer.currentOverlays = new Set(spec._export.activeOverlays);
-      }
-
-      // Render
-      await this.viewer.renderDiagram();
-      this.viewer.renderNarrative(spec);
-      this.viewer.renderContracts(spec);
-      this.viewer.drillSystem.renderDrills(spec);
-
-      alert('Diagram imported successfully!');
-      this.closeModal();
-    } catch (error) {
-      alert('Failed to import diagram: ' + error.message);
-    }
-  }
-}
-
-// Export for module systems, or make global
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = ExportManager;
-} else {
-  window.ExportManager = ExportManager;
 }class GFSViewer {
   constructor() {
     this.validator = null;
@@ -2505,32 +3244,13 @@ if (typeof module !== 'undefined' && module.exports) {
     this.drillSystem = null;
     this.stepper = null;
     this.overlayManager = null;
-    this.stateManager = null;  // Unified state manager
     this.exportManager = null;
-    // learningProgress removed
+    this.learningProgress = null;
 
     this.currentSpec = null;
     this.currentDiagramId = null;
     this.currentOverlays = new Set();
     this.manifest = null;
-
-    // Store event listeners for cleanup
-    this.eventListeners = [];
-  }
-
-  // Helper to add event listeners that can be cleaned up
-  addCleanableListener(element, event, handler) {
-    if (!element) return;
-    element.addEventListener(event, handler);
-    this.eventListeners.push({ element, event, handler });
-  }
-
-  // Clean up all event listeners
-  cleanupEventListeners() {
-    this.eventListeners.forEach(({ element, event, handler }) => {
-      element.removeEventListener(event, handler);
-    });
-    this.eventListeners = [];
   }
 
   async initialize() {
@@ -2549,14 +3269,8 @@ if (typeof module !== 'undefined' && module.exports) {
       this.drillSystem = new DrillSystem();
       this.stepper = new StepThroughEngine(this.renderer, this.composer);
       this.overlayManager = new OverlayManager(this);
-
-      // Initialize StateManager if available
-      if (typeof StateManager !== 'undefined') {
-        this.stateManager = new StateManager();
-      }
-
       this.exportManager = new ExportManager(this);
-      // LearningProgress removed - no progress tracking
+      this.learningProgress = new LearningProgress();
 
       // Load manifest
       await this.loadManifest();
@@ -2614,10 +3328,8 @@ if (typeof module !== 'undefined' && module.exports) {
 
   async loadDiagram(diagramId) {
     try {
-      // Clean up previous diagram's event listeners
-      this.cleanupEventListeners();
-
-      // Progress tracking removed
+      // Track diagram view
+      this.learningProgress.markDiagramViewed(diagramId);
 
       // Show loading
       this.showDiagramLoading(true);
@@ -2634,7 +3346,7 @@ if (typeof module !== 'undefined' && module.exports) {
       try {
         this.validator.validateSpec(spec);
       } catch (validationError) {
-        console.warn('Validation warning:', validationError.message || validationError);
+        console.warn('Validation warning:', validationError);
         // Continue anyway for development
       }
 
@@ -2648,10 +3360,6 @@ if (typeof module !== 'undefined' && module.exports) {
       this.updateTitle(spec.title);
       this.renderNarrative(spec);
       this.renderContracts(spec);
-      this.renderCrystallizedInsight(spec);
-      this.renderPrerequisites(spec);
-      this.renderFirstPrinciples(spec);
-      this.renderAssessments(spec);
 
       // Render the main diagram
       await this.renderDiagram();
@@ -2661,23 +3369,18 @@ if (typeof module !== 'undefined' && module.exports) {
       this.overlayManager.renderOverlayChips(spec);
       this.stepper.initialize(spec);
 
-      // Initialize StateManager with spec (for unified state controls)
-      if (this.stateManager) {
-        this.stateManager.initialize(spec);
-        this.renderStateControls();
-      }
-
       // Update step controls
       this.renderStepControls();
 
       // Update URL
       this.updateURL(diagramId);
 
-      // Progress display removed
+      // Update progress stats
+      this.updateProgressDisplay();
 
       this.showDiagramLoading(false);
     } catch (error) {
-      console.error('Failed to load diagram:', error.message || error);
+      console.error('Failed to load diagram:', error);
       this.handleError(error);
       this.showDiagramLoading(false);
     }
@@ -2703,6 +3406,13 @@ if (typeof module !== 'undefined' && module.exports) {
 
     nav.innerHTML = '';
 
+    // Add home button
+    const homeBtn = document.createElement('button');
+    homeBtn.className = 'nav-home';
+    homeBtn.innerHTML = '🏠 Home';
+    homeBtn.onclick = () => this.loadDiagram('00-legend');
+    nav.appendChild(homeBtn);
+
     // Add diagram list
     const list = document.createElement('div');
     list.className = 'nav-list';
@@ -2712,9 +3422,15 @@ if (typeof module !== 'undefined' && module.exports) {
       item.className = 'nav-item';
       item.dataset.diagramId = diagram.id;
 
+      const progress = this.learningProgress.getDiagramStats(diagram.id);
+      const hasProgress = progress.viewCount > 0;
+
       item.innerHTML = `
         <span class="nav-number">${index}</span>
         <span class="nav-title">${diagram.title}</span>
+        ${hasProgress ? `
+          <span class="nav-progress">${progress.completionPercentage}%</span>
+        ` : ''}
       `;
 
       item.onclick = () => this.loadDiagram(diagram.id);
@@ -2829,249 +3545,6 @@ if (typeof module !== 'undefined' && module.exports) {
     `;
   }
 
-  renderCrystallizedInsight(spec) {
-    const panel = document.getElementById('crystallized-insight');
-    if (!panel || !spec.crystallizedInsight) return;
-
-    panel.textContent = spec.crystallizedInsight;
-
-    // Show the insight panel if there's content
-    const insightPanel = document.querySelector('.insight-panel');
-    if (insightPanel && spec.crystallizedInsight) {
-      insightPanel.style.display = 'flex';
-    } else if (insightPanel) {
-      insightPanel.style.display = 'none';
-    }
-  }
-
-  renderPrerequisites(spec) {
-    const panel = document.getElementById('prerequisites-panel');
-    const content = document.getElementById('prerequisites-content');
-
-    if (!panel || !content || !spec.prerequisites) return;
-
-    // Show the prerequisites section if there's content
-    if (spec.prerequisites.concepts?.length > 0 || spec.prerequisites.understanding) {
-      panel.style.display = 'block';
-
-      content.innerHTML = `
-        ${spec.prerequisites.concepts?.length > 0 ? `
-          <div class="prereq-concepts">
-            <h5>Required Concepts:</h5>
-            <ul>
-              ${spec.prerequisites.concepts.map(c => `<li>${c}</li>`).join('')}
-            </ul>
-          </div>
-        ` : ''}
-
-        ${spec.prerequisites.understanding ? `
-          <div class="prereq-check">
-            <h5>Check Your Understanding:</h5>
-            <p>${spec.prerequisites.understanding}</p>
-          </div>
-        ` : ''}
-      `;
-    } else {
-      panel.style.display = 'none';
-    }
-  }
-
-  renderFirstPrinciples(spec) {
-    const container = document.getElementById('principles-container');
-    if (!container || !spec.firstPrinciples) return;
-
-    // Use DocumentFragment for better performance with large content (35KB+)
-    const fragment = document.createDocumentFragment();
-    const wrapper = document.createElement('div');
-    wrapper.className = 'principles-content';
-
-    // First Principles Accordion
-    const principlesAccordion = document.createElement('details');
-    principlesAccordion.className = 'accordion-item first-principles-accordion';
-
-    const principlesSummary = document.createElement('summary');
-    principlesSummary.className = 'accordion-header';
-    principlesSummary.innerHTML = '<span class="accordion-icon">▶</span><span class="accordion-title">🎯 First Principles</span>';
-
-    const principlesContent = document.createElement('div');
-    principlesContent.className = 'accordion-content';
-
-    // Render each principle category
-    for (const [category, principles] of Object.entries(spec.firstPrinciples)) {
-      const subAccordion = document.createElement('details');
-      subAccordion.className = 'sub-accordion-item';
-
-      const subSummary = document.createElement('summary');
-      subSummary.className = 'sub-accordion-header';
-      subSummary.innerHTML = `<span class="sub-accordion-icon">▶</span><span class="sub-accordion-title">${category.replace(/([A-Z])/g, ' $1').trim()}</span>`;
-
-      const subContent = document.createElement('div');
-      subContent.className = 'sub-accordion-content';
-
-      const dl = document.createElement('dl');
-      dl.className = 'principle-section';
-
-      for (const [key, value] of Object.entries(principles)) {
-        const dt = document.createElement('dt');
-        dt.textContent = key.replace(/([A-Z])/g, ' $1').trim();
-        const dd = document.createElement('dd');
-        dd.textContent = value;
-        dl.appendChild(dt);
-        dl.appendChild(dd);
-      }
-
-      subContent.appendChild(dl);
-      subAccordion.appendChild(subSummary);
-      subAccordion.appendChild(subContent);
-      principlesContent.appendChild(subAccordion);
-    }
-
-    principlesAccordion.appendChild(principlesSummary);
-    principlesAccordion.appendChild(principlesContent);
-    wrapper.appendChild(principlesAccordion);
-
-    // Advanced Concepts Accordion (if present)
-    if (spec.advancedConcepts) {
-      const advancedAccordion = document.createElement('details');
-      advancedAccordion.className = 'accordion-item advanced-concepts-accordion advanced-section';
-
-      const advancedSummary = document.createElement('summary');
-      advancedSummary.className = 'accordion-header';
-      advancedSummary.innerHTML = '<span class="accordion-icon">▶</span><span class="accordion-title">🚀 Advanced Concepts</span>';
-
-      const advancedContent = document.createElement('div');
-      advancedContent.className = 'accordion-content advanced-section';
-
-      for (const [category, concepts] of Object.entries(spec.advancedConcepts)) {
-        const subAccordion = document.createElement('details');
-        subAccordion.className = 'sub-accordion-item';
-
-        const subSummary = document.createElement('summary');
-        subSummary.className = 'sub-accordion-header';
-        subSummary.innerHTML = `<span class="sub-accordion-icon">▶</span><span class="sub-accordion-title">${category.replace(/([A-Z])/g, ' $1').trim()}</span>`;
-
-        const subContent = document.createElement('div');
-        subContent.className = 'sub-accordion-content';
-
-        const dl = document.createElement('dl');
-        dl.className = 'concept-section';
-
-        for (const [key, value] of Object.entries(concepts)) {
-          const dt = document.createElement('dt');
-          dt.textContent = key.replace(/([A-Z])/g, ' $1').trim();
-          const dd = document.createElement('dd');
-          dd.textContent = value;
-          dl.appendChild(dt);
-          dl.appendChild(dd);
-        }
-
-        subContent.appendChild(dl);
-        subAccordion.appendChild(subSummary);
-        subAccordion.appendChild(subContent);
-        advancedContent.appendChild(subAccordion);
-      }
-
-      advancedAccordion.appendChild(advancedSummary);
-      advancedAccordion.appendChild(advancedContent);
-      wrapper.appendChild(advancedAccordion);
-    }
-
-    fragment.appendChild(wrapper);
-
-    // Clear and append in one operation - reduces reflows
-    container.textContent = '';
-    container.appendChild(fragment);
-  }
-
-  renderAssessments(spec) {
-    const container = document.getElementById('assessment-container');
-    if (!container || !spec.assessmentCheckpoints) return;
-
-    let html = '<div class="assessment-content">';
-
-    spec.assessmentCheckpoints.forEach((checkpoint, index) => {
-      html += `
-        <div class="checkpoint-card">
-          <h4>${index + 1}. ${checkpoint.concept}</h4>
-          ${checkpoint.check ? `
-            <div class="checkpoint-check">
-              <strong>Check:</strong> ${checkpoint.check}
-            </div>
-          ` : ''}
-          ${checkpoint.mastery ? `
-            <div class="checkpoint-mastery">
-              <strong>Mastery:</strong> ${checkpoint.mastery}
-            </div>
-          ` : ''}
-        </div>
-      `;
-    });
-
-    html += '</div>';
-    container.innerHTML = html;
-  }
-
-  renderStateControls() {
-    const container = document.getElementById('state-controls');
-    if (!container || !this.stateManager) return;
-
-    const states = this.stateManager.getStates();
-    const currentStateIndex = this.stateManager.getCurrentStateIndex();
-    const overlays = this.stateManager.getOverlays();
-
-    if (states.length === 0) {
-      container.style.display = 'none';
-      return;
-    }
-
-    container.style.display = 'flex';
-    container.innerHTML = `
-      <div class="state-nav-buttons">
-        <button onclick="viewer.stateManager.previousState()" ${currentStateIndex === 0 ? 'disabled' : ''}>◀</button>
-        <button onclick="viewer.stateManager.playPause()" title="Play/Pause">
-          ${this.stateManager.isPlaying ? '⏸' : '▶'}
-        </button>
-        <button onclick="viewer.stateManager.nextState()" ${currentStateIndex >= states.length - 1 ? 'disabled' : ''}>▶</button>
-      </div>
-
-      <div class="state-timeline">
-        <div class="timeline-track" onclick="viewer.handleTimelineClick(event)">
-          <div class="timeline-progress" style="width: ${(currentStateIndex + 1) / states.length * 100}%"></div>
-          <div class="timeline-markers">
-            ${states.map((state, i) => `
-              <div class="timeline-marker ${i === currentStateIndex ? 'active' : ''}"
-                   style="left: ${(i + 0.5) / states.length * 100}%"
-                   onclick="viewer.stateManager.goToState(${i})"
-                   title="${state.name}">
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-
-      <div class="state-info">
-        <div class="state-dropdown" onclick="viewer.toggleStateDropdown(event)">
-          <span>${states[currentStateIndex]?.name || 'Select State'}</span>
-          <span>▼</span>
-        </div>
-        ${overlays.length > 0 ? `
-          <div class="layer-indicator" onclick="viewer.toggleLayerPanel(event)">
-            <span>Layers</span>
-            <span class="layer-count">${overlays.filter(o => o.active).length}</span>
-          </div>
-        ` : ''}
-      </div>
-    `;
-
-    // Listen for state changes
-    if (!this.stateListenerAdded) {
-      document.addEventListener('stateChange', (e) => {
-        this.onStateChange(e.detail);
-      });
-      this.stateListenerAdded = true;
-    }
-  }
-
   renderStepControls() {
     const controls = document.getElementById('step-controls');
     if (!controls) return;
@@ -3121,10 +3594,27 @@ if (typeof module !== 'undefined' && module.exports) {
     }
   }
 
-  // Progress display removed
   updateProgressDisplay() {
-    // Progress tracking removed - function kept for compatibility
-    // No-op function
+    const stats = this.learningProgress.getOverallProgress();
+    const diagramStats = this.learningProgress.getDiagramStats(this.currentDiagramId);
+
+    const progressEl = document.getElementById('progress-summary');
+    if (progressEl) {
+      progressEl.innerHTML = `
+        <div class="progress-item">
+          <span class="progress-label">Overall:</span>
+          <span class="progress-value">${stats.completionPercentage}%</span>
+        </div>
+        <div class="progress-item">
+          <span class="progress-label">This Diagram:</span>
+          <span class="progress-value">${diagramStats.completionPercentage}%</span>
+        </div>
+        <div class="progress-item">
+          <span class="progress-label">Time Spent:</span>
+          <span class="progress-value">${diagramStats.formattedTime}</span>
+        </div>
+      `;
+    }
   }
 
   setupEventListeners() {
@@ -3134,7 +3624,28 @@ if (typeof module !== 'undefined' && module.exports) {
       this.renderDiagram();
     });
 
-    // Progress tracking event listeners removed
+    // Listen for step changes
+    document.addEventListener('stepChange', (e) => {
+      this.learningProgress.updateStepProgress(
+        this.currentDiagramId,
+        e.detail.index,
+        e.detail.total
+      );
+    });
+
+    // Listen for drill completion
+    document.addEventListener('drillComplete', (e) => {
+      const drills = this.currentSpec.drills || [];
+      const completed = drills.filter(d =>
+        this.drillSystem.progress.isDrillComplete(this.currentDiagramId, d.id)
+      ).length;
+
+      this.learningProgress.updateDrillProgress(
+        this.currentDiagramId,
+        completed,
+        drills.length
+      );
+    });
 
     // Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
@@ -3282,39 +3793,6 @@ if (typeof module !== 'undefined' && module.exports) {
     }
   }
 
-  onStateChange(detail) {
-    // Update diagram based on state change
-    if (detail.overlays) {
-      this.currentOverlays = new Set(detail.overlays);
-      this.renderDiagram();
-    }
-
-    // Re-render state controls to update UI
-    this.renderStateControls();
-  }
-
-  handleTimelineClick(event) {
-    if (!this.stateManager) return;
-
-    const track = event.currentTarget;
-    const rect = track.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const percentage = x / rect.width;
-    const stateIndex = Math.floor(percentage * this.stateManager.getStates().length);
-
-    this.stateManager.goToState(stateIndex);
-  }
-
-  toggleStateDropdown(event) {
-    event.stopPropagation();
-    // Implementation for state dropdown
-  }
-
-  toggleLayerPanel(event) {
-    event.stopPropagation();
-    // Implementation for layer panel
-  }
-
   showHelp() {
     const modal = document.createElement('div');
     modal.className = 'modal';
@@ -3359,17 +3837,6 @@ if (typeof module !== 'undefined' && module.exports) {
               <span>Show this help</span>
             </div>
           </div>
-          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-            <h3 style="margin-bottom: 10px;">Resources</h3>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <a href="intro.html" style="padding: 8px 16px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; display: inline-block;">
-                📺 Watch Introduction Video
-              </a>
-              <a href="https://youtu.be/oHZDfovrUjo" target="_blank" style="padding: 8px 16px; background: #ef4444; color: white; text-decoration: none; border-radius: 6px; display: inline-block;">
-                🎥 YouTube Video
-              </a>
-            </div>
-          </div>
         </div>
       </div>
     `;
@@ -3403,7 +3870,7 @@ if (typeof module !== 'undefined' && module.exports) {
   }
 
   handleError(error) {
-    console.error('Viewer error:', error.message || error);
+    console.error('Viewer error:', error);
 
     const container = document.getElementById('diagram-container');
     if (container) {
@@ -3419,13 +3886,13 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Initialize on load
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
   window.viewer = new GFSViewer();
-  await window.viewer.initialize();
+  window.viewer.initialize();
   window.drillSystem = window.viewer.drillSystem; // For drill onclick handlers
 });
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = GFSViewer;
-}
+}// Bundle created: Sun Oct 12 19:23:59 IST 2025
