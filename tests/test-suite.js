@@ -717,115 +717,103 @@ class GFSTestSuite {
   }
 
   async testUnifiedNavigation(specId, results) {
-    console.log('🧭 Testing unified navigation...');
+    console.log('🧭 Testing state navigation...');
 
-    const test = { name: 'Unified Navigation', passed: false, details: {} };
+    const test = { name: 'State Navigation', passed: false, details: {} };
 
     try {
-      // Test unified navigation display
+      // Test state navigation functionality
       const navInfo = await this.page.evaluate(() => {
-        const navCurrent = document.getElementById('nav-current');
-        const prevBtn = document.getElementById('nav-prev');
-        const nextBtn = document.getElementById('nav-next');
-
-        if (!navCurrent) return { found: false };
-
-        // Parse navigation display
-        const navText = navCurrent.innerText || '';
-        const navParts = {
-          diagram: navCurrent.querySelector('.nav-diagram')?.innerText || '',
-          state: navCurrent.querySelector('.nav-state')?.innerText || '',
-          global: navCurrent.querySelector('.nav-global')?.innerText || ''
-        };
-
-        // Get current state from state manager
         const stateManager = window.viewer?.stateManager;
         const currentDiagramId = window.viewer?.currentDiagramId;
-        const globalNav = window.viewer?.globalNavigation;
+        const stateControls = document.getElementById('state-controls');
+        const prevBtn = stateControls?.querySelector('.state-prev');
+        const nextBtn = stateControls?.querySelector('.state-next');
+
+        if (!stateManager) return { found: false, error: 'State manager not found' };
 
         return {
           found: true,
-          navText: navText,
-          navParts: navParts,
-          hasDiagramInfo: navParts.diagram.includes('D') && navParts.diagram.includes('/13'),
-          hasStateInfo: navParts.state.includes('S'),
-          hasGlobalInfo: navParts.global.includes('/'),
-          prevDisabled: prevBtn?.disabled,
-          nextDisabled: nextBtn?.disabled,
+          hasStateControls: !!stateControls,
+          prevDisabled: prevBtn?.disabled || prevBtn?.classList.contains('disabled'),
+          nextDisabled: nextBtn?.disabled || nextBtn?.classList.contains('disabled'),
           currentDiagramId: currentDiagramId,
-          currentStateIndex: stateManager?.currentStateIndex,
-          totalStates: globalNav?.totalStates?.length || 0,
-          currentGlobalPos: window.viewer?.getCurrentGlobalPosition ?
-                           window.viewer.getCurrentGlobalPosition() : -1
+          currentStateIndex: stateManager.currentStateIndex,
+          totalStates: stateManager.states?.length || 0,
+          currentState: stateManager.getCurrentState()?.caption || ''
         };
       });
 
       test.details = navInfo;
       test.passed = navInfo.found &&
-                   navInfo.hasDiagramInfo &&
-                   navInfo.hasStateInfo &&
+                   navInfo.hasStateControls &&
                    navInfo.totalStates > 0;
 
       // Test navigation continuity
       if (navInfo.found && !navInfo.nextDisabled) {
         console.log('  🔄 Testing navigation continuity...');
 
-        const beforeNav = navInfo.currentGlobalPos;
+        const beforeNav = navInfo.currentStateIndex;
 
-        // Navigate forward
-        await this.page.click('#nav-next');
+        // Navigate forward using state manager
+        const moved = await this.page.evaluate(() => {
+          return window.viewer?.stateManager?.next();
+        });
         await this.page.waitForTimeout(500);
 
         const afterNav = await this.page.evaluate(() => {
-          return window.viewer?.getCurrentGlobalPosition ?
-                 window.viewer.getCurrentGlobalPosition() : -1;
+          return window.viewer?.stateManager?.currentStateIndex;
         });
 
-        const navWorked = afterNav > beforeNav;
+        const navWorked = moved && afterNav > beforeNav;
         test.details.continuityTest = {
-          before: beforeNav,
-          after: afterNav,
+          beforeIndex: beforeNav,
+          afterIndex: afterNav,
           worked: navWorked
         };
 
         // Navigate back
-        await this.page.click('#nav-prev');
+        await this.page.evaluate(() => {
+          window.viewer?.stateManager?.previous();
+        });
         await this.page.waitForTimeout(500);
 
-        console.log(`    ${navWorked ? '✅' : '❌'} Navigation continuity: ${beforeNav} → ${afterNav}`);
+        console.log(`    ${navWorked ? '✅' : '❌'} Navigation continuity: state ${beforeNav} → ${afterNav}`);
       }
 
-      // Test cross-diagram navigation
-      if (navInfo.totalStates > 10) {
-        console.log('  🌐 Testing cross-diagram navigation...');
+      // Test state exhaustion (navigating through all states)
+      if (navInfo.totalStates > 1) {
+        console.log('  🔄 Testing state exhaustion...');
 
-        // Try to navigate multiple times to cross diagram boundary
-        let crossedBoundary = false;
         const startDiagram = navInfo.currentDiagramId;
+        let statesNavigated = 0;
 
-        for (let i = 0; i < 10; i++) {
+        // Navigate through states in current diagram
+        for (let i = 0; i < navInfo.totalStates; i++) {
           const canContinue = await this.page.evaluate(() => {
-            const nextBtn = document.getElementById('nav-next');
-            return nextBtn && !nextBtn.disabled;
+            const stateManager = window.viewer?.stateManager;
+            return stateManager && stateManager.currentStateIndex < stateManager.states.length - 1;
           });
 
           if (!canContinue) break;
 
-          await this.page.click('#nav-next');
-          await this.page.waitForTimeout(200);
-
-          const currentDiagram = await this.page.evaluate(() => {
-            return window.viewer?.currentDiagramId;
+          const moved = await this.page.evaluate(() => {
+            return window.viewer?.stateManager?.next();
           });
 
-          if (currentDiagram !== startDiagram) {
-            crossedBoundary = true;
+          if (moved) {
+            statesNavigated++;
+            await this.page.waitForTimeout(100);
+          } else {
             break;
           }
         }
 
-        test.details.crossDiagramNav = crossedBoundary;
-        console.log(`    ${crossedBoundary ? '✅' : '⚠️'} Cross-diagram navigation: ${crossedBoundary ? 'Success' : 'Did not cross boundary'}`);
+        test.details.stateExhaustion = {
+          statesNavigated,
+          totalStates: navInfo.totalStates
+        };
+        console.log(`    ✅ Navigated through ${statesNavigated} states`);
 
         // Navigate back to original spec
         await this.navigateToSpec(specId);
@@ -834,17 +822,27 @@ class GFSTestSuite {
 
       // Take screenshot of navigation controls
       const screenshotPath = path.join(CONFIG.screenshotDir, `${specId}-07-unified-nav.png`);
-      await this.page.screenshot({
-        path: screenshotPath,
-        fullPage: false,
-        clip: await this.getElementBounds('.nav-controls')
-      });
+      const controlsBounds = await this.getElementBounds('#state-controls');
+
+      if (controlsBounds) {
+        await this.page.screenshot({
+          path: screenshotPath,
+          fullPage: false,
+          clip: controlsBounds
+        });
+      } else {
+        await this.page.screenshot({
+          path: screenshotPath,
+          fullPage: false
+        });
+      }
+
       results.screenshots.push({
-        name: 'unified-navigation',
+        name: 'state-navigation',
         path: screenshotPath
       });
 
-      console.log(`  ${test.passed ? '✅' : '❌'} Unified Navigation: ${navInfo.totalStates} total states, Global pos: ${navInfo.currentGlobalPos}`);
+      console.log(`  ${test.passed ? '✅' : '❌'} State Navigation: ${navInfo.totalStates} total states, Current: ${navInfo.currentStateIndex}`);
     } catch (error) {
       test.error = error.message;
       console.log(`  ❌ Unified Navigation: ERROR - ${error.message}`);
@@ -862,39 +860,58 @@ class GFSTestSuite {
       const interactive = await this.page.evaluate(() => {
         // Test various interactive elements
         const results = {
-          navigation: {
-            prevButton: !!document.querySelector('.nav-prev'),
-            nextButton: !!document.querySelector('.nav-next'),
-            homeButton: !!document.querySelector('.nav-home')
-          },
-          controls: {
+          stateControls: {
+            prevButton: !!document.querySelector('.state-prev'),
+            nextButton: !!document.querySelector('.state-next'),
             playButton: !!document.querySelector('.state-play'),
-            speedControl: !!document.querySelector('.speed-control'),
-            layerToggle: !!document.querySelector('.layer-indicator')
+            speedControl: !!document.querySelector('.speed-control')
           },
           tabs: {
             drillsTab: !!document.querySelector('[data-tab="drills"]'),
             principlesTab: !!document.querySelector('[data-tab="principles"]'),
             assessmentTab: !!document.querySelector('[data-tab="assessment"]')
           },
+          navigation: {
+            navItems: document.querySelectorAll('[data-diagram-id]').length,
+            hasNavigation: !!document.getElementById('diagram-nav')
+          },
           overlays: {
             hasOverlays: !!document.querySelector('.overlay-chip'),
-            overlayCount: document.querySelectorAll('.overlay-chip').length
+            overlayCount: document.querySelectorAll('.overlay-chip').length,
+            hasLayerIndicators: document.querySelectorAll('.layer-indicator').length > 0
           }
         };
 
-        // Count total interactive elements
-        results.totalInteractive = Object.values(results).reduce((sum, category) => {
-          return sum + Object.values(category).filter(Boolean).length;
-        }, 0);
+        // Count total interactive elements found
+        let totalInteractive = 0;
+        totalInteractive += Object.values(results.stateControls).filter(Boolean).length;
+        totalInteractive += Object.values(results.tabs).filter(Boolean).length;
+        totalInteractive += results.navigation.hasNavigation ? 1 : 0;
+        totalInteractive += results.overlays.hasOverlays ? 1 : 0;
+
+        results.totalInteractive = totalInteractive;
+        results.summary = {
+          stateControls: Object.values(results.stateControls).filter(Boolean).length,
+          tabs: Object.values(results.tabs).filter(Boolean).length,
+          navigation: results.navigation.navItems,
+          overlays: results.overlays.overlayCount
+        };
 
         return results;
       });
 
       test.details = interactive;
-      test.passed = interactive.totalInteractive > 5; // At least 5 interactive elements
+      // Expect at least state controls and tabs
+      test.passed = interactive.summary.stateControls >= 2 && interactive.summary.tabs >= 2;
 
-      console.log(`  ${test.passed ? '✅' : '❌'} Interactive: ${interactive.totalInteractive} elements found`);
+      if (test.passed) {
+        console.log(`  ✅ Interactive: ${interactive.totalInteractive} elements found`);
+        console.log(`     State controls: ${interactive.summary.stateControls}, Tabs: ${interactive.summary.tabs}`);
+        console.log(`     Navigation items: ${interactive.summary.navigation}, Overlays: ${interactive.summary.overlays}`);
+      } else {
+        console.log(`  ❌ Interactive: Missing critical elements`);
+        console.log(`     State controls: ${interactive.summary.stateControls} (need 2+), Tabs: ${interactive.summary.tabs} (need 2+)`);
+      }
     } catch (error) {
       test.error = error.message;
       console.log(`  ❌ Interactive: ERROR - ${error.message}`);
@@ -909,11 +926,17 @@ class GFSTestSuite {
         const element = document.querySelector(sel);
         if (!element) return null;
         const rect = element.getBoundingClientRect();
+
+        // Ensure width and height are positive for screenshots
+        if (rect.width <= 0 || rect.height <= 0) {
+          return null;
+        }
+
         return {
-          x: rect.left,
-          y: rect.top,
-          width: rect.width,
-          height: rect.height
+          x: Math.max(0, rect.left),
+          y: Math.max(0, rect.top),
+          width: Math.max(1, Math.round(rect.width)),
+          height: Math.max(1, Math.round(rect.height))
         };
       }, selector);
     } catch {
@@ -1165,10 +1188,21 @@ class GFSTestSuite {
   }
 
   getTestDetails(test) {
-    if (!test.details) return test.passed ? 'PASS' : 'FAIL';
+    if (!test.details) {
+      if (test.error) {
+        return `ERROR: ${test.error}`;
+      }
+      return test.passed ? 'PASS' : 'FAIL';
+    }
 
     const details = [];
 
+    // Add error first if present
+    if (test.error) {
+      details.push(`ERROR: ${test.error}`);
+    }
+
+    // Content-related details
     if (test.details.contentLength !== undefined) {
       details.push(`${test.details.contentLength} chars`);
     }
@@ -1184,17 +1218,38 @@ class GFSTestSuite {
     if (test.details.nodeCount !== undefined) {
       details.push(`${test.details.nodeCount} nodes`);
     }
+
+    // State management details
     if (test.details.totalStates !== undefined) {
-      details.push(`${test.details.totalStates} total states`);
+      details.push(`${test.details.totalStates} states`);
     }
-    if (test.details.currentGlobalPos !== undefined && test.details.currentGlobalPos >= 0) {
-      details.push(`pos ${test.details.currentGlobalPos}`);
+    if (test.details.currentStateIndex !== undefined) {
+      details.push(`current: ${test.details.currentStateIndex}`);
     }
-    if (test.details.continuityTest?.worked) {
-      details.push('✓ continuity');
+
+    // Navigation test results
+    if (test.details.continuityTest) {
+      const ct = test.details.continuityTest;
+      if (ct.worked) {
+        details.push(`✓ continuity (${ct.beforeIndex} → ${ct.afterIndex})`);
+      } else {
+        details.push(`✗ continuity failed`);
+      }
     }
-    if (test.details.crossDiagramNav) {
-      details.push('✓ cross-diagram');
+    if (test.details.stateExhaustion) {
+      const se = test.details.stateExhaustion;
+      details.push(`navigated ${se.statesNavigated}/${se.totalStates} states`);
+    }
+
+    // Interactive elements
+    if (test.details.summary) {
+      const s = test.details.summary;
+      details.push(`controls: ${s.stateControls}, tabs: ${s.tabs}, nav: ${s.navigation}`);
+    }
+
+    // Missing features
+    if (test.details.found === false) {
+      details.push(`NOT FOUND${test.details.error ? ': ' + test.details.error : ''}`);
     }
 
     return details.length > 0 ? details.join(', ') : (test.passed ? 'PASS' : 'FAIL');

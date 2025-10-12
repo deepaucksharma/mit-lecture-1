@@ -1,19 +1,23 @@
 {
-  "timestamp": "2025-10-11T12:50:55.808Z",
+  "timestamp": "2025-10-12T11:45:02.726Z",
   "specs": {
     "00-legend": {
       "id": "00-legend",
-      "timestamp": "2025-10-11T12:51:02.833Z",
+      "timestamp": "2025-10-12T11:45:09.641Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
-            "nodeCount": 0,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-8 -8 636.9609375 370.7239685058594"
+            },
+            "nodeCount": 5,
             "edgeCount": 0,
             "containerDimensions": {
               "width": 812,
@@ -152,12 +156,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -176,7 +179,7 @@
             "prevDisabled": true,
             "nextDisabled": false,
             "currentDiagramId": "00-legend",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -198,7 +201,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -209,7 +212,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -255,17 +258,21 @@
     },
     "01-triangle": {
       "id": "01-triangle",
-      "timestamp": "2025-10-11T12:51:16.213Z",
+      "timestamp": "2025-10-12T11:45:22.113Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
-            "nodeCount": 0,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-8 -8 198.5 288.96875"
+            },
+            "nodeCount": 3,
             "edgeCount": 0,
             "containerDimensions": {
               "width": 812,
@@ -408,12 +415,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -432,7 +438,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "01-triangle",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -454,7 +460,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -465,7 +471,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -511,16 +517,20 @@
     },
     "02-scale": {
       "id": "02-scale",
-      "timestamp": "2025-10-11T12:51:28.495Z",
+      "timestamp": "2025-10-12T11:45:36.813Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-50 -20 754.5 279"
+            },
             "nodeCount": 0,
             "edgeCount": 0,
             "containerDimensions": {
@@ -660,12 +670,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -684,7 +693,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "02-scale",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -706,7 +715,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -717,7 +726,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -763,17 +772,21 @@
     },
     "03-chunk-size": {
       "id": "03-chunk-size",
-      "timestamp": "2025-10-11T12:51:40.827Z",
+      "timestamp": "2025-10-12T11:45:49.062Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
-            "nodeCount": 0,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-8 -8 206.625 363.9384460449219"
+            },
+            "nodeCount": 3,
             "edgeCount": 0,
             "containerDimensions": {
               "width": 812,
@@ -912,12 +925,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -936,7 +948,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "03-chunk-size",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -958,7 +970,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -969,7 +981,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -1015,17 +1027,21 @@
     },
     "04-architecture": {
       "id": "04-architecture",
-      "timestamp": "2025-10-11T12:51:54.042Z",
+      "timestamp": "2025-10-12T11:46:01.364Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
-            "nodeCount": 0,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-8 -8 640.671875 350.92620849609375"
+            },
+            "nodeCount": 5,
             "edgeCount": 0,
             "containerDimensions": {
               "width": 812,
@@ -1168,12 +1184,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -1192,7 +1207,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "04-architecture",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -1214,7 +1229,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -1225,7 +1240,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -1271,16 +1286,20 @@
     },
     "05-planes": {
       "id": "05-planes",
-      "timestamp": "2025-10-11T12:52:06.357Z",
+      "timestamp": "2025-10-12T11:46:16.174Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-60 -20 1316 697"
+            },
             "nodeCount": 0,
             "edgeCount": 0,
             "containerDimensions": {
@@ -1424,12 +1443,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -1448,7 +1466,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "05-planes",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -1470,7 +1488,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -1481,7 +1499,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -1527,16 +1545,20 @@
     },
     "06-read-path": {
       "id": "06-read-path",
-      "timestamp": "2025-10-11T12:52:19.522Z",
+      "timestamp": "2025-10-12T11:46:28.457Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-50 -20 893 367"
+            },
             "nodeCount": 0,
             "edgeCount": 0,
             "containerDimensions": {
@@ -1680,12 +1702,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -1704,7 +1725,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "06-read-path",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -1726,7 +1747,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -1737,7 +1758,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -1783,16 +1804,20 @@
     },
     "07-write-path": {
       "id": "07-write-path",
-      "timestamp": "2025-10-11T12:52:31.790Z",
+      "timestamp": "2025-10-12T11:46:40.840Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-60 -20 1276 950"
+            },
             "nodeCount": 0,
             "edgeCount": 0,
             "containerDimensions": {
@@ -1953,12 +1978,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -1977,7 +2001,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "07-write-path",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -1999,7 +2023,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -2010,7 +2034,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -2056,17 +2080,21 @@
     },
     "08-lease": {
       "id": "08-lease",
-      "timestamp": "2025-10-11T12:52:44.121Z",
+      "timestamp": "2025-10-12T11:46:55.599Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
-            "nodeCount": 0,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "0 0 707.49609375 711.8125"
+            },
+            "nodeCount": 6,
             "edgeCount": 0,
             "containerDimensions": {
               "width": 812,
@@ -2226,12 +2254,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -2250,7 +2277,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "08-lease",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -2272,7 +2299,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -2283,7 +2310,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -2329,17 +2356,21 @@
     },
     "09-consistency": {
       "id": "09-consistency",
-      "timestamp": "2025-10-11T12:52:57.267Z",
+      "timestamp": "2025-10-12T11:47:07.984Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
-            "nodeCount": 0,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-8 -8 552.8359375 202.42633056640625"
+            },
+            "nodeCount": 5,
             "edgeCount": 0,
             "containerDimensions": {
               "width": 812,
@@ -2500,12 +2531,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -2524,7 +2554,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "09-consistency",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -2546,7 +2576,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -2557,7 +2587,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -2603,17 +2633,21 @@
     },
     "10-recovery": {
       "id": "10-recovery",
-      "timestamp": "2025-10-11T12:53:09.566Z",
+      "timestamp": "2025-10-12T11:47:22.537Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
-            "nodeCount": 0,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-8 -7.999996185302734 1275.703125 99.05580139160156"
+            },
+            "nodeCount": 5,
             "edgeCount": 0,
             "containerDimensions": {
               "width": 812,
@@ -2775,12 +2809,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -2799,7 +2832,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "10-recovery",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -2821,7 +2854,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -2832,7 +2865,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -2878,17 +2911,21 @@
     },
     "11-evolution": {
       "id": "11-evolution",
-      "timestamp": "2025-10-11T12:53:21.849Z",
+      "timestamp": "2025-10-12T11:47:34.850Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
-            "nodeCount": 0,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-8 -8 151.953125 712.28125"
+            },
+            "nodeCount": 4,
             "edgeCount": 0,
             "containerDimensions": {
               "width": 812,
@@ -3049,12 +3086,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -3073,7 +3109,7 @@
             "prevDisabled": false,
             "nextDisabled": false,
             "currentDiagramId": "11-evolution",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1,
             "continuityTest": {
@@ -3095,7 +3131,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -3106,7 +3142,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -3152,17 +3188,21 @@
     },
     "12-dna": {
       "id": "12-dna",
-      "timestamp": "2025-10-11T12:53:34.891Z",
+      "timestamp": "2025-10-12T11:47:47.200Z",
       "tests": [
         {
           "name": "Diagram Rendering",
-          "passed": false,
+          "passed": true,
           "details": {
             "hasContainer": true,
-            "hasSvg": false,
+            "hasSvg": true,
             "hasMermaid": false,
-            "svgDimensions": null,
-            "nodeCount": 0,
+            "svgDimensions": {
+              "width": "100%",
+              "height": null,
+              "viewBox": "-8 -8 848.1640625 352.8482971191406"
+            },
+            "nodeCount": 7,
             "edgeCount": 0,
             "containerDimensions": {
               "width": 812,
@@ -3322,12 +3362,11 @@
             "currentIndex": 0,
             "currentScene": "initial",
             "hasControls": true,
-            "hasTimeline": false,
+            "hasTimeline": true,
             "hasPrevButton": false,
             "hasNextButton": false,
             "hasPlayButton": false
-          },
-          "error": "window.viewer?.stateManager?.goToState is not a function"
+          }
         },
         {
           "name": "Unified Navigation",
@@ -3346,7 +3385,7 @@
             "prevDisabled": false,
             "nextDisabled": true,
             "currentDiagramId": "12-dna",
-            "currentStateIndex": 3,
+            "currentStateIndex": 0,
             "totalStates": 0,
             "currentGlobalPos": -1
           }
@@ -3363,7 +3402,7 @@
             "controls": {
               "playButton": false,
               "speedControl": false,
-              "layerToggle": false
+              "layerToggle": true
             },
             "tabs": {
               "drillsTab": false,
@@ -3374,7 +3413,7 @@
               "hasOverlays": false,
               "overlayCount": 0
             },
-            "totalInteractive": 1
+            "totalInteractive": 2
           }
         }
       ],
@@ -3421,453 +3460,73 @@
   },
   "summary": {
     "total": 130,
-    "passed": 52,
-    "failed": 78,
+    "passed": 65,
+    "failed": 65,
     "errors": [
       {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:50:57.384Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:50:57.384Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:02.917Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:02.917Z"
+        "type": "javascript",
+        "message": "Cannot read properties of null (reading 'checkAnalysis')",
+        "timestamp": "2025-10-12T11:45:14.914Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:51:08.125Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:14.114Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:14.114Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:15.450Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:15.451Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:16.295Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:16.295Z"
+        "timestamp": "2025-10-12T11:45:27.422Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:51:21.522Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:26.419Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:26.419Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:27.731Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:27.731Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:28.566Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:28.566Z"
+        "timestamp": "2025-10-12T11:45:42.078Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:51:33.801Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:38.715Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:38.715Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:40.033Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:40.033Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:40.909Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:40.909Z"
+        "timestamp": "2025-10-12T11:45:54.358Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:51:47.024Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:51.946Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:51.946Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:53.277Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:53.277Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:54.127Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:51:54.127Z"
+        "timestamp": "2025-10-12T11:46:06.736Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:51:59.353Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:04.237Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:04.237Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:05.575Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:05.575Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:06.439Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:06.439Z"
+        "timestamp": "2025-10-12T11:46:21.477Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:52:11.634Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:16.500Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:16.500Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:18.730Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:18.730Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:19.597Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:19.597Z"
+        "timestamp": "2025-10-12T11:46:33.755Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:52:24.827Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:29.708Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:29.708Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:31.019Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:31.019Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:31.872Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:31.873Z"
+        "timestamp": "2025-10-12T11:46:48.534Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:52:37.075Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:42.016Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:42.016Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:43.330Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:43.330Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:44.212Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:44.212Z"
+        "timestamp": "2025-10-12T11:47:00.947Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:52:49.415Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:55.156Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:55.156Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:56.500Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:56.500Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:57.347Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:52:57.347Z"
+        "timestamp": "2025-10-12T11:47:13.301Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:53:02.556Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:07.463Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:07.463Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:08.780Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:08.780Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:09.649Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:09.649Z"
+        "timestamp": "2025-10-12T11:47:27.823Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:53:14.873Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:19.759Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:19.760Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:21.095Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:21.095Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:21.927Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:21.927Z"
+        "timestamp": "2025-10-12T11:47:40.149Z"
       },
       {
         "type": "javascript",
         "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:53:27.918Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:32.809Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:32.809Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:34.124Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:34.124Z"
-      },
-      {
-        "type": "console",
-        "message": "Failed to load diagram: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:34.984Z"
-      },
-      {
-        "type": "console",
-        "message": "Viewer error: JSHandle@error",
-        "timestamp": "2025-10-11T12:53:34.984Z"
-      },
-      {
-        "type": "javascript",
-        "message": "Cannot read properties of null (reading 'checkAnalysis')",
-        "timestamp": "2025-10-11T12:53:40.174Z"
+        "timestamp": "2025-10-12T11:47:54.512Z"
       }
     ]
   }

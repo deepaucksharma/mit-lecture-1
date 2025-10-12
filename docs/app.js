@@ -1152,6 +1152,19 @@ class DrillSystem {
           <div class="correct-answer">
             <strong>Answer:</strong> ${drill.answer || 'No answer provided'}
           </div>
+          ${drill.thoughtProcess && drill.thoughtProcess.length > 0 ? `
+            <div class="thought-process">
+              <h4>💭 Thought Process:</h4>
+              <ol class="thought-steps">
+                ${drill.thoughtProcess.map(step => `<li>${step}</li>`).join('')}
+              </ol>
+            </div>
+          ` : ''}
+          ${drill.insight ? `
+            <div class="drill-insight">
+              <strong>💡 Key Insight:</strong> ${drill.insight}
+            </div>
+          ` : ''}
         </div>
       </div>
     `;
@@ -1189,6 +1202,19 @@ class DrillSystem {
               </li>`
             ).join('')}
           </ul>
+          ${drill.thoughtProcess && drill.thoughtProcess.length > 0 ? `
+            <div class="thought-process">
+              <h4>💭 Thought Process:</h4>
+              <ol class="thought-steps">
+                ${drill.thoughtProcess.map(step => `<li>${step}</li>`).join('')}
+              </ol>
+            </div>
+          ` : ''}
+          ${drill.insight ? `
+            <div class="drill-insight">
+              <strong>💡 Key Insight:</strong> ${drill.insight}
+            </div>
+          ` : ''}
         </div>
       </div>
     `;
@@ -1236,6 +1262,19 @@ class DrillSystem {
           <ul>
             ${(drill.rubric || []).map(point => `<li>${point}</li>`).join('')}
           </ul>
+          ${drill.thoughtProcess && drill.thoughtProcess.length > 0 ? `
+            <div class="thought-process">
+              <h4>💭 Thought Process:</h4>
+              <ol class="thought-steps">
+                ${drill.thoughtProcess.map(step => `<li>${step}</li>`).join('')}
+              </ol>
+            </div>
+          ` : ''}
+          ${drill.insight ? `
+            <div class="drill-insight">
+              <strong>💡 Key Insight:</strong> ${drill.insight}
+            </div>
+          ` : ''}
         </div>
       </div>
     `;
@@ -1271,6 +1310,19 @@ class DrillSystem {
               </li>`
             ).join('')}
           </ul>
+          ${drill.thoughtProcess && drill.thoughtProcess.length > 0 ? `
+            <div class="thought-process">
+              <h4>💭 Thought Process:</h4>
+              <ol class="thought-steps">
+                ${drill.thoughtProcess.map(step => `<li>${step}</li>`).join('')}
+              </ol>
+            </div>
+          ` : ''}
+          ${drill.insight ? `
+            <div class="drill-insight">
+              <strong>💡 Key Insight:</strong> ${drill.insight}
+            </div>
+          ` : ''}
           <button onclick="drillSystem.markComplete('${drill.id}')" class="primary">
             Mark as Complete
           </button>
@@ -2828,93 +2880,107 @@ if (typeof module !== 'undefined' && module.exports) {
     const container = document.getElementById('principles-container');
     if (!container || !spec.firstPrinciples) return;
 
-    let html = '<div class="principles-content">';
+    // Use DocumentFragment for better performance with large content (35KB+)
+    const fragment = document.createDocumentFragment();
+    const wrapper = document.createElement('div');
+    wrapper.className = 'principles-content';
 
     // First Principles Accordion
-    html += `
-      <details class="accordion-item first-principles-accordion">
-        <summary class="accordion-header">
-          <span class="accordion-icon">▶</span>
-          <span class="accordion-title">🎯 First Principles</span>
-        </summary>
-        <div class="accordion-content">
-    `;
+    const principlesAccordion = document.createElement('details');
+    principlesAccordion.className = 'accordion-item first-principles-accordion';
+
+    const principlesSummary = document.createElement('summary');
+    principlesSummary.className = 'accordion-header';
+    principlesSummary.innerHTML = '<span class="accordion-icon">▶</span><span class="accordion-title">🎯 First Principles</span>';
+
+    const principlesContent = document.createElement('div');
+    principlesContent.className = 'accordion-content';
 
     // Render each principle category
     for (const [category, principles] of Object.entries(spec.firstPrinciples)) {
-      html += `
-        <details class="sub-accordion-item">
-          <summary class="sub-accordion-header">
-            <span class="sub-accordion-icon">▶</span>
-            <span class="sub-accordion-title">${category.replace(/([A-Z])/g, ' $1').trim()}</span>
-          </summary>
-          <div class="sub-accordion-content">
-            <dl class="principle-section">
-      `;
+      const subAccordion = document.createElement('details');
+      subAccordion.className = 'sub-accordion-item';
+
+      const subSummary = document.createElement('summary');
+      subSummary.className = 'sub-accordion-header';
+      subSummary.innerHTML = `<span class="sub-accordion-icon">▶</span><span class="sub-accordion-title">${category.replace(/([A-Z])/g, ' $1').trim()}</span>`;
+
+      const subContent = document.createElement('div');
+      subContent.className = 'sub-accordion-content';
+
+      const dl = document.createElement('dl');
+      dl.className = 'principle-section';
 
       for (const [key, value] of Object.entries(principles)) {
-        html += `
-          <dt>${key.replace(/([A-Z])/g, ' $1').trim()}</dt>
-          <dd>${value}</dd>
-        `;
+        const dt = document.createElement('dt');
+        dt.textContent = key.replace(/([A-Z])/g, ' $1').trim();
+        const dd = document.createElement('dd');
+        dd.textContent = value;
+        dl.appendChild(dt);
+        dl.appendChild(dd);
       }
 
-      html += `
-            </dl>
-          </div>
-        </details>
-      `;
+      subContent.appendChild(dl);
+      subAccordion.appendChild(subSummary);
+      subAccordion.appendChild(subContent);
+      principlesContent.appendChild(subAccordion);
     }
 
-    html += `
-        </div>
-      </details>
-    `;
+    principlesAccordion.appendChild(principlesSummary);
+    principlesAccordion.appendChild(principlesContent);
+    wrapper.appendChild(principlesAccordion);
 
     // Advanced Concepts Accordion (if present)
     if (spec.advancedConcepts) {
-      html += `
-        <details class="accordion-item advanced-concepts-accordion">
-          <summary class="accordion-header">
-            <span class="accordion-icon">▶</span>
-            <span class="accordion-title">🚀 Advanced Concepts</span>
-          </summary>
-          <div class="accordion-content">
-      `;
+      const advancedAccordion = document.createElement('details');
+      advancedAccordion.className = 'accordion-item advanced-concepts-accordion advanced-section';
+
+      const advancedSummary = document.createElement('summary');
+      advancedSummary.className = 'accordion-header';
+      advancedSummary.innerHTML = '<span class="accordion-icon">▶</span><span class="accordion-title">🚀 Advanced Concepts</span>';
+
+      const advancedContent = document.createElement('div');
+      advancedContent.className = 'accordion-content advanced-section';
 
       for (const [category, concepts] of Object.entries(spec.advancedConcepts)) {
-        html += `
-          <details class="sub-accordion-item">
-            <summary class="sub-accordion-header">
-              <span class="sub-accordion-icon">▶</span>
-              <span class="sub-accordion-title">${category.replace(/([A-Z])/g, ' $1').trim()}</span>
-            </summary>
-            <div class="sub-accordion-content">
-              <dl class="concept-section">
-        `;
+        const subAccordion = document.createElement('details');
+        subAccordion.className = 'sub-accordion-item';
+
+        const subSummary = document.createElement('summary');
+        subSummary.className = 'sub-accordion-header';
+        subSummary.innerHTML = `<span class="sub-accordion-icon">▶</span><span class="sub-accordion-title">${category.replace(/([A-Z])/g, ' $1').trim()}</span>`;
+
+        const subContent = document.createElement('div');
+        subContent.className = 'sub-accordion-content';
+
+        const dl = document.createElement('dl');
+        dl.className = 'concept-section';
 
         for (const [key, value] of Object.entries(concepts)) {
-          html += `
-            <dt>${key.replace(/([A-Z])/g, ' $1').trim()}</dt>
-            <dd>${value}</dd>
-          `;
+          const dt = document.createElement('dt');
+          dt.textContent = key.replace(/([A-Z])/g, ' $1').trim();
+          const dd = document.createElement('dd');
+          dd.textContent = value;
+          dl.appendChild(dt);
+          dl.appendChild(dd);
         }
 
-        html += `
-              </dl>
-            </div>
-          </details>
-        `;
+        subContent.appendChild(dl);
+        subAccordion.appendChild(subSummary);
+        subAccordion.appendChild(subContent);
+        advancedContent.appendChild(subAccordion);
       }
 
-      html += `
-        </div>
-      </details>
-      `;
+      advancedAccordion.appendChild(advancedSummary);
+      advancedAccordion.appendChild(advancedContent);
+      wrapper.appendChild(advancedAccordion);
     }
 
-    html += '</div>';
-    container.innerHTML = html;
+    fragment.appendChild(wrapper);
+
+    // Clear and append in one operation - reduces reflows
+    container.textContent = '';
+    container.appendChild(fragment);
   }
 
   renderAssessments(spec) {
@@ -3353,9 +3419,9 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Initialize on load
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   window.viewer = new GFSViewer();
-  window.viewer.initialize();
+  await window.viewer.initialize();
   window.drillSystem = window.viewer.drillSystem; // For drill onclick handlers
 });
 

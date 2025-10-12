@@ -29,6 +29,9 @@ class MermaidRenderer {
     };
 
     this.initialized = false;
+    // Cache to avoid re-rendering identical diagrams
+    this.lastRenderedCode = null;
+    this.lastRenderedSvg = null;
   }
 
   async initialize() {
@@ -61,6 +64,13 @@ class MermaidRenderer {
       return null;
     }
 
+    // Performance optimization: avoid re-rendering if diagram hasn't changed
+    if (this.lastRenderedCode === code && this.lastRenderedSvg) {
+      container.innerHTML = this.lastRenderedSvg;
+      this.postProcess(container, spec);
+      return this.lastRenderedSvg;
+    }
+
     // Clear container
     container.innerHTML = '';
 
@@ -75,6 +85,10 @@ class MermaidRenderer {
       // Render the diagram
       const { svg } = await mermaid.render(id, code);
       container.innerHTML = svg;
+
+      // Cache the result for future renders
+      this.lastRenderedCode = code;
+      this.lastRenderedSvg = svg;
 
       // Post-process the SVG
       this.postProcess(container, spec);

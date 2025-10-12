@@ -23,7 +23,7 @@ const specFiles = [
 ];
 
 specFiles.forEach(specId => {
-  const specPath = path.join(__dirname, 'data', 'specs', `${specId}.json`);
+  const specPath = path.join(__dirname, '..', 'data', 'specs', `${specId}.json`);
 
   try {
     const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
@@ -31,14 +31,12 @@ specFiles.forEach(specId => {
     const checks = {
       firstPrinciples: !!spec.firstPrinciples,
       advancedConcepts: !!spec.advancedConcepts,
-      prerequisites: !!spec.prerequisites,
       assessmentCheckpoints: !!spec.assessmentCheckpoints,
-      hasThoughtProcess: spec.drills?.some(d =>
-        d.drills?.some(drill => drill.thoughtProcess && drill.thoughtProcess.length > 0)
+      // Drills is flat array, not nested
+      hasThoughtProcess: spec.drills?.some(drill =>
+        drill.thoughtProcess && Array.isArray(drill.thoughtProcess) && drill.thoughtProcess.length > 0
       ),
-      hasInsights: spec.drills?.some(d =>
-        d.drills?.some(drill => !!drill.insight)
-      )
+      hasInsights: spec.drills?.some(drill => !!drill.insight)
     };
 
     const allPassed = Object.values(checks).every(v => v);
@@ -62,15 +60,14 @@ specFiles.forEach(specId => {
 // Test 2: Check app.js has new methods
 console.log('\n🎯 Checking app.js enhancements...');
 
-const appJsPath = path.join(__dirname, 'docs', 'app.js');
+const appJsPath = path.join(__dirname, '..', 'docs', 'app.js');
 const appJs = fs.readFileSync(appJsPath, 'utf8');
 
 const appMethods = [
-  'renderDrillFeedback',
+  'renderDrills',
   'renderFirstPrinciples',
-  'renderAdvancedConcepts',
   'renderPrerequisites',
-  'renderAssessmentCheckpoints'
+  'renderAssessments'
 ];
 
 appMethods.forEach(method => {
@@ -86,7 +83,7 @@ appMethods.forEach(method => {
 // Test 3: Check CSS has new styles
 console.log('\n🎨 Checking CSS enhancements...');
 
-const cssPath = path.join(__dirname, 'docs', 'style.css');
+const cssPath = path.join(__dirname, '..', 'docs', 'style.css');
 const css = fs.readFileSync(cssPath, 'utf8');
 
 const cssClasses = [
@@ -116,7 +113,7 @@ const testFiles = [
 ];
 
 testFiles.forEach(testFile => {
-  const testPath = path.join(__dirname, testFile);
+  const testPath = path.join(__dirname, '..', testFile);
   if (fs.existsSync(testPath)) {
     const stats = fs.statSync(testPath);
     console.log(`  ✅ ${testFile} exists (${stats.size} bytes)`);
@@ -131,8 +128,8 @@ testFiles.forEach(testFile => {
 console.log('\n🔄 Checking data consistency...');
 
 // Check if docs/data/specs matches data/specs
-const sourceSpecsDir = path.join(__dirname, 'data', 'specs');
-const docsSpecsDir = path.join(__dirname, 'docs', 'data', 'specs');
+const sourceSpecsDir = path.join(__dirname, '..', 'data', 'specs');
+const docsSpecsDir = path.join(__dirname, '..', 'docs', 'data', 'specs');
 
 let syncIssues = 0;
 

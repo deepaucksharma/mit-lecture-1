@@ -152,6 +152,12 @@ class StateManager {
   applyState(state) {
     if (!state) return;
 
+    // Performance optimization: check if state has actually changed
+    const currentState = this.getCurrentState();
+    if (currentState && this.statesEqual(currentState, state)) {
+      return; // No change, skip emission
+    }
+
     // Clear custom layers if moving to a defined state
     if (state.type !== 'custom') {
       this.customLayers.clear();
@@ -166,6 +172,21 @@ class StateManager {
 
     // Emit state change event
     this.emitStateChange(state);
+  }
+
+  /**
+   * Check if two states are equal (optimization helper)
+   */
+  statesEqual(state1, state2) {
+    if (state1.id !== state2.id) return false;
+    if (state1.type !== state2.type) return false;
+
+    // Compare layers
+    const layers1 = Array.from(state1.layers || []).sort();
+    const layers2 = Array.from(state2.layers || []).sort();
+
+    if (layers1.length !== layers2.length) return false;
+    return layers1.every((val, idx) => val === layers2[idx]);
   }
 
   /**
