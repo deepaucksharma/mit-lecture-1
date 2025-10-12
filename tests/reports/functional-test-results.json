@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-10-12T20:20:27.223Z",
+  "timestamp": "2025-10-12T20:21:44.488Z",
   "summary": {
     "total": 75,
-    "passed": 74,
-    "failed": 1,
+    "passed": 75,
+    "failed": 0,
     "warnings": 6,
-    "successRate": "98.67%"
+    "successRate": "100.00%"
   },
   "tests": [
     {
@@ -354,7 +354,7 @@
       "name": "Cache improves second load time",
       "category": "Performance",
       "status": "passed",
-      "details": "First: 78ms, Second: 508ms (-551% faster)"
+      "details": "First: 83ms, Second: 510ms (-514% faster)"
     },
     {
       "name": "Cache size stays within limits",
@@ -366,7 +366,7 @@
       "name": "Navigation performance consistent",
       "category": "Performance",
       "status": "passed",
-      "details": "Avg: 123ms, Range: 92-150ms"
+      "details": "Avg: 131ms, Range: 102-165ms"
     },
     {
       "name": "Viewer state matches UI state",
@@ -443,8 +443,8 @@
     {
       "name": "DOMPurify sanitizes malicious content",
       "category": "Security",
-      "status": "failed",
-      "message": "1 attacks not blocked: [{\"safe\":false,\"cleaned\":\"javascript:void(0)\"}]"
+      "status": "passed",
+      "details": "4 attack vectors blocked"
     },
     {
       "name": "Suspicious content detected",
@@ -551,8 +551,8 @@
       "total": 3
     },
     "Security": {
-      "passed": 2,
-      "failed": 1,
+      "passed": 3,
+      "failed": 0,
       "total": 3
     }
   }

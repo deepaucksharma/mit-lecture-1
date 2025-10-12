@@ -376,7 +376,7 @@ class GFSViewer {
           .map(([k, v]) => renderPrincipleField(k, v, depth + 1))
           .join('');
         return `
-          <details class="principle-section nested-section" open>
+          <details class="principle-section nested-section">
             <summary><h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}></summary>
             <div class="nested-content">
               ${nested}
@@ -470,7 +470,7 @@ class GFSViewer {
       // Append to principles container as a separate collapsible section
       container.innerHTML += `
         <div class="advanced-concepts-separator"></div>
-        <details class="advanced-concepts-container" open>
+        <details class="advanced-concepts-container">
           <summary><h3>🎓 Advanced Concepts</h3></summary>
           <div class="advanced-concepts-content">
             ${advancedSections}
