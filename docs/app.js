@@ -3724,7 +3724,41 @@ class GFSViewer {
     };
 
     const content = Object.entries(fp)
-      .map(([key, value]) => renderPrincipleField(key, value))
+      .map(([key, value], index) => {
+        const icon = {
+          theoreticalFoundation: '🔬',
+          quantitativeAnalysis: '📊',
+          derivedInvariants: '🔒',
+          keyInsights: '💡',
+          timeBasedCoordination: '⏰',
+          formalModel: '📐',
+          probabilisticAnalysis: '🎲',
+          failureModels: '⚠️',
+          reliabilityMath: '📈',
+          scaleLaws: '📏',
+          cachingTheory: '💾',
+          littlesLawApplication: '⚖️',
+          coordinationCost: '💸',
+          dataflowPrinciples: '🌊',
+          coreTradeoffs: '⚖️'
+        }[key] || '📌';
+
+        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+
+        return `
+          <div class="accordion-section">
+            <details class="accordion-item principles-accordion">
+              <summary class="accordion-header">
+                <span class="accordion-icon">▶</span>
+                <span class="accordion-title">${icon} ${label}</span>
+              </summary>
+              <div class="accordion-content">
+                ${renderPrincipleField(key, value)}
+              </div>
+            </details>
+          </div>
+        `;
+      })
       .join('');
 
     container.innerHTML = `<div class="principles-content">${content}</div>`;
@@ -3803,15 +3837,20 @@ class GFSViewer {
     ].filter(Boolean).join('');
 
     if (advancedSections) {
-      // Append to principles container as a separate collapsible section
+      // Append to principles container with same accordion styling
       container.innerHTML += `
         <div class="advanced-concepts-separator"></div>
-        <details class="advanced-concepts-container">
-          <summary><h3>🎓 Advanced Concepts</h3></summary>
-          <div class="advanced-concepts-content">
-            ${advancedSections}
-          </div>
-        </details>
+        <div class="accordion-section">
+          <details class="accordion-item advanced-concepts-accordion">
+            <summary class="accordion-header">
+              <span class="accordion-icon">▶</span>
+              <span class="accordion-title">🎓 Advanced Concepts</span>
+            </summary>
+            <div class="accordion-content advanced-concepts-content">
+              ${advancedSections}
+            </div>
+          </details>
+        </div>
       `;
     }
   }
