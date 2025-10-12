@@ -3869,18 +3869,36 @@ class GFSViewer {
 
   renderStepControls() {
     const controls = document.getElementById('step-controls');
+    const captionContainer = document.getElementById('step-caption-container');
+    const caption = document.getElementById('step-caption');
+
     if (!controls) return;
 
     const stepCount = this.stepper.getStepCount();
     const hasSteps = stepCount > 0;
 
+    // Render the caption separately
+    if (caption) {
+      if (hasSteps) {
+        caption.textContent = 'Click Play to start';
+        caption.style.display = 'block';
+      } else {
+        caption.style.display = 'none';
+      }
+    }
+
+    // Show/hide caption container
+    if (captionContainer) {
+      captionContainer.style.display = hasSteps ? 'flex' : 'none';
+    }
+
+    // Render the control bar without caption
     controls.innerHTML = `
       ${hasSteps ? `
         <div class="step-info">
           <span class="step-count-badge">${stepCount} steps</span>
           <div id="step-progress" class="step-progress-text">Step 1 of ${stepCount}</div>
         </div>
-        <div class="step-caption" id="step-caption">Click Play to start</div>
         <div class="step-buttons">
           <button id="step-first" data-action="first" title="First">⏮</button>
           <button id="step-prev" data-action="prev" title="Previous">⏪</button>
