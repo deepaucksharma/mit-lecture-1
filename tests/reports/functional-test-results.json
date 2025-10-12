@@ -1,0 +1,559 @@
+{
+  "timestamp": "2025-10-12T20:20:27.223Z",
+  "summary": {
+    "total": 75,
+    "passed": 74,
+    "failed": 1,
+    "warnings": 6,
+    "successRate": "98.67%"
+  },
+  "tests": [
+    {
+      "name": "Application loads completely",
+      "category": "Initialization",
+      "status": "passed",
+      "details": "Application fully loaded"
+    },
+    {
+      "name": "All core components initialized",
+      "category": "Initialization",
+      "status": "passed",
+      "details": "All 10 components initialized"
+    },
+    {
+      "name": "Dependencies loaded correctly",
+      "category": "Initialization",
+      "status": "passed",
+      "details": "All dependencies loaded"
+    },
+    {
+      "name": "Initial diagram rendered",
+      "category": "Initialization",
+      "status": "passed",
+      "details": "Diagram 00-legend with 22 elements"
+    },
+    {
+      "name": "Navigate through all 13 diagrams sequentially",
+      "category": "Navigation",
+      "status": "passed",
+      "details": "Navigated through 13 diagrams"
+    },
+    {
+      "name": "Navigate backwards through all diagrams",
+      "category": "Navigation",
+      "status": "passed",
+      "details": "Navigated backward 12 times"
+    },
+    {
+      "name": "Direct diagram selection via nav items",
+      "category": "Navigation",
+      "status": "passed",
+      "details": "Direct navigation to 05-planes"
+    },
+    {
+      "name": "URL parameter navigation",
+      "category": "Navigation",
+      "status": "passed",
+      "details": "URL parameter navigation working"
+    },
+    {
+      "name": "Step controls visible and functional",
+      "category": "Step-Through",
+      "status": "passed",
+      "details": "Controls present, 5 steps available"
+    },
+    {
+      "name": "Step through complete sequence",
+      "category": "Step-Through",
+      "status": "passed",
+      "details": "Stepped through 5 steps successfully"
+    },
+    {
+      "name": "Auto-play functionality",
+      "category": "Step-Through",
+      "status": "passed",
+      "details": "Auto-play started and stopped"
+    },
+    {
+      "name": "Speed control adjustment",
+      "category": "Step-Through",
+      "status": "passed",
+      "details": "Speed control working"
+    },
+    {
+      "name": "Crystallized insight displays",
+      "category": "Content",
+      "status": "passed",
+      "details": "Insight: \"The separation of control and data is the foundati...\""
+    },
+    {
+      "name": "Narrative content displays",
+      "category": "Content",
+      "status": "passed",
+      "details": "Narrative length: 550 chars"
+    },
+    {
+      "name": "Contracts display with all sections",
+      "category": "Content",
+      "status": "passed",
+      "details": "Contracts: 4 invariants"
+    },
+    {
+      "name": "First Principles renders recursively",
+      "category": "Content",
+      "status": "passed",
+      "details": "3 sections (0 nested)"
+    },
+    {
+      "name": "Advanced Concepts displays",
+      "category": "Content",
+      "status": "passed",
+      "details": "1 advanced sections"
+    },
+    {
+      "name": "Assessment checkpoints display",
+      "category": "Content",
+      "status": "passed",
+      "details": "3 checkpoints displayed"
+    },
+    {
+      "name": "Drills load and display",
+      "category": "Drills",
+      "status": "passed",
+      "details": "3 drills displayed"
+    },
+    {
+      "name": "Drill interaction workflow",
+      "category": "Drills",
+      "status": "passed",
+      "details": "Drill expands on click"
+    },
+    {
+      "name": "Drill types render correctly",
+      "category": "Drills",
+      "status": "passed",
+      "details": "Found 2 drill types: analyze, apply"
+    },
+    {
+      "name": "Learning progress tracks diagram views",
+      "category": "Progress",
+      "status": "passed",
+      "details": "Views: 7, Time: undefineds"
+    },
+    {
+      "name": "Progress persists across sessions",
+      "category": "Progress",
+      "status": "passed",
+      "details": "Progress saved to localStorage"
+    },
+    {
+      "name": "Overall progress calculated correctly",
+      "category": "Progress",
+      "status": "passed",
+      "details": "Overall: 0%"
+    },
+    {
+      "name": "Theme toggle button works",
+      "category": "Theme",
+      "status": "passed",
+      "details": "theme-light → theme-dark"
+    },
+    {
+      "name": "Theme persists to localStorage",
+      "category": "Theme",
+      "status": "passed",
+      "details": "Theme saved: dark"
+    },
+    {
+      "name": "Theme affects diagram rendering",
+      "category": "Theme",
+      "status": "passed",
+      "details": "Diagram updated with theme"
+    },
+    {
+      "name": "Theme toggle keyboard shortcut (t)",
+      "category": "Theme",
+      "status": "passed",
+      "details": "Keyboard shortcut working"
+    },
+    {
+      "name": "Overlay chips display",
+      "category": "Overlays",
+      "status": "passed",
+      "details": "No overlays for this diagram (OK)"
+    },
+    {
+      "name": "Toggle overlay updates diagram",
+      "category": "Overlays",
+      "status": "passed",
+      "details": "No overlays to test"
+    },
+    {
+      "name": "Multiple overlays can be active",
+      "category": "Overlays",
+      "status": "passed",
+      "details": "Not enough overlays to test"
+    },
+    {
+      "name": "Arrow keys navigate steps",
+      "category": "Keyboard",
+      "status": "passed",
+      "details": "Step: 0 → 1"
+    },
+    {
+      "name": "Ctrl+Arrow keys navigate diagrams",
+      "category": "Keyboard",
+      "status": "passed",
+      "details": "Diagram: 00-legend → 01-triangle"
+    },
+    {
+      "name": "Number keys toggle overlays",
+      "category": "Keyboard",
+      "status": "passed",
+      "details": "No overlays or already active"
+    },
+    {
+      "name": "Space bar plays/pauses steps",
+      "category": "Keyboard",
+      "status": "passed",
+      "details": "Space toggle working"
+    },
+    {
+      "name": "Help dialog shortcut (?)",
+      "category": "Keyboard",
+      "status": "passed",
+      "details": "Help dialog opened"
+    },
+    {
+      "name": "Legend shortcut (L)",
+      "category": "Keyboard",
+      "status": "passed",
+      "details": "Jumped to legend"
+    },
+    {
+      "name": "Switch between Principles and Practice tabs",
+      "category": "Tabs",
+      "status": "passed",
+      "details": "Tab switching working"
+    },
+    {
+      "name": "Tab content changes on switch",
+      "category": "Tabs",
+      "status": "passed",
+      "details": "Tab content visibility correct"
+    },
+    {
+      "name": "Export manager accessible",
+      "category": "Export",
+      "status": "passed",
+      "details": "4/4 export methods available"
+    },
+    {
+      "name": "SVG export generates valid data",
+      "category": "Export",
+      "status": "passed",
+      "details": "SVG data: 13127 bytes"
+    },
+    {
+      "name": "JSON export includes spec data",
+      "category": "Export",
+      "status": "passed",
+      "details": "Spec exports as valid JSON"
+    },
+    {
+      "name": "New user: Load → Read → Practice flow",
+      "category": "User Journey",
+      "status": "passed",
+      "details": "Complete learning flow successful"
+    },
+    {
+      "name": "Return user: Progress displayed correctly",
+      "category": "User Journey",
+      "status": "passed",
+      "details": "Progress indicators showing"
+    },
+    {
+      "name": "Complete validation: 00-legend",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 73 SVG elements"
+    },
+    {
+      "name": "Complete validation: 01-triangle",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 59 SVG elements"
+    },
+    {
+      "name": "Complete validation: 02-scale",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 60 SVG elements"
+    },
+    {
+      "name": "Complete validation: 03-chunk-size",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 53 SVG elements"
+    },
+    {
+      "name": "Complete validation: 04-architecture",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 97 SVG elements"
+    },
+    {
+      "name": "Complete validation: 05-planes",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 108 SVG elements"
+    },
+    {
+      "name": "Complete validation: 06-read-path",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 66 SVG elements"
+    },
+    {
+      "name": "Complete validation: 07-write-path",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 125 SVG elements"
+    },
+    {
+      "name": "Complete validation: 08-lease",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 134 SVG elements"
+    },
+    {
+      "name": "Complete validation: 09-consistency",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 79 SVG elements"
+    },
+    {
+      "name": "Complete validation: 10-recovery",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 73 SVG elements"
+    },
+    {
+      "name": "Complete validation: 11-evolution",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 78 SVG elements"
+    },
+    {
+      "name": "Complete validation: 12-dna",
+      "category": "Diagrams",
+      "status": "passed",
+      "details": "6/6 components validated, 105 SVG elements"
+    },
+    {
+      "name": "Cache improves second load time",
+      "category": "Performance",
+      "status": "passed",
+      "details": "First: 78ms, Second: 508ms (-551% faster)"
+    },
+    {
+      "name": "Cache size stays within limits",
+      "category": "Performance",
+      "status": "passed",
+      "details": "Cache size: 5 (within limit)"
+    },
+    {
+      "name": "Navigation performance consistent",
+      "category": "Performance",
+      "status": "passed",
+      "details": "Avg: 123ms, Range: 92-150ms"
+    },
+    {
+      "name": "Viewer state matches UI state",
+      "category": "State Consistency",
+      "status": "passed",
+      "details": "All state sources consistent"
+    },
+    {
+      "name": "Progress state consistent with localStorage",
+      "category": "State Consistency",
+      "status": "passed",
+      "details": "Progress state synchronized"
+    },
+    {
+      "name": "AppState manages global state",
+      "category": "State Consistency",
+      "status": "passed",
+      "details": "AppState set/get/subscribe working"
+    },
+    {
+      "name": "Spec loads with all enhanced fields",
+      "category": "Data Integrity",
+      "status": "passed",
+      "details": "Required: 5/5, Enhanced: 5/5, Nodes: 5, Edges: 3"
+    },
+    {
+      "name": "Enhanced metrics preserved in edges",
+      "category": "Data Integrity",
+      "status": "passed",
+      "details": "3 edges with metrics, 1 with enhanced fields"
+    },
+    {
+      "name": "Drill thought processes preserved",
+      "category": "Data Integrity",
+      "status": "passed",
+      "details": "3 drills: 2 with thoughtProcess, 3 with insight"
+    },
+    {
+      "name": "Keyboard-only navigation possible",
+      "category": "Accessibility",
+      "status": "passed",
+      "details": "Full keyboard navigation working"
+    },
+    {
+      "name": "Focus indicators visible",
+      "category": "Accessibility",
+      "status": "passed",
+      "details": "Focus indicators present"
+    },
+    {
+      "name": "ARIA labels present on key elements",
+      "category": "Accessibility",
+      "status": "passed",
+      "details": "SVG role: img, label: true, desc: true"
+    },
+    {
+      "name": "Invalid diagram ID shows error",
+      "category": "Error Handling",
+      "status": "passed",
+      "details": "Error displayed"
+    },
+    {
+      "name": "Missing spec data handled gracefully",
+      "category": "Error Handling",
+      "status": "passed",
+      "details": "Missing spec handled with error or fallback"
+    },
+    {
+      "name": "App continues working after errors",
+      "category": "Error Handling",
+      "status": "passed",
+      "details": "App recovers and continues working"
+    },
+    {
+      "name": "DOMPurify sanitizes malicious content",
+      "category": "Security",
+      "status": "failed",
+      "message": "1 attacks not blocked: [{\"safe\":false,\"cleaned\":\"javascript:void(0)\"}]"
+    },
+    {
+      "name": "Suspicious content detected",
+      "category": "Security",
+      "status": "passed",
+      "details": "5/5 patterns detected"
+    },
+    {
+      "name": "Rendered content is safe",
+      "category": "Security",
+      "status": "passed",
+      "details": "All rendered content is safe"
+    }
+  ],
+  "categories": {
+    "Initialization": {
+      "passed": 4,
+      "failed": 0,
+      "total": 4
+    },
+    "Navigation": {
+      "passed": 4,
+      "failed": 0,
+      "total": 4
+    },
+    "Step-Through": {
+      "passed": 4,
+      "failed": 0,
+      "total": 4
+    },
+    "Content": {
+      "passed": 6,
+      "failed": 0,
+      "total": 6
+    },
+    "Drills": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "Progress": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "Theme": {
+      "passed": 4,
+      "failed": 0,
+      "total": 4
+    },
+    "Overlays": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "Keyboard": {
+      "passed": 6,
+      "failed": 0,
+      "total": 6
+    },
+    "Tabs": {
+      "passed": 2,
+      "failed": 0,
+      "total": 2
+    },
+    "Export": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "User Journey": {
+      "passed": 2,
+      "failed": 0,
+      "total": 2
+    },
+    "Diagrams": {
+      "passed": 13,
+      "failed": 0,
+      "total": 13
+    },
+    "Performance": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "State Consistency": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "Data Integrity": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "Accessibility": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "Error Handling": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "Security": {
+      "passed": 2,
+      "failed": 1,
+      "total": 3
+    }
+  }
+}

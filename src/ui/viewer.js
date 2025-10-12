@@ -536,15 +536,9 @@ class GFSViewer {
     const hasSteps = stepCount > 0;
 
     controls.innerHTML = `
-      <div class="step-header">
-        <h3>Step-Through Mode</h3>
-        ${hasSteps ? `<span class="step-count">${stepCount} steps</span>` : ''}
-      </div>
       ${hasSteps ? `
-        <div class="step-progress">
-          <div class="step-progress-bar-container">
-            <div id="step-progress-bar" class="step-progress-bar" style="width: 0%"></div>
-          </div>
+        <div class="step-info">
+          <span class="step-count-badge">${stepCount} steps</span>
           <div id="step-progress" class="step-progress-text">Step 1 of ${stepCount}</div>
         </div>
         <div class="step-caption" id="step-caption">Click Play to start</div>
@@ -561,7 +555,7 @@ class GFSViewer {
           <span id="step-speed-label">2s</span>
         </div>
       ` : `
-        <div class="no-steps">No steps available for this diagram</div>
+        <div class="no-steps">No steps available</div>
       `}
     `;
 
