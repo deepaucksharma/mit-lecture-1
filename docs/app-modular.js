@@ -1,77 +1,5323 @@
 /**
- * GFS Visual Learning System - Modular Version
- * Main application module that integrates all components
+ * GFS Visual Learning System - Modular Bundle
+ * Generated: 2025-10-12T14:17:10.176Z
  */
 
-// Import modules
-import { DiagramValidator, ValidationError } from './modules/validation.js';
-import { DrillSystem } from './modules/drills.js';
-import { StepThroughEngine } from './modules/step-through.js';
-import { ExportManager } from './modules/export-manager.js';
-// StateManager is loaded separately as it doesn't export ES6 modules yet
+(function() {
+  'use strict';
 
-// Main GFS Viewer Application
-class GFSViewer {
+  // Initialize global namespace
+  window.GFS = window.GFS || {};
+
+
+  // Polyfills
+  if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame = function(callback) {
+      return setTimeout(callback, 1000/60);
+    };
+  }
+
+
+// Module: src/app/core/events.js
+(function() {
+  'use strict';
+
+/**
+ * Event Bus System - Central event management
+ * Provides decoupled communication between modules
+ */
+
+window.EventBus {
   constructor() {
-    this.currentDiagramId = null;
-    this.currentSpec = null;
-    this.renderer = null;
-    this.validator = new DiagramValidator();
-    this.drillSystem = new DrillSystem();
-    this.stepThrough = null;
-    this.exportManager = new ExportManager(this);
-    this.stateManager = null;
-    this.diagramCache = new Map();
+    this.events = new Map();
+    this.debug = false;
+  }
+
+  /**
+   * Subscribe to an event
+   * @param {string} event - Event name
+   * @param {Function} handler - Event handler function
+   * @param {Object} context - Optional context for handler
+   * @returns {Function} Unsubscribe function
+   */
+  on(event, handler, context = null) {
+    if (!this.events.has(event)) {
+      this.events.set(event, []);
+    }
+
+    const listener = { handler, context };
+    this.events.get(event).push(listener);
+
+    // Return unsubscribe function
+    return () => this.off(event, handler);
+  }
+
+  /**
+   * Subscribe to an event (one-time)
+   * @param {string} event - Event name
+   * @param {Function} handler - Event handler function
+   * @param {Object} context - Optional context
+   */
+  once(event, handler, context = null) {
+    const wrapper = (...args) => {
+      handler.apply(context, args);
+      this.off(event, wrapper);
+    };
+    this.on(event, wrapper, context);
+  }
+
+  /**
+   * Unsubscribe from an event
+   * @param {string} event - Event name
+   * @param {Function} handler - Handler to remove
+   */
+  off(event, handler) {
+    if (!this.events.has(event)) return;
+
+    const listeners = this.events.get(event);
+    const index = listeners.findIndex(l => l.handler === handler);
+
+    if (index !== -1) {
+      listeners.splice(index, 1);
+    }
+
+    if (listeners.length === 0) {
+      this.events.delete(event);
+    }
+  }
+
+  /**
+   * Emit an event
+   * @param {string} event - Event name
+   * @param {...any} args - Arguments to pass to handlers
+   */
+  emit(event, ...args) {
+    if (this.debug) {
+      console.log(`[EventBus] Emitting: ${event}`, args);
+    }
+
+    if (!this.events.has(event)) return;
+
+    const listeners = this.events.get(event).slice();
+    listeners.forEach(({ handler, context }) => {
+      try {
+        handler.apply(context, args);
+      } catch (error) {
+        console.error(`[EventBus] Error in handler for ${event}:`, error);
+      }
+    });
+  }
+
+  /**
+   * Clear all event listeners
+   */
+  clear() {
+    this.events.clear();
+  }
+
+  /**
+   * Enable/disable debug logging
+   * @param {boolean} enabled
+   */
+  setDebug(enabled) {
+    this.debug = enabled;
+  }
+}
+
+// Create singleton instance
+window.eventBus = new EventBus();
+
+// Event constants for type safety
+window.Events = {
+  // Application lifecycle
+  APP_INIT: 'app:init',
+  APP_READY: 'app:ready',
+  APP_ERROR: 'app:error',
+
+  // Diagram events
+  DIAGRAM_LOAD: 'diagram:load',
+  DIAGRAM_LOADED: 'diagram:loaded',
+  DIAGRAM_RENDER: 'diagram:render',
+  DIAGRAM_RENDERED: 'diagram:rendered',
+  DIAGRAM_ERROR: 'diagram:error',
+
+  // Navigation events
+  NAV_PREV: 'nav:prev',
+  NAV_NEXT: 'nav:next',
+  NAV_GOTO: 'nav:goto',
+
+  // State events
+  STATE_CHANGE: 'state:change',
+  STATE_SAVE: 'state:save',
+  STATE_RESTORE: 'state:restore',
+
+  // UI events
+  UI_TAB_CHANGE: 'ui:tab:change',
+  UI_THEME_CHANGE: 'ui:theme:change',
+  UI_MODAL_OPEN: 'ui:modal:open',
+  UI_MODAL_CLOSE: 'ui:modal:close',
+
+  // Learning events
+  DRILL_START: 'drill:start',
+  DRILL_COMPLETE: 'drill:complete',
+  ASSESSMENT_START: 'assessment:start',
+  ASSESSMENT_COMPLETE: 'assessment:complete',
+
+  // Export events
+  EXPORT_START: 'export:start',
+  EXPORT_COMPLETE: 'export:complete',
+  EXPORT_ERROR: 'export:error'
+};
+
+window.eventBus;
+
+})();
+
+// Module: src/app/core/config.js
+(function() {
+  'use strict';
+
+/**
+ * Central Configuration Management
+ */
+
+window.Config = {
+  // Application
+  app: {
+    name: 'GFS Visual Learning System',
+    version: '2.0.0',
+    debug: false
+  },
+
+  // API and Data
+  api: {
+    baseUrl: '',  // Empty for relative paths
+    dataPath: 'data/',
+    specsPath: 'data/specs/',
+    manifestFile: 'data/manifest.json',
+    timeout: 30000
+  },
+
+  // UI Configuration
+  ui: {
+    defaultTheme: 'light',
+    animationDuration: 300,
+    autoPlaySpeed: 2000,
+    tooltipDelay: 500,
+    maxDiagramWidth: 1200,
+    maxDiagramHeight: 800
+  },
+
+  // Features
+  features: {
+    enableDrills: true,
+    enableAssessment: true,
+    enableExport: true,
+    enableKeyboardShortcuts: true,
+    enableTouchGestures: false,
+    enableOfflineMode: true
+  },
+
+  // Storage
+  storage: {
+    prefix: 'gfs-',
+    enablePersistence: true,
+    storageQuota: 10 * 1024 * 1024, // 10MB
+    cacheTimeout: 24 * 60 * 60 * 1000 // 24 hours
+  },
+
+  // Diagram Defaults
+  diagram: {
+    defaultDiagram: '00-legend',
+    mermaidTheme: 'default',
+    mermaidConfig: {
+      startOnLoad: false,
+      theme: 'default',
+      themeVariables: {
+        primaryColor: '#1a73e8',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#0d47a1',
+        lineColor: '#333',
+        secondaryColor: '#f0f0f0',
+        tertiaryColor: '#fff'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    }
+  },
+
+  // Performance
+  performance: {
+    enableLazyLoading: true,
+    preloadNextDiagram: true,
+    maxConcurrentRequests: 3,
+    debounceDelay: 250,
+    throttleDelay: 100
+  },
+
+  // Development
+  dev: {
+    enableHotReload: false,
+    enableSourceMaps: true,
+    logLevel: 'info', // 'debug' | 'info' | 'warn' | 'error'
+    mockData: false
+  }
+};
+
+/**
+ * Configuration manager with validation and override support
+ */
+window.ConfigManager {
+  constructor() {
+    this.config = { ...Config };
+    this.overrides = {};
+  }
+
+  /**
+   * Get configuration value
+   * @param {string} path - Dot-notation path (e.g., 'ui.defaultTheme')
+   * @returns {any} Configuration value
+   */
+  get(path) {
+    const keys = path.split('.');
+    let value = this.config;
+
+    for (const key of keys) {
+      value = value[key];
+      if (value === undefined) {
+        console.warn(`Config key not found: ${path}`);
+        return undefined;
+      }
+    }
+
+    // Check for overrides
+    if (this.overrides[path] !== undefined) {
+      return this.overrides[path];
+    }
+
+    return value;
+  }
+
+  /**
+   * Set configuration override
+   * @param {string} path - Dot-notation path
+   * @param {any} value - New value
+   */
+  set(path, value) {
+    this.overrides[path] = value;
+
+    // Apply to actual config
+    const keys = path.split('.');
+    let target = this.config;
+
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (!target[keys[i]]) {
+        target[keys[i]] = {};
+      }
+      target = target[keys[i]];
+    }
+
+    target[keys[keys.length - 1]] = value;
+  }
+
+  /**
+   * Load configuration from localStorage
+   */
+  loadFromStorage() {
+    try {
+      const stored = localStorage.getItem('gfs-config');
+      if (stored) {
+        const overrides = JSON.parse(stored);
+        Object.keys(overrides).forEach(key => {
+          this.set(key, overrides[key]);
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load config from storage:', error);
+    }
+  }
+
+  /**
+   * Save configuration overrides to localStorage
+   */
+  saveToStorage() {
+    try {
+      localStorage.setItem('gfs-config', JSON.stringify(this.overrides));
+    } catch (error) {
+      console.error('Failed to save config to storage:', error);
+    }
+  }
+
+  /**
+   * Reset configuration to defaults
+   */
+  reset() {
+    this.config = { ...Config };
+    this.overrides = {};
+    localStorage.removeItem('gfs-config');
+  }
+
+  /**
+   * Validate configuration
+   * @returns {boolean} True if valid
+   */
+  validate() {
+    const required = [
+      'app.name',
+      'api.dataPath',
+      'diagram.defaultDiagram'
+    ];
+
+    for (const path of required) {
+      if (!this.get(path)) {
+        console.error(`Required config missing: ${path}`);
+        return false;
+      }
+    }
+
+    return true;
+  }
+}
+
+// Export singleton instance
+window.configManager = new ConfigManager();
+window.configManager;
+
+})();
+
+// Module: src/app/state/app-state.js
+(function() {
+  'use strict';
+
+/**
+ * Centralized Application State Management
+ * Single source of truth for all application state
+ */
+
+
+window.AppState {
+  constructor() {
+    this.state = {
+      // Application state
+      app: {
+        initialized: false,
+        loading: false,
+        error: null,
+        theme: 'light'
+      },
+
+      // Current diagram state
+      diagram: {
+        current: null,
+        spec: null,
+        rendered: false,
+        loading: false,
+        error: null
+      },
+
+      // View state (replaces steps/overlays/scenes)
+      view: {
+        activeState: null,
+        activeLayers: new Set(),
+        timeline: {
+          position: 0,
+          playing: false,
+          speed: 2000
+        }
+      },
+
+      // UI state
+      ui: {
+        activeTab: 'principles',
+        modalOpen: false,
+        sidebarCollapsed: false,
+        notifications: []
+      },
+
+      // Learning state
+      learning: {
+        currentDrill: null,
+        drillProgress: {},
+        assessmentProgress: {}
+      },
+
+      // User preferences
+      preferences: {
+        theme: 'light',
+        autoPlay: false,
+        showHints: true,
+        animationSpeed: 'normal'
+      }
+    };
+
+    this.listeners = new Map();
+    this.history = [];
+    this.maxHistory = 50;
+  }
+
+  /**
+   * Get state value by path
+   * @param {string} path - Dot-notation path (e.g., 'diagram.current')
+   * @returns {any} State value
+   */
+  get(path) {
+    if (!path) return { ...this.state };
+
+    const keys = path.split('.');
+    let value = this.state;
+
+    for (const key of keys) {
+      value = value[key];
+      if (value === undefined) return undefined;
+    }
+
+    return value;
+  }
+
+  /**
+   * Set state value and notify listeners
+   * @param {string} path - Dot-notation path
+   * @param {any} value - New value
+   * @param {Object} options - Update options
+   */
+  set(path, value, options = {}) {
+    const oldValue = this.get(path);
+
+    // Skip if value hasn't changed (unless forced)
+    if (!options.force && oldValue === value) return;
+
+    // Store previous state in history
+    if (!options.silent) {
+      this.addToHistory(path, oldValue, value);
+    }
+
+    // Update state
+    const keys = path.split('.');
+    let target = this.state;
+
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (!target[keys[i]]) {
+        target[keys[i]] = {};
+      }
+      target = target[keys[i]];
+    }
+
+    target[keys[keys.length - 1]] = value;
+
+    // Notify listeners
+    if (!options.silent) {
+      this.notifyListeners(path, value, oldValue);
+      eventBus.emit(Events.STATE_CHANGE, {
+        path,
+        value,
+        oldValue
+      });
+    }
+  }
+
+  /**
+   * Update multiple state values
+   * @param {Object} updates - Object with path-value pairs
+   * @param {Object} options - Update options
+   */
+  update(updates, options = {}) {
+    Object.entries(updates).forEach(([path, value]) => {
+      this.set(path, value, { ...options, silent: true });
+    });
+
+    if (!options.silent) {
+      eventBus.emit(Events.STATE_CHANGE, { updates });
+    }
+  }
+
+  /**
+   * Subscribe to state changes
+   * @param {string} path - Path to watch (supports wildcards)
+   * @param {Function} callback - Callback function
+   * @returns {Function} Unsubscribe function
+   */
+  subscribe(path, callback) {
+    if (!this.listeners.has(path)) {
+      this.listeners.set(path, new Set());
+    }
+
+    this.listeners.get(path).add(callback);
+
+    // Return unsubscribe function
+    return () => {
+      const callbacks = this.listeners.get(path);
+      if (callbacks) {
+        callbacks.delete(callback);
+        if (callbacks.size === 0) {
+          this.listeners.delete(path);
+        }
+      }
+    };
+  }
+
+  /**
+   * Notify listeners of state change
+   * @private
+   */
+  notifyListeners(path, value, oldValue) {
+    // Exact path listeners
+    if (this.listeners.has(path)) {
+      this.listeners.get(path).forEach(callback => {
+        try {
+          callback(value, oldValue, path);
+        } catch (error) {
+          console.error(`Error in state listener for ${path}:`, error);
+        }
+      });
+    }
+
+    // Wildcard listeners
+    this.listeners.forEach((callbacks, pattern) => {
+      if (pattern.includes('*') && this.matchesPattern(path, pattern)) {
+        callbacks.forEach(callback => {
+          try {
+            callback(value, oldValue, path);
+          } catch (error) {
+            console.error(`Error in wildcard listener for ${pattern}:`, error);
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Check if path matches wildcard pattern
+   * @private
+   */
+  matchesPattern(path, pattern) {
+    const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+    return regex.test(path);
+  }
+
+  /**
+   * Add state change to history
+   * @private
+   */
+  addToHistory(path, oldValue, newValue) {
+    this.history.push({
+      timestamp: Date.now(),
+      path,
+      oldValue,
+      newValue
+    });
+
+    if (this.history.length > this.maxHistory) {
+      this.history.shift();
+    }
+  }
+
+  /**
+   * Undo last state change
+   */
+  undo() {
+    if (this.history.length === 0) return false;
+
+    const last = this.history.pop();
+    this.set(last.path, last.oldValue, { silent: true });
+
+    eventBus.emit(Events.STATE_CHANGE, {
+      path: last.path,
+      value: last.oldValue,
+      oldValue: last.newValue,
+      undo: true
+    });
+
+    return true;
+  }
+
+  /**
+   * Reset state to initial values
+   */
+  reset() {
+    this.state = {
+      app: {
+        initialized: false,
+        loading: false,
+        error: null,
+        theme: 'light'
+      },
+      diagram: {
+        current: null,
+        spec: null,
+        rendered: false,
+        loading: false,
+        error: null
+      },
+      view: {
+        activeState: null,
+        activeLayers: new Set(),
+        timeline: {
+          position: 0,
+          playing: false,
+          speed: 2000
+        }
+      },
+      ui: {
+        activeTab: 'principles',
+        modalOpen: false,
+        sidebarCollapsed: false,
+        notifications: []
+      },
+      learning: {
+        currentDrill: null,
+        drillProgress: {},
+        assessmentProgress: {}
+      },
+      preferences: {
+        theme: 'light',
+        autoPlay: false,
+        showHints: true,
+        animationSpeed: 'normal'
+      }
+    };
+
+    this.history = [];
+    eventBus.emit(Events.STATE_CHANGE, { reset: true });
+  }
+
+  /**
+   * Save state to localStorage
+   */
+  save() {
+    try {
+      const serializable = {
+        ...this.state,
+        view: {
+          ...this.state.view,
+          activeLayers: Array.from(this.state.view.activeLayers)
+        }
+      };
+
+      localStorage.setItem('gfs-app-state', JSON.stringify(serializable));
+      eventBus.emit(Events.STATE_SAVE, serializable);
+      return true;
+    } catch (error) {
+      console.error('Failed to save state:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Load state from localStorage
+   */
+  load() {
+    try {
+      const stored = localStorage.getItem('gfs-app-state');
+      if (!stored) return false;
+
+      const parsed = JSON.parse(stored);
+
+      // Restore Sets from Arrays
+      if (parsed.view && parsed.view.activeLayers) {
+        parsed.view.activeLayers = new Set(parsed.view.activeLayers);
+      }
+
+      this.state = { ...this.state, ...parsed };
+      eventBus.emit(Events.STATE_RESTORE, this.state);
+      return true;
+    } catch (error) {
+      console.error('Failed to load state:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get state snapshot
+   */
+  snapshot() {
+    return JSON.parse(JSON.stringify(this.state));
+  }
+}
+
+// Create singleton instance
+window.appState = new AppState();
+window.appState;
+
+})();
+
+// Module: src/app/data/spec-loader.js
+(function() {
+  'use strict';
+
+/**
+ * Spec Loader Module
+ * Handles loading and caching of diagram specifications
+ */
+
+
+
+window.SpecLoader {
+  constructor() {
+    this.cache = new Map();
+    this.manifest = null;
+    this.loading = new Set();
+  }
+
+  /**
+   * Initialize the spec loader
+   */
+  async init() {
+    await this.loadManifest();
+  }
+
+  /**
+   * Load the manifest file
+   */
+  async loadManifest() {
+    try {
+      const manifestPath = configManager.get('api.manifestFile');
+      const response = await fetch(manifestPath);
+
+      if (!response.ok) {
+        // Use default manifest if fetch fails
+        this.manifest = this.getDefaultManifest();
+        console.warn('Using default manifest');
+        return;
+      }
+
+      this.manifest = await response.json();
+
+      // Cache manifest
+      if (configManager.get('storage.enablePersistence')) {
+        localStorage.setItem('gfs-manifest', JSON.stringify(this.manifest));
+      }
+    } catch (error) {
+      console.warn('Failed to load manifest, using defaults:', error);
+      this.manifest = this.getDefaultManifest();
+    }
+  }
+
+  /**
+   * Get default manifest
+   */
+  getDefaultManifest() {
+    return {
+      diagrams: [
+        { id: '00-legend', title: 'Master Legend & System Contracts' },
+        { id: '01-triangle', title: 'The Impossible Triangle' },
+        { id: '02-scale', title: 'Scale Reality Dashboard' },
+        { id: '03-chunk-size', title: 'The 64MB Decision Tree' },
+        { id: '04-architecture', title: 'Complete Architecture' },
+        { id: '05-planes', title: 'Control vs Data Plane' },
+        { id: '06-read-path', title: 'Read Path with Cache' },
+        { id: '07-write-path', title: 'Write Path Ballet' },
+        { id: '08-lease', title: 'Lease State Machine' },
+        { id: '09-consistency', title: 'Consistency Reality' },
+        { id: '10-recovery', title: 'Failure Recovery Matrix' },
+        { id: '11-evolution', title: 'Single Master Evolution' },
+        { id: '12-dna', title: 'GFS DNA in Modern Systems' }
+      ]
+    };
+  }
+
+  /**
+   * Load a diagram specification
+   * @param {string} diagramId - Diagram identifier
+   * @returns {Promise<Object>} Diagram specification
+   */
+  async load(diagramId) {
+    // Check cache first
+    if (this.cache.has(diagramId)) {
+      return this.cache.get(diagramId);
+    }
+
+    // Prevent duplicate loading
+    if (this.loading.has(diagramId)) {
+      // Wait for existing load to complete
+      return new Promise((resolve, reject) => {
+        const checkInterval = setInterval(() => {
+          if (!this.loading.has(diagramId)) {
+            clearInterval(checkInterval);
+            if (this.cache.has(diagramId)) {
+              resolve(this.cache.get(diagramId));
+            } else {
+              reject(new Error(`Failed to load ${diagramId}`));
+            }
+          }
+        }, 100);
+      });
+    }
+
+    // Start loading
+    this.loading.add(diagramId);
+
+    try {
+      const specsPath = configManager.get('api.specsPath');
+      const response = await fetch(`${specsPath}${diagramId}.json`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to load diagram ${diagramId}: ${response.statusText}`);
+      }
+
+      const spec = await response.json();
+
+      // Validate spec
+      this.validateSpec(spec);
+
+      // Enhance spec with defaults
+      const enhanced = this.enhanceSpec(spec, diagramId);
+
+      // Cache the spec
+      this.cache.set(diagramId, enhanced);
+
+      // Persist to localStorage if enabled
+      if (configManager.get('storage.enablePersistence')) {
+        this.saveToStorage(diagramId, enhanced);
+      }
+
+      this.loading.delete(diagramId);
+      return enhanced;
+
+    } catch (error) {
+      this.loading.delete(diagramId);
+
+      // Try to load from storage as fallback
+      const stored = this.loadFromStorage(diagramId);
+      if (stored) {
+        console.warn(`Loaded ${diagramId} from storage due to error:`, error);
+        return stored;
+      }
+
+      throw error;
+    }
+  }
+
+  /**
+   * Validate specification structure
+   * @param {Object} spec - Specification to validate
+   */
+  validateSpec(spec) {
+    const required = ['id', 'title', 'nodes', 'edges'];
+
+    for (const field of required) {
+      if (!spec[field]) {
+        throw new Error(`Invalid spec: missing required field '${field}'`);
+      }
+    }
+
+    // Validate nodes
+    if (!Array.isArray(spec.nodes) || spec.nodes.length === 0) {
+      throw new Error('Invalid spec: nodes must be a non-empty array');
+    }
+
+    // Validate edges
+    if (!Array.isArray(spec.edges)) {
+      throw new Error('Invalid spec: edges must be an array');
+    }
+  }
+
+  /**
+   * Enhance spec with defaults and computed properties
+   * @param {Object} spec - Raw specification
+   * @param {string} diagramId - Diagram ID
+   * @returns {Object} Enhanced specification
+   */
+  enhanceSpec(spec, diagramId) {
+    return {
+      ...spec,
+      id: spec.id || diagramId,
+      layout: spec.layout || { type: 'flow' },
+      contracts: spec.contracts || {},
+      firstPrinciples: spec.firstPrinciples || {},
+      drills: spec.drills || [],
+      assessment: spec.assessment || [],
+      overlays: spec.overlays || [],
+      steps: spec.steps || [],
+      // Convert old format to new unified state format
+      states: this.convertToStates(spec),
+      layers: this.convertToLayers(spec)
+    };
+  }
+
+  /**
+   * Convert old step/scene format to unified states
+   * @param {Object} spec - Specification
+   * @returns {Array} Unified states
+   */
+  convertToStates(spec) {
+    const states = [];
+
+    // Convert steps to sequential states
+    if (spec.steps && spec.steps.length > 0) {
+      spec.steps.forEach((step, index) => {
+        states.push({
+          id: step.id || `step-${index}`,
+          type: 'sequential',
+          position: (index / (spec.steps.length - 1)) * 100,
+          layers: step.overlays || [],
+          caption: step.caption || step.description || `Step ${index + 1}`,
+          narrative: step.narrative
+        });
+      });
+    }
+
+    // Convert scenes to named states
+    if (spec.scenes && spec.scenes.length > 0) {
+      spec.scenes.forEach((scene) => {
+        states.push({
+          id: scene.id,
+          type: 'named',
+          position: scene.position || 50,
+          layers: scene.overlays || [],
+          caption: scene.name || scene.id,
+          narrative: scene.description
+        });
+      });
+    }
+
+    // If no states, create a default
+    if (states.length === 0) {
+      states.push({
+        id: 'default',
+        type: 'sequential',
+        position: 0,
+        layers: [],
+        caption: 'Default View'
+      });
+    }
+
+    return states;
+  }
+
+  /**
+   * Convert overlays to layers
+   * @param {Object} spec - Specification
+   * @returns {Array} Layers
+   */
+  convertToLayers(spec) {
+    if (!spec.overlays || spec.overlays.length === 0) {
+      return [];
+    }
+
+    return spec.overlays.map(overlay => ({
+      id: overlay.id,
+      name: overlay.name || overlay.id,
+      description: overlay.description,
+      diff: {
+        add: overlay.addNodes || [],
+        remove: overlay.removeNodes || [],
+        modify: overlay.modifyNodes || [],
+        edges: overlay.edges || []
+      }
+    }));
+  }
+
+  /**
+   * Save spec to localStorage
+   * @param {string} diagramId - Diagram ID
+   * @param {Object} spec - Specification
+   */
+  saveToStorage(diagramId, spec) {
+    try {
+      const key = `gfs-spec-${diagramId}`;
+      localStorage.setItem(key, JSON.stringify(spec));
+    } catch (error) {
+      console.warn(`Failed to save ${diagramId} to storage:`, error);
+    }
+  }
+
+  /**
+   * Load spec from localStorage
+   * @param {string} diagramId - Diagram ID
+   * @returns {Object|null} Specification or null
+   */
+  loadFromStorage(diagramId) {
+    try {
+      const key = `gfs-spec-${diagramId}`;
+      const stored = localStorage.getItem(key);
+
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.warn(`Failed to load ${diagramId} from storage:`, error);
+    }
+
+    return null;
+  }
+
+  /**
+   * Clear cache
+   */
+  clearCache() {
+    this.cache.clear();
+  }
+
+  /**
+   * Get manifest
+   * @returns {Object} Manifest
+   */
+  getManifest() {
+    return this.manifest || this.getDefaultManifest();
+  }
+
+  /**
+   * Get diagram info
+   * @param {string} diagramId - Diagram ID
+   * @returns {Object|null} Diagram info from manifest
+   */
+  getDiagramInfo(diagramId) {
+    const manifest = this.getManifest();
+    return manifest.diagrams.find(d => d.id === diagramId) || null;
+  }
+
+  /**
+   * Get all diagram IDs
+   * @returns {Array<string>} Diagram IDs
+   */
+  getDiagramIds() {
+    const manifest = this.getManifest();
+    return manifest.diagrams.map(d => d.id);
+  }
+
+  /**
+   * Preload next diagram
+   * @param {string} currentId - Current diagram ID
+   */
+  async preloadNext(currentId) {
+    const ids = this.getDiagramIds();
+    const currentIndex = ids.indexOf(currentId);
+
+    if (currentIndex !== -1 && currentIndex < ids.length - 1) {
+      const nextId = ids[currentIndex + 1];
+      // Load in background
+      this.load(nextId).catch(() => {
+        // Silent fail for preload
+      });
+    }
+  }
+}
+
+window.SpecLoader;
+
+})();
+
+// Module: src/app/render/diagram-renderer.js
+(function() {
+  'use strict';
+
+/**
+ * Diagram Renderer Module
+ * Handles Mermaid diagram rendering and composition
+ */
+
+
+
+
+window.DiagramRenderer {
+  constructor() {
+    this.mermaidAPI = null;
+    this.initialized = false;
+    this.container = null;
+  }
+
+  /**
+   * Initialize the renderer
+   */
+  async init() {
+    // Wait for Mermaid to be available
+    if (typeof window.mermaid === 'undefined') {
+      console.warn('Mermaid not loaded, waiting...');
+      await this.waitForMermaid();
+    }
+
+    this.mermaidAPI = window.mermaid;
+
+    // Configure Mermaid
+    const mermaidConfig = configManager.get('diagram.mermaidConfig');
+    this.mermaidAPI.initialize(mermaidConfig);
+
+    // Get container
+    this.container = document.getElementById('diagram-container');
+    if (!this.container) {
+      throw new Error('Diagram container not found');
+    }
+
+    this.initialized = true;
+  }
+
+  /**
+   * Wait for Mermaid to load
+   */
+  async waitForMermaid() {
+    return new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (typeof window.mermaid !== 'undefined') {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 100);
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        resolve();
+      }, 10000);
+    });
+  }
+
+  /**
+   * Compose scene with layers
+   * @param {Object} spec - Base specification
+   * @param {Set} activeLayers - Active layer IDs
+   * @returns {Object} Composed specification
+   */
+  compose(spec, activeLayers = new Set()) {
+    // Deep clone the spec
+    const composed = JSON.parse(JSON.stringify(spec));
+
+    // If no layers active, return base spec
+    if (activeLayers.size === 0) {
+      return composed;
+    }
+
+    // Create maps for efficient lookup
+    const nodeMap = new Map(composed.nodes.map(n => [n.id, n]));
+    const edgeMap = new Map(composed.edges.map(e => [e.id, e]));
+
+    // Apply each active layer
+    const layers = spec.layers || [];
+    for (const layerId of activeLayers) {
+      const layer = layers.find(l => l.id === layerId);
+      if (!layer || !layer.diff) continue;
+
+      this.applyLayer(composed, nodeMap, edgeMap, layer.diff);
+    }
+
+    return composed;
+  }
+
+  /**
+   * Apply a layer to the composed spec
+   * @private
+   */
+  applyLayer(composed, nodeMap, edgeMap, diff) {
+    // Add nodes
+    if (diff.add && Array.isArray(diff.add)) {
+      diff.add.forEach(node => {
+        if (!nodeMap.has(node.id)) {
+          const newNode = { ...node, added: true };
+          composed.nodes.push(newNode);
+          nodeMap.set(node.id, newNode);
+        }
+      });
+    }
+
+    // Remove nodes
+    if (diff.remove && Array.isArray(diff.remove)) {
+      diff.remove.forEach(nodeId => {
+        const index = composed.nodes.findIndex(n => n.id === nodeId);
+        if (index !== -1) {
+          composed.nodes.splice(index, 1);
+          nodeMap.delete(nodeId);
+        }
+      });
+    }
+
+    // Modify nodes
+    if (diff.modify && Array.isArray(diff.modify)) {
+      diff.modify.forEach(mod => {
+        const node = nodeMap.get(mod.id);
+        if (node) {
+          Object.assign(node, mod, { modified: true });
+        }
+      });
+    }
+
+    // Handle edges
+    if (diff.edges && Array.isArray(diff.edges)) {
+      diff.edges.forEach(edge => {
+        if (edge.action === 'add' && !edgeMap.has(edge.id)) {
+          const newEdge = { ...edge, added: true };
+          delete newEdge.action;
+          composed.edges.push(newEdge);
+          edgeMap.set(edge.id, newEdge);
+        } else if (edge.action === 'remove') {
+          const index = composed.edges.findIndex(e => e.id === edge.id);
+          if (index !== -1) {
+            composed.edges.splice(index, 1);
+            edgeMap.delete(edge.id);
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * Render a composed specification
+   * @param {Object} composed - Composed specification
+   */
+  async render(composed) {
+    if (!this.initialized) {
+      await this.init();
+    }
+
+    try {
+      // Generate Mermaid code
+      const mermaidCode = this.generateMermaidCode(composed);
+
+      // Clear container
+      this.container.innerHTML = '';
+
+      // Create a unique ID for this render
+      const graphId = `mermaid-${Date.now()}`;
+
+      // Create wrapper div
+      const wrapper = document.createElement('div');
+      wrapper.id = graphId;
+      wrapper.className = 'mermaid-wrapper';
+      this.container.appendChild(wrapper);
+
+      // Render with Mermaid
+      await this.renderMermaid(graphId, mermaidCode);
+
+      // Apply animations for added/modified elements
+      this.applyAnimations(composed);
+
+      // Apply theme adjustments
+      this.applyTheme();
+
+    } catch (error) {
+      console.error('Render error:', error);
+      this.showError(error);
+      throw error;
+    }
+  }
+
+  /**
+   * Generate Mermaid code from specification
+   * @param {Object} spec - Specification
+   * @returns {string} Mermaid code
+   */
+  generateMermaidCode(spec) {
+    const lines = [];
+
+    // Determine diagram type
+    const layoutType = spec.layout?.type || 'flow';
+
+    if (layoutType === 'flow') {
+      lines.push('flowchart TB');
+    } else if (layoutType === 'graph') {
+      lines.push('graph TB');
+    } else {
+      lines.push('flowchart LR');
+    }
+
+    // Add nodes
+    spec.nodes.forEach(node => {
+      const label = this.escapeLabel(node.label || node.id);
+      const shape = this.getNodeShape(node.type);
+
+      let className = node.type || 'default';
+      if (node.added) className += ' added';
+      if (node.modified) className += ' modified';
+
+      lines.push(`    ${node.id}${shape[0]}${label}${shape[1]}:::${className}`);
+    });
+
+    // Add edges
+    spec.edges.forEach(edge => {
+      const label = edge.label ? `|${this.escapeLabel(edge.label)}|` : '';
+      const arrow = this.getArrowType(edge.type);
+
+      let edgeClass = '';
+      if (edge.added) edgeClass = ':::edgeAdded';
+      if (edge.style === 'dashed') edgeClass = ':::edgeDashed';
+
+      lines.push(`    ${edge.from} ${arrow}${label} ${edge.to}${edgeClass}`);
+    });
+
+    // Add class definitions
+    lines.push('');
+    lines.push('    classDef default fill:#f9f9f9,stroke:#333,stroke-width:2px;');
+    lines.push('    classDef master fill:#4285f4,stroke:#1a73e8,stroke-width:2px,color:#fff;');
+    lines.push('    classDef chunkserver fill:#34a853,stroke:#188038,stroke-width:2px,color:#fff;');
+    lines.push('    classDef client fill:#fbbc04,stroke:#f9ab00,stroke-width:2px;');
+    lines.push('    classDef added fill:#e8f5e9,stroke:#4caf50,stroke-width:3px;');
+    lines.push('    classDef modified fill:#fff3e0,stroke:#ff9800,stroke-width:3px;');
+    lines.push('    classDef edgeAdded stroke:#4caf50,stroke-width:3px;');
+    lines.push('    classDef edgeDashed stroke-dasharray: 5 5;');
+
+    return lines.join('\n');
+  }
+
+  /**
+   * Render Mermaid diagram
+   * @private
+   */
+  async renderMermaid(elementId, mermaidCode) {
+    return new Promise((resolve, reject) => {
+      try {
+        // Use mermaid.render for better control
+        this.mermaidAPI.render(elementId + '-svg', mermaidCode, (svgCode) => {
+          const element = document.getElementById(elementId);
+          if (element) {
+            element.innerHTML = svgCode;
+            resolve();
+          } else {
+            reject(new Error('Container element not found'));
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * Get node shape based on type
+   * @private
+   */
+  getNodeShape(type) {
+    const shapes = {
+      'master': ['[', ']'],        // Rectangle
+      'chunkserver': ['[', ']'],    // Rectangle
+      'client': ['(', ')'],         // Rounded
+      'storage': ['[(', ')]'],      // Cylinder
+      'process': ['{{', '}}'],      // Hexagon
+      'decision': ['{', '}'],       // Diamond
+      'default': ['[', ']']         // Rectangle
+    };
+
+    return shapes[type] || shapes.default;
+  }
+
+  /**
+   * Get arrow type for edges
+   * @private
+   */
+  getArrowType(type) {
+    const arrows = {
+      'sync': '-->',
+      'async': '-.->',
+      'bidirectional': '<-->',
+      'none': '---',
+      'default': '-->'
+    };
+
+    return arrows[type] || arrows.default;
+  }
+
+  /**
+   * Escape label for Mermaid
+   * @private
+   */
+  escapeLabel(label) {
+    if (!label) return '';
+
+    return label
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br/>');
+  }
+
+  /**
+   * Apply animations to added/modified elements
+   * @private
+   */
+  applyAnimations(spec) {
+    const animationDuration = configManager.get('ui.animationDuration');
+
+    // Animate added nodes
+    const addedNodes = spec.nodes.filter(n => n.added);
+    addedNodes.forEach(node => {
+      const element = this.container.querySelector(`#${node.id}`);
+      if (element) {
+        element.style.animation = `fadeIn ${animationDuration}ms ease-in`;
+      }
+    });
+
+    // Animate modified nodes
+    const modifiedNodes = spec.nodes.filter(n => n.modified);
+    modifiedNodes.forEach(node => {
+      const element = this.container.querySelector(`#${node.id}`);
+      if (element) {
+        element.style.animation = `pulse ${animationDuration * 2}ms ease-in-out`;
+      }
+    });
+  }
+
+  /**
+   * Apply theme adjustments
+   * @private
+   */
+  applyTheme() {
+    const theme = appState.get('preferences.theme');
+    const isDark = theme === 'dark';
+
+    if (isDark) {
+      this.container.classList.add('dark-theme');
+    } else {
+      this.container.classList.remove('dark-theme');
+    }
+  }
+
+  /**
+   * Show error in diagram container
+   * @private
+   */
+  showError(error) {
+    if (!this.container) return;
+
+    this.container.innerHTML = `
+      <div class="diagram-error">
+        <h3>⚠️ Rendering Error</h3>
+        <p>${error.message}</p>
+        <button onclick="location.reload()">Reload Page</button>
+      </div>
+    `;
+  }
+
+  /**
+   * Export diagram as image
+   * @param {string} format - Export format (png, svg)
+   * @returns {Promise<string>} Data URL or SVG string
+   */
+  async export(format = 'png') {
+    const svg = this.container.querySelector('svg');
+    if (!svg) {
+      throw new Error('No diagram to export');
+    }
+
+    if (format === 'svg') {
+      return svg.outerHTML;
+    }
+
+    if (format === 'png') {
+      return this.svgToPng(svg);
+    }
+
+    throw new Error(`Unsupported export format: ${format}`);
+  }
+
+  /**
+   * Convert SVG to PNG
+   * @private
+   */
+  async svgToPng(svg) {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL('image/png'));
+      };
+
+      img.onerror = reject;
+      img.src = url;
+    });
+  }
+
+  /**
+   * Destroy the renderer
+   */
+  destroy() {
+    if (this.container) {
+      this.container.innerHTML = '';
+    }
+    this.initialized = false;
+  }
+}
+
+window.DiagramRenderer;
+
+})();
+
+// Module: src/core/composer.js
+class SceneComposer {
+  constructor() {
+    this.debug = false;
+  }
+
+  composeScene(spec, overlayIds = []) {
+    // Deep clone the spec to avoid mutations
+    const composed = this.deepClone(spec);
+    const nodeMap = new Map(composed.nodes.map(n => [n.id, n]));
+    const edgeMap = new Map(composed.edges.map(e => [e.id, e]));
+
+    // Track which overlays are active
+    composed._activeOverlays = overlayIds;
+
+    // Apply each overlay in sequence
+    for (const overlayId of overlayIds) {
+      const overlay = spec.overlays?.find(o => o.id === overlayId);
+      if (!overlay) {
+        console.warn(`Overlay ${overlayId} not found`);
+        continue;
+      }
+
+      this.applyDiff(nodeMap, edgeMap, overlay.diff);
+    }
+
+    // Convert maps back to arrays
+    composed.nodes = Array.from(nodeMap.values());
+    composed.edges = Array.from(edgeMap.values());
+
+    return composed;
+  }
+
+  applyDiff(nodeMap, edgeMap, diff) {
+    if (!diff) return;
+
+    // Process removals first
+    if (diff.remove) {
+      diff.remove.nodeIds?.forEach(id => {
+        nodeMap.delete(id);
+        // Also remove edges connected to this node
+        for (const [edgeId, edge] of edgeMap.entries()) {
+          if (edge.from === id || edge.to === id) {
+            edgeMap.delete(edgeId);
+          }
+        }
+      });
+
+      diff.remove.edgeIds?.forEach(id => edgeMap.delete(id));
+    }
+
+    // Process additions
+    if (diff.add) {
+      diff.add.nodes?.forEach(n => {
+        const node = { ...n, _added: true };
+        nodeMap.set(n.id, node);
+      });
+
+      diff.add.edges?.forEach(e => {
+        const edge = { ...e, _added: true };
+        edgeMap.set(e.id, edge);
+      });
+    }
+
+    // Process highlights
+    if (diff.highlight) {
+      diff.highlight.nodeIds?.forEach(id => {
+        const node = nodeMap.get(id);
+        if (node) {
+          node._highlighted = true;
+        }
+      });
+
+      diff.highlight.edgeIds?.forEach(id => {
+        const edge = edgeMap.get(id);
+        if (edge) {
+          edge._highlighted = true;
+        }
+      });
+    }
+
+    // Process modifications
+    if (diff.modify) {
+      diff.modify.nodes?.forEach(mod => {
+        const node = nodeMap.get(mod.id);
+        if (node) {
+          Object.assign(node, mod, { _modified: true });
+        }
+      });
+
+      diff.modify.edges?.forEach(mod => {
+        const edge = edgeMap.get(mod.id);
+        if (edge) {
+          Object.assign(edge, mod, { _modified: true });
+        }
+      });
+    }
+  }
+
+  mergeScenes(spec, sceneIds = []) {
+    // Get overlays for all specified scenes
+    const overlayIds = [];
+    for (const sceneId of sceneIds) {
+      const scene = spec.scenes?.find(s => s.id === sceneId);
+      if (scene) {
+        overlayIds.push(...(scene.overlays || []));
+      }
+    }
+
+    // Remove duplicates while preserving order
+    const uniqueOverlayIds = [...new Set(overlayIds)];
+
+    return this.composeScene(spec, uniqueOverlayIds);
+  }
+
+  deepClone(obj) {
+    if (obj === null || typeof obj !== 'object') return obj;
+    if (obj instanceof Date) return new Date(obj.getTime());
+    if (obj instanceof Array) return obj.map(item => this.deepClone(item));
+    if (obj instanceof Object) {
+      const clonedObj = {};
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          clonedObj[key] = this.deepClone(obj[key]);
+        }
+      }
+      return clonedObj;
+    }
+  }
+
+  // Get the diff between two states (useful for animations)
+  calculateDiff(specBefore, specAfter) {
+    const diff = {
+      add: { nodes: [], edges: [] },
+      remove: { nodeIds: [], edgeIds: [] },
+      modify: { nodes: [], edges: [] }
+    };
+
+    const beforeNodes = new Map(specBefore.nodes.map(n => [n.id, n]));
+    const afterNodes = new Map(specAfter.nodes.map(n => [n.id, n]));
+    const beforeEdges = new Map(specBefore.edges.map(e => [e.id, e]));
+    const afterEdges = new Map(specAfter.edges.map(e => [e.id, e]));
+
+    // Find removed nodes
+    for (const [id, node] of beforeNodes) {
+      if (!afterNodes.has(id)) {
+        diff.remove.nodeIds.push(id);
+      }
+    }
+
+    // Find added or modified nodes
+    for (const [id, node] of afterNodes) {
+      if (!beforeNodes.has(id)) {
+        diff.add.nodes.push(node);
+      } else {
+        // Check if modified
+        const before = beforeNodes.get(id);
+        if (JSON.stringify(before) !== JSON.stringify(node)) {
+          diff.modify.nodes.push(node);
+        }
+      }
+    }
+
+    // Find removed edges
+    for (const [id, edge] of beforeEdges) {
+      if (!afterEdges.has(id)) {
+        diff.remove.edgeIds.push(id);
+      }
+    }
+
+    // Find added or modified edges
+    for (const [id, edge] of afterEdges) {
+      if (!beforeEdges.has(id)) {
+        diff.add.edges.push(edge);
+      } else {
+        // Check if modified
+        const before = beforeEdges.get(id);
+        if (JSON.stringify(before) !== JSON.stringify(edge)) {
+          diff.modify.edges.push(edge);
+        }
+      }
+    }
+
+    return diff;
+  }
+}
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = SceneComposer;
+} else {
+  window.SceneComposer = SceneComposer;
+}
+
+// Module: src/core/validator.js
+class ValidationError extends Error {
+  constructor(rule, errors) {
+    super(`Validation failed for ${rule}: ${errors.join(', ')}`);
+    this.rule = rule;
+    this.errors = errors;
+  }
+}
+
+class DiagramValidator {
+  constructor() {
+    this.ajv = null;
+    this.schema = null;
+    this.validate = null;
+    this.semanticRules = [
+      this.validateMasterNotOnDataPath,
+      this.validatePrimarySecondaryConsistency,
+      this.validateVersionMonotonicity,
+      this.validateReplicationFactor,
+      this.validateOverlayReferences
+    ];
   }
 
   async initialize() {
-    console.log('🚀 Initializing GFS Visual Learning System...');
+    try {
+      // In browser environment, Ajv should be loaded via CDN
+      if (typeof Ajv === 'undefined') {
+        console.warn('Ajv not loaded. Schema validation will be skipped.');
+        return;
+      }
 
-    // Initialize Mermaid
-    if (typeof mermaid !== 'undefined') {
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: localStorage.getItem('theme') === 'dark' ? 'dark' : 'default',
-        themeVariables: {
-          primaryColor: '#667eea',
-          primaryTextColor: '#fff',
-          primaryBorderColor: '#764ba2',
-          lineColor: '#667eea',
-          secondaryColor: '#f3f4f6',
-          tertiaryColor: '#e5e7eb'
+      this.ajv = new Ajv({ allErrors: true });
+      this.schema = await fetch('/data/schema.json').then(r => r.json());
+      this.validate = this.ajv.compile(this.schema);
+    } catch (error) {
+      console.error('Failed to initialize validator:', error);
+    }
+  }
+
+  validateSpec(spec) {
+    const errors = [];
+
+    // Schema validation if available
+    if (this.validate && !this.validate(spec)) {
+      throw new ValidationError('Schema', this.ajv.errors.map(e => e.message));
+    }
+
+    // Semantic validation
+    for (const rule of this.semanticRules) {
+      const result = rule.call(this, spec);
+      if (!result.valid) {
+        errors.push(...result.errors);
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new ValidationError('Semantic', errors);
+    }
+
+    return true;
+  }
+
+  validateMasterNotOnDataPath(spec) {
+    const masters = new Set(
+      (spec.nodes || []).filter(n => n.type === 'master').map(n => n.id)
+    );
+
+    const violations = (spec.edges || []).filter(e =>
+      e.kind === 'data' && (masters.has(e.from) || masters.has(e.to))
+    );
+
+    return {
+      valid: violations.length === 0,
+      rule: 'MasterNotOnDataPath',
+      errors: violations.map(e => `Data edge ${e.id} touches master`)
+    };
+  }
+
+  validatePrimarySecondaryConsistency(spec) {
+    // Check that if there's a primary, there are secondaries
+    const nodes = spec.nodes || [];
+    const primaryCount = nodes.filter(n => n.label && n.label.includes('Primary')).length;
+    const secondaryCount = nodes.filter(n => n.label && n.label.includes('Secondary')).length;
+
+    if (primaryCount > 0 && secondaryCount === 0) {
+      return {
+        valid: false,
+        rule: 'PrimarySecondaryConsistency',
+        errors: ['Primary exists without secondaries']
+      };
+    }
+
+    return { valid: true, errors: [] };
+  }
+
+  validateVersionMonotonicity(spec) {
+    // Check version numbers are consistent
+    const versionedNodes = (spec.nodes || []).filter(n => n.metadata && n.metadata.version);
+    const errors = [];
+
+    // Just ensure versions are positive
+    versionedNodes.forEach(node => {
+      if (node.metadata.version < 0) {
+        errors.push(`Node ${node.id} has negative version ${node.metadata.version}`);
+      }
+    });
+
+    return {
+      valid: errors.length === 0,
+      rule: 'VersionMonotonicity',
+      errors
+    };
+  }
+
+  validateReplicationFactor(spec) {
+    // This is more of a warning than an error for educational purposes
+    const chunkservers = (spec.nodes || []).filter(n => n.type === 'chunkserver');
+
+    if (chunkservers.length > 0 && chunkservers.length < 3) {
+      return {
+        valid: true, // Warning only
+        rule: 'ReplicationFactor',
+        errors: []
+      };
+    }
+
+    return { valid: true, errors: [] };
+  }
+
+  validateOverlayReferences(spec) {
+    const nodeIds = new Set((spec.nodes || []).map(n => n.id));
+    const edgeIds = new Set((spec.edges || []).map(e => e.id));
+    const errors = [];
+
+    for (const overlay of spec.overlays || []) {
+      // Check removals reference existing elements
+      overlay.diff?.remove?.nodeIds?.forEach(id => {
+        if (!nodeIds.has(id)) {
+          errors.push(`Overlay ${overlay.id} removes non-existent node ${id}`);
+        }
+      });
+
+      overlay.diff?.remove?.edgeIds?.forEach(id => {
+        if (!edgeIds.has(id)) {
+          errors.push(`Overlay ${overlay.id} removes non-existent edge ${id}`);
+        }
+      });
+
+      // Check highlights reference existing elements
+      overlay.diff?.highlight?.nodeIds?.forEach(id => {
+        if (!nodeIds.has(id)) {
+          errors.push(`Overlay ${overlay.id} highlights non-existent node ${id}`);
+        }
+      });
+
+      overlay.diff?.highlight?.edgeIds?.forEach(id => {
+        if (!edgeIds.has(id)) {
+          errors.push(`Overlay ${overlay.id} highlights non-existent edge ${id}`);
+        }
+      });
+
+      // Check modifications reference existing elements
+      overlay.diff?.modify?.nodes?.forEach(node => {
+        if (!nodeIds.has(node.id)) {
+          errors.push(`Overlay ${overlay.id} modifies non-existent node ${node.id}`);
+        }
+      });
+
+      overlay.diff?.modify?.edges?.forEach(edge => {
+        if (!edgeIds.has(edge.id)) {
+          errors.push(`Overlay ${overlay.id} modifies non-existent edge ${edge.id}`);
         }
       });
     }
 
-    // Initialize StateManager if available
-    if (typeof StateManager !== 'undefined') {
-      this.stateManager = new StateManager();
+    return {
+      valid: errors.length === 0,
+      rule: 'OverlayReferences',
+      errors
+    };
+  }
+}
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { DiagramValidator, ValidationError };
+} else {
+  window.DiagramValidator = DiagramValidator;
+  window.ValidationError = ValidationError;
+}
+
+// Module: src/core/state-manager.js
+/**
+ * Unified State Manager
+ * Combines steps, overlays, and scenes into a single state system
+ */
+class StateManager {
+  constructor() {
+    this.states = [];
+    this.layers = new Map();
+    this.currentStateIndex = 0;
+    this.customLayers = new Set();
+    this.isPlaying = false;
+    this.playSpeed = 2000;
+    this.playInterval = null;
+  }
+
+  /**
+   * Initialize from spec data
+   * Converts old format (steps/scenes/overlays) to unified states
+   */
+  initialize(spec) {
+    this.states = [];
+    this.layers.clear();
+
+    // Convert overlays to layers
+    if (spec.overlays) {
+      spec.overlays.forEach(overlay => {
+        this.layers.set(overlay.id, {
+          id: overlay.id,
+          name: overlay.caption || overlay.id,
+          diff: overlay.diff || {},
+          type: 'modifier'
+        });
+      });
     }
 
-    // Initialize StepThrough engine
-    this.stepThrough = new StepThroughEngine(this, null);
+    // Convert steps to sequential states (if they exist)
+    if (spec.steps && spec.steps.length > 0) {
+      const totalSteps = spec.steps.length;
+      spec.steps.forEach((step, index) => {
+        const position = totalSteps > 1 ? (index / (totalSteps - 1)) * 100 : 50;
 
-    // Set up event listeners
-    this.setupEventListeners();
+        // Determine active layers from step overlays
+        const activeLayers = new Set();
+        if (step.overlays) {
+          step.overlays.forEach(overlayId => activeLayers.add(overlayId));
+        }
 
-    // Load initial diagram from URL or default
-    const urlParams = new URLSearchParams(window.location.search);
-    const diagramId = urlParams.get('d') || '00-legend';
-    await this.loadDiagram(diagramId);
+        this.states.push({
+          id: `step-${index}`,
+          type: 'sequential',
+          position: position,
+          layers: activeLayers,
+          caption: step.caption || `Step ${index + 1}`,
+          narrative: step.narrative || '',
+          index: index
+        });
+      });
+    }
+    // If no steps but we have scenes, create sequential states from scenes
+    else if (spec.scenes && spec.scenes.length > 0) {
+      // First, add an initial state with no overlays
+      this.states.push({
+        id: 'initial',
+        type: 'sequential',
+        position: 0,
+        layers: new Set(),
+        caption: 'Initial State',
+        narrative: spec.narrative || '',
+        index: 0
+      });
 
-    console.log('✅ GFS Viewer initialized');
+      // Then convert scenes to sequential states
+      const totalScenes = spec.scenes.length;
+      spec.scenes.forEach((scene, index) => {
+        const position = ((index + 1) / (totalScenes + 1)) * 100;
+
+        this.states.push({
+          id: scene.id || `scene-${index}`,
+          type: 'sequential',
+          position: position,
+          layers: new Set(scene.overlays || []),
+          caption: scene.title || scene.name || `Scene ${index + 1}`,
+          narrative: scene.narrative || '',
+          index: index + 1,
+          isScene: true
+        });
+      });
+    }
+    // If we have neither steps nor scenes, create states from overlays
+    else if (spec.overlays && spec.overlays.length > 0) {
+      // Initial state with no overlays
+      this.states.push({
+        id: 'initial',
+        type: 'sequential',
+        position: 0,
+        layers: new Set(),
+        caption: 'Base Diagram',
+        narrative: spec.narrative || '',
+        index: 0
+      });
+
+      // Create a state for each overlay
+      spec.overlays.forEach((overlay, index) => {
+        const position = ((index + 1) / (spec.overlays.length + 1)) * 100;
+
+        this.states.push({
+          id: `overlay-${overlay.id}`,
+          type: 'sequential',
+          position: position,
+          layers: new Set([overlay.id]),
+          caption: overlay.caption || overlay.id,
+          narrative: '',
+          index: index + 1
+        });
+      });
+    }
+
+    // Sort states by position
+    this.states.sort((a, b) => a.position - b.position);
+
+    // Set initial state
+    this.currentStateIndex = 0;
+    if (this.states.length > 0) {
+      this.applyState(this.states[0]);
+    }
+  }
+
+  /**
+   * Find appropriate timeline position for a scene
+   */
+  findScenePosition(scene) {
+    // Try to intelligently place scenes based on their overlays
+    // This is a heuristic - scenes with more overlays come later
+    const overlayCount = (scene.overlays || []).length;
+    const maxOverlays = 3; // Assume max 3 overlays
+    return Math.min(25 + (overlayCount * 25), 90);
+  }
+
+  /**
+   * Get current state
+   */
+  getCurrentState() {
+    return this.states[this.currentStateIndex];
+  }
+
+  /**
+   * Apply a state (activate its layers and update UI)
+   */
+  applyState(state) {
+    if (!state) return;
+
+    // Clear custom layers if moving to a defined state
+    if (state.type !== 'custom') {
+      this.customLayers.clear();
+    }
+
+    // Apply state layers
+    this.customLayers = new Set(state.layers);
+
+    // Emit state change event
+    this.emitStateChange(state);
+  }
+
+  /**
+   * Navigate to next state
+   */
+  next() {
+    if (this.currentStateIndex < this.states.length - 1) {
+      this.currentStateIndex++;
+      this.applyState(this.states[this.currentStateIndex]);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Navigate to previous state
+   */
+  previous() {
+    if (this.currentStateIndex > 0) {
+      this.currentStateIndex--;
+      this.applyState(this.states[this.currentStateIndex]);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Jump to specific state by ID
+   */
+  jumpToState(stateId) {
+    const index = this.states.findIndex(s => s.id === stateId);
+    if (index !== -1) {
+      this.currentStateIndex = index;
+      this.applyState(this.states[index]);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Jump to position on timeline (0-100)
+   */
+  jumpToPosition(position) {
+    // Find closest state to this position
+    let closestIndex = 0;
+    let closestDistance = Math.abs(this.states[0].position - position);
+
+    this.states.forEach((state, index) => {
+      const distance = Math.abs(state.position - position);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    this.currentStateIndex = closestIndex;
+    this.applyState(this.states[closestIndex]);
+  }
+
+  /**
+   * Toggle a layer on current state
+   */
+  toggleLayer(layerId) {
+    if (this.customLayers.has(layerId)) {
+      this.customLayers.delete(layerId);
+    } else {
+      this.customLayers.add(layerId);
+    }
+
+    // Create custom state
+    const customState = {
+      id: 'custom',
+      type: 'custom',
+      position: this.getCurrentState().position,
+      layers: new Set(this.customLayers),
+      caption: 'Custom View',
+      narrative: ''
+    };
+
+    this.emitStateChange(customState);
+  }
+
+  /**
+   * Get all named states (for quick jump menu)
+   */
+  getNamedStates() {
+    return this.states.filter(s => s.type === 'named' || s.isScene);
+  }
+
+  /**
+   * Get active layers
+   */
+  getActiveLayers() {
+    return Array.from(this.customLayers);
+  }
+
+  /**
+   * Start auto-play through states
+   */
+  play() {
+    if (this.isPlaying) return;
+
+    this.isPlaying = true;
+    this.playInterval = setInterval(() => {
+      if (!this.next()) {
+        this.pause();
+      }
+    }, this.playSpeed);
+
+    this.emitPlayStateChange(true);
+  }
+
+  /**
+   * Pause auto-play
+   */
+  pause() {
+    this.isPlaying = false;
+    if (this.playInterval) {
+      clearInterval(this.playInterval);
+      this.playInterval = null;
+    }
+    this.emitPlayStateChange(false);
+  }
+
+  /**
+   * Toggle play/pause
+   */
+  togglePlay() {
+    if (this.isPlaying) {
+      this.pause();
+    } else {
+      this.play();
+    }
+  }
+
+  /**
+   * Set playback speed
+   */
+  setSpeed(ms) {
+    this.playSpeed = ms;
+    if (this.isPlaying) {
+      this.pause();
+      this.play();
+    }
+  }
+
+  /**
+   * Emit state change event
+   */
+  emitStateChange(state) {
+    document.dispatchEvent(new CustomEvent('stateChange', {
+      detail: {
+        state: state,
+        index: this.currentStateIndex,
+        total: this.states.length,
+        layers: Array.from(state.layers || this.customLayers),
+        position: state.position
+      }
+    }));
+  }
+
+  /**
+   * Emit play state change
+   */
+  emitPlayStateChange(isPlaying) {
+    document.dispatchEvent(new CustomEvent('playStateChange', {
+      detail: { isPlaying }
+    }));
+  }
+
+  /**
+   * Get progress percentage
+   */
+  getProgress() {
+    if (this.states.length === 0) return 0;
+    return (this.currentStateIndex / (this.states.length - 1)) * 100;
+  }
+}
+
+// Export for module systems
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = StateManager;
+} else {
+  window.StateManager = StateManager;
+}
+
+// Module: src/core/renderer.js
+class MermaidRenderer {
+  constructor() {
+    this.config = {
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#CFE8FF',
+        primaryBorderColor: '#2B6CB0',
+        secondaryColor: '#D1FAE5',
+        tertiaryColor: '#E5E7EB',
+        primaryTextColor: '#1F2937',
+        lineColor: '#6B7280',
+        background: '#FFFFFF'
+      },
+      flowchart: {
+        htmlLabels: true,
+        curve: 'basis'
+      },
+      sequence: {
+        diagramMarginX: 50,
+        diagramMarginY: 20,
+        actorMargin: 100,
+        width: 150,
+        height: 65,
+        boxMargin: 10,
+        boxTextMargin: 5,
+        noteMargin: 10,
+        messageMargin: 35
+      }
+    };
+
+    this.initialized = false;
+  }
+
+  async initialize() {
+    if (this.initialized) return;
+
+    // Check if mermaid is available
+    if (typeof mermaid === 'undefined') {
+      console.error('Mermaid library not loaded');
+      return;
+    }
+
+    mermaid.initialize({
+      startOnLoad: false,
+      ...this.config
+    });
+
+    this.initialized = true;
+  }
+
+  async render(spec, containerId = 'diagram-container') {
+    if (!this.initialized) {
+      await this.initialize();
+    }
+
+    const code = this.generateMermaidCode(spec);
+    const container = document.getElementById(containerId);
+
+    if (!container) {
+      console.error(`Container ${containerId} not found`);
+      return null;
+    }
+
+    // Clear container
+    container.innerHTML = '';
+
+    // Create a unique ID for this render
+    const id = `mermaid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const element = document.createElement('div');
+    element.id = id;
+
+    container.appendChild(element);
+
+    try {
+      // Render the diagram
+      const { svg } = await mermaid.render(id, code);
+      container.innerHTML = svg;
+
+      // Post-process the SVG
+      this.postProcess(container, spec);
+
+      return svg;
+    } catch (error) {
+      console.error('Failed to render diagram:', error);
+      container.innerHTML = `<div class="error">Failed to render diagram: ${error.message}</div>`;
+      return null;
+    }
+  }
+
+  generateMermaidCode(spec) {
+    const layoutType = spec.layout?.type || 'flow';
+    const generator = this.getGenerator(layoutType);
+    return generator.call(this, spec);
+  }
+
+  getGenerator(type) {
+    const generators = {
+      'sequence': this.generateSequence,
+      'flow': this.generateFlow,
+      'state': this.generateState,
+      'matrix': this.generateMatrix,
+      'timeline': this.generateTimeline
+    };
+
+    return generators[type] || generators['flow'];
+  }
+
+  generateSequence(spec) {
+    const lines = ['sequenceDiagram'];
+
+    // Add autonumber if specified
+    if (spec.layout?.numbered !== false) {
+      lines.push('  autonumber');
+    }
+
+    // Define participants in canonical order
+    const typeOrder = ['client', 'master', 'chunkserver', 'rack', 'switch', 'note'];
+    const sortedNodes = [...(spec.nodes || [])].sort((a, b) =>
+      typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type)
+    );
+
+    for (const node of sortedNodes) {
+      const icon = this.getNodeIcon(node);
+      lines.push(`  participant ${node.id} as ${icon}${node.label}`);
+    }
+
+    // Group edges by phase if available
+    const phases = this.groupEdgesByPhase(spec.edges || []);
+
+    for (const [phaseName, edges] of phases) {
+      if (phaseName !== 'default') {
+        lines.push(`  rect rgba(${this.getPhaseColor(phaseName)})`);
+        lines.push(`    Note over ${sortedNodes[0].id}: ${phaseName}`);
+      }
+
+      for (const edge of edges) {
+        const arrow = this.getSequenceArrow(edge);
+        const label = this.formatEdgeLabel(edge);
+
+        // Add highlight box if needed
+        if (edge._highlighted) {
+          lines.push(`  rect rgba(255,220,0,0.3)`);
+        }
+
+        lines.push(`  ${edge.from}${arrow}${edge.to}: ${label}`);
+
+        // Close highlight box
+        if (edge._highlighted) {
+          lines.push(`  end`);
+        }
+      }
+
+      if (phaseName !== 'default') {
+        lines.push(`  end`);
+      }
+    }
+
+    return lines.join('\n');
+  }
+
+  generateFlow(spec) {
+    const lines = ['flowchart TB'];
+
+    // Define nodes with shapes and styles
+    for (const node of spec.nodes || []) {
+      const shape = this.getNodeShape(node);
+      const style = node._highlighted ? ':::highlight' :
+                   node._added ? ':::added' : '';
+      // Don't use icons in flowchart - they cause parsing issues with some shapes
+      lines.push(`  ${node.id}${shape.open}"${node.label}"${shape.close}${style}`);
+    }
+
+    // Define edges
+    for (const edge of spec.edges || []) {
+      const arrow = this.getFlowArrow(edge);
+      const label = edge.label ? `|${this.formatFlowchartEdgeLabel(edge)}|` : '';
+      const style = edge._highlighted ? ':::highlightEdge' :
+                   edge._added ? ':::addedEdge' : '';
+      lines.push(`  ${edge.from} ${arrow}${label} ${edge.to}${style}`);
+    }
+
+    // Add style definitions
+    lines.push('');
+    lines.push('  classDef highlight fill:#FFD700,stroke:#B8860B,stroke-width:4px');
+    lines.push('  classDef added fill:#90EE90,stroke:#228B22,stroke-width:3px');
+    lines.push('  classDef highlightEdge stroke:#FFD700,stroke-width:4px');
+    lines.push('  classDef addedEdge stroke:#228B22,stroke-width:3px,stroke-dasharray: 5 5');
+    lines.push('  classDef master fill:#CFE8FF,stroke:#2B6CB0,stroke-width:2px');
+    lines.push('  classDef chunkserver fill:#D1FAE5,stroke:#059669,stroke-width:2px');
+    lines.push('  classDef client fill:#E5E7EB,stroke:#4B5563,stroke-width:2px');
+
+    // Apply type-based styles
+    for (const node of spec.nodes || []) {
+      if (!node._highlighted && !node._added) {
+        lines.push(`  class ${node.id} ${node.type}`);
+      }
+    }
+
+    return lines.join('\n');
+  }
+
+  generateState(spec) {
+    const lines = ['stateDiagram-v2'];
+
+    // Generate state definitions
+    for (const node of spec.nodes || []) {
+      if (node.type === 'state') {
+        lines.push(`  state "${node.label}" as ${node.id}`);
+        if (node.metadata?.description) {
+          lines.push(`  ${node.id} : ${node.metadata.description}`);
+        }
+      }
+    }
+
+    // Generate transitions
+    for (const edge of spec.edges || []) {
+      const label = edge.label ? ` : ${edge.label}` : '';
+      lines.push(`  ${edge.from} --> ${edge.to}${label}`);
+    }
+
+    return lines.join('\n');
+  }
+
+  generateMatrix(spec) {
+    // For matrix layout, use flowchart with subgraphs
+    const lines = ['flowchart TB'];
+
+    // Group nodes by rack/cluster if available
+    const racks = this.groupNodesByRack(spec.nodes || []);
+
+    for (const [rackName, nodes] of racks) {
+      if (rackName !== 'default') {
+        lines.push(`  subgraph ${rackName}["${rackName}"]`);
+      }
+
+      for (const node of nodes) {
+        const shape = this.getNodeShape(node);
+        const icon = this.getNodeIcon(node);
+        lines.push(`    ${node.id}${shape.open}${icon}${node.label}${shape.close}`);
+      }
+
+      if (rackName !== 'default') {
+        lines.push(`  end`);
+      }
+    }
+
+    // Add edges
+    for (const edge of spec.edges || []) {
+      const arrow = this.getFlowArrow(edge);
+      const label = edge.label ? `|${edge.label}|` : '';
+      lines.push(`  ${edge.from} ${arrow}${label} ${edge.to}`);
+    }
+
+    return lines.join('\n');
+  }
+
+  generateTimeline(spec) {
+    const lines = ['gitGraph'];
+
+    // Use git graph for timeline visualization
+    lines.push('  commit id: "Start"');
+
+    for (const node of spec.nodes || []) {
+      if (node.type === 'event') {
+        lines.push(`  commit id: "${node.label}"`);
+        if (node.metadata?.branch) {
+          lines.push(`  branch ${node.metadata.branch}`);
+        }
+      }
+    }
+
+    return lines.join('\n');
+  }
+
+  getNodeShape(node) {
+    const shapes = {
+      'master': { open: '{{', close: '}}' },      // Hexagon (control/coordination)
+      'chunkserver': { open: '[(', close: ')]' }, // Cylinder (storage)
+      'client': { open: '[', close: ']' },        // Rectangle
+      'rack': { open: '{{', close: '}}' },        // Hexagon
+      'switch': { open: '((', close: '))' },      // Circle
+      'note': { open: '[', close: ']' },          // Rectangle
+      'state': { open: '[', close: ']' },
+      'event': { open: '(', close: ')' }
+    };
+
+    return shapes[node.type] || shapes['note'];
+  }
+
+  getNodeIcon(node) {
+    const icons = {
+      'master': '🎯 ',
+      'chunkserver': '💾 ',
+      'client': '💻 ',
+      'rack': '🏢 ',
+      'switch': '🔌 ',
+      'note': '📝 '
+    };
+
+    return icons[node.type] || '';
+  }
+
+  getSequenceArrow(edge) {
+    const arrows = {
+      'control': '->>',
+      'data': '-->>',
+      'cache': '-.>>',
+      'heartbeat': '->>'
+    };
+
+    return arrows[edge.kind] || '->>';
+  }
+
+  getFlowArrow(edge) {
+    const arrows = {
+      'control': '-->',
+      'data': '==>',
+      'cache': '-.->',
+      'heartbeat': '-.->',
+      'bidirectional': '<-->'
+    };
+
+    return arrows[edge.kind] || '-->';
+  }
+
+  formatEdgeLabel(edge) {
+    const parts = [];
+
+    // Add kind indicator
+    const kindEmoji = {
+      'control': '⚡',
+      'data': '📦',
+      'cache': '💾',
+      'heartbeat': '💓'
+    };
+
+    if (kindEmoji[edge.kind]) {
+      parts.push(kindEmoji[edge.kind]);
+    }
+
+    parts.push(edge.label || '');
+
+    // Add metrics if available
+    if (edge.metrics) {
+      const metrics = [];
+      if (edge.metrics.size) metrics.push(edge.metrics.size);
+      if (edge.metrics.latency) metrics.push(edge.metrics.latency);
+      if (edge.metrics.throughput) metrics.push(`@${edge.metrics.throughput}`);
+
+      if (metrics.length > 0) {
+        parts.push(`[${metrics.join(', ')}]`);
+      }
+    }
+
+    return parts.filter(Boolean).join(' ');
+  }
+
+  formatFlowchartEdgeLabel(edge) {
+    // Simplified label format for flowcharts (no emojis, no special chars)
+    // Only use basic text to avoid Mermaid parsing conflicts
+    // Remove or escape problematic characters: parentheses, pipes, brackets
+    const label = edge.label || '';
+    return label
+      .replace(/\(/g, '')  // Remove opening parentheses
+      .replace(/\)/g, '')  // Remove closing parentheses
+      .replace(/\|/g, '')  // Remove pipe characters
+      .replace(/\[/g, '')  // Remove brackets
+      .replace(/\]/g, '')
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim();
+  }
+
+  groupEdgesByPhase(edges) {
+    const phases = new Map([['default', []]]);
+
+    for (const edge of edges) {
+      const phase = edge.phase || 'default';
+      if (!phases.has(phase)) {
+        phases.set(phase, []);
+      }
+      phases.get(phase).push(edge);
+    }
+
+    return phases;
+  }
+
+  groupNodesByRack(nodes) {
+    const racks = new Map([['default', []]]);
+
+    for (const node of nodes) {
+      const rack = node.rack || 'default';
+      if (!racks.has(rack)) {
+        racks.set(rack, []);
+      }
+      racks.get(rack).push(node);
+    }
+
+    return racks;
+  }
+
+  getPhaseColor(phaseName) {
+    const colors = {
+      'setup': '200,200,255,0.2',
+      'execution': '200,255,200,0.2',
+      'cleanup': '255,200,200,0.2',
+      'error': '255,100,100,0.3'
+    };
+
+    return colors[phaseName] || '200,200,200,0.2';
+  }
+
+  postProcess(container, spec) {
+    // Add tooltips
+    this.addTooltips(container, spec);
+
+    // Add accessibility attributes
+    this.addAccessibility(container, spec);
+
+    // Add click handlers if needed
+    this.addInteractivity(container, spec);
+  }
+
+  addTooltips(container, spec) {
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    // Add tooltips to edges
+    for (const edge of spec.edges || []) {
+      const edgeElements = svg.querySelectorAll(`[id*="${edge.id}"]`);
+      edgeElements.forEach(el => {
+        const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        const details = [
+          edge.label,
+          `Type: ${edge.kind}`,
+          edge.metrics?.size && `Size: ${edge.metrics.size}`,
+          edge.metrics?.latency && `Latency: ${edge.metrics.latency}`,
+          edge.metrics?.throughput && `Throughput: ${edge.metrics.throughput}`
+        ].filter(Boolean).join('\n');
+
+        title.textContent = details;
+        el.appendChild(title);
+      });
+    }
+  }
+
+  addAccessibility(container, spec) {
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    // Add ARIA labels
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', spec.title || 'System Architecture Diagram');
+
+    // Add descriptions for screen readers
+    const desc = document.createElementNS('http://www.w3.org/2000/svg', 'desc');
+    desc.textContent = this.generateTextDescription(spec);
+    svg.insertBefore(desc, svg.firstChild);
+  }
+
+  generateTextDescription(spec) {
+    const nodes = spec.nodes || [];
+    const edges = spec.edges || [];
+
+    return `This diagram shows ${nodes.length} components connected by ${edges.length} relationships. ` +
+           `Components include ${nodes.map(n => n.label).join(', ')}. ` +
+           `The system demonstrates ${spec.title || 'distributed system architecture'}.`;
+  }
+
+  addInteractivity(container, spec) {
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    // Add click handlers to nodes
+    for (const node of spec.nodes || []) {
+      const nodeElements = svg.querySelectorAll(`[id*="${node.id}"]`);
+      nodeElements.forEach(el => {
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', () => {
+          this.onNodeClick(node);
+        });
+      });
+    }
+  }
+
+  onNodeClick(node) {
+    // Emit custom event that the viewer can handle
+    const event = new CustomEvent('nodeClick', {
+      detail: { node }
+    });
+    document.dispatchEvent(event);
+  }
+}
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = MermaidRenderer;
+} else {
+  window.MermaidRenderer = MermaidRenderer;
+}
+
+// Module: src/learning/drills.js
+class ProgressTracker {
+  constructor() {
+    this.storageKey = 'gfs-learning-progress';
+    this.progress = this.loadProgress();
+  }
+
+  loadProgress() {
+    try {
+      const saved = localStorage.getItem(this.storageKey);
+      return saved ? JSON.parse(saved) : {};
+    } catch (error) {
+      console.error('Failed to load progress:', error);
+      return {};
+    }
+  }
+
+  saveProgress() {
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+    }
+  }
+
+  isDrillComplete(diagramId, drillId) {
+    return this.progress[`${diagramId}-${drillId}`]?.completed || false;
+  }
+
+  markDrillComplete(diagramId, drillId) {
+    this.progress[`${diagramId}-${drillId}`] = {
+      completed: true,
+      timestamp: Date.now()
+    };
+    this.saveProgress();
+  }
+
+  getDiagramProgress(diagramId) {
+    const prefix = `${diagramId}-`;
+    const completed = Object.keys(this.progress).filter(key =>
+      key.startsWith(prefix) && this.progress[key].completed
+    ).length;
+
+    return { completed };
+  }
+
+  resetProgress(diagramId = null) {
+    if (diagramId) {
+      const prefix = `${diagramId}-`;
+      Object.keys(this.progress).forEach(key => {
+        if (key.startsWith(prefix)) {
+          delete this.progress[key];
+        }
+      });
+    } else {
+      this.progress = {};
+    }
+    this.saveProgress();
+  }
+}
+
+class DrillSystem {
+  constructor() {
+    this.progress = new ProgressTracker();
+    this.currentDrill = null;
+    this.currentDiagramId = null;
+    this.stateManager = null;
+    this.stateDrills = new Map(); // Maps state IDs to relevant drills
+  }
+
+  // Set reference to state manager for state-aware drills
+  setStateManager(stateManager) {
+    this.stateManager = stateManager;
+
+    // Listen for state changes to highlight relevant drills
+    if (this.stateManager) {
+      document.addEventListener('stateChange', (e) => {
+        this.onStateChange(e.detail);
+      });
+    }
+  }
+
+  // Handle state changes - highlight drills relevant to current state
+  onStateChange(stateDetail) {
+    const currentState = stateDetail.state;
+    if (!currentState) return;
+
+    // Update drill visibility based on state
+    const drillElements = document.querySelectorAll('.drill');
+    drillElements.forEach(element => {
+      const drillId = element.dataset.drillId;
+      const stateId = element.dataset.stateId;
+
+      // Highlight drills associated with current state
+      if (stateId && stateId === currentState.id) {
+        element.classList.add('state-relevant');
+      } else {
+        element.classList.remove('state-relevant');
+      }
+    });
+  }
+
+  renderDrills(spec, containerId = 'drills-container') {
+    const container = document.getElementById(containerId);
+    if (!container) {
+      console.warn('Drills container not found');
+      return;
+    }
+
+    this.currentDiagramId = spec.id;
+    container.innerHTML = '';
+
+    const drills = spec.drills || [];
+    if (drills.length === 0) {
+      container.innerHTML = '<div class="no-drills">No drills available for this diagram</div>';
+      return;
+    }
+
+    // Add progress header
+    const progressHeader = this.createProgressHeader(spec.id, drills.length);
+    container.appendChild(progressHeader);
+
+    // Group drills by type
+    const drillsByType = this.groupDrillsByType(drills);
+
+    for (const [type, typeDrills] of Object.entries(drillsByType)) {
+      const section = this.createDrillSection(type, typeDrills, spec.id);
+      container.appendChild(section);
+    }
+  }
+
+  createProgressHeader(diagramId, totalDrills) {
+    const progress = this.progress.getDiagramProgress(diagramId);
+    const percentage = totalDrills > 0 ? Math.round((progress.completed / totalDrills) * 100) : 0;
+
+    const header = document.createElement('div');
+    header.className = 'drills-progress';
+    header.innerHTML = `
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: ${percentage}%"></div>
+      </div>
+      <div class="progress-text">${progress.completed} of ${totalDrills} completed (${percentage}%)</div>
+      <button class="reset-btn" onclick="window.viewer.drillSystem.resetDiagramProgress()">Reset Progress</button>
+    `;
+
+    return header;
+  }
+
+  groupDrillsByType(drills) {
+    const grouped = {};
+    for (const drill of drills) {
+      const type = drill.type || 'recall';
+      if (!grouped[type]) {
+        grouped[type] = [];
+      }
+      grouped[type].push(drill);
+    }
+    return grouped;
+  }
+
+  createDrillSection(type, drills, diagramId) {
+    const section = document.createElement('section');
+    section.className = `drill-section drill-${type}`;
+
+    const header = document.createElement('h3');
+    header.textContent = this.getDrillTypeLabel(type);
+    header.innerHTML += ` <span class="drill-count">(${drills.length})</span>`;
+    section.appendChild(header);
+
+    const description = document.createElement('p');
+    description.className = 'drill-type-description';
+    description.textContent = this.getDrillTypeDescription(type);
+    section.appendChild(description);
+
+    drills.forEach((drill, index) => {
+      const drillEl = this.createDrillElement(drill, diagramId, index);
+      section.appendChild(drillEl);
+    });
+
+    return section;
+  }
+
+  getDrillTypeLabel(type) {
+    const labels = {
+      'recall': '🧠 Recall',
+      'apply': '⚡ Apply',
+      'analyze': '🔍 Analyze',
+      'create': '🛠️ Create'
+    };
+    return labels[type] || type;
+  }
+
+  getDrillTypeDescription(type) {
+    const descriptions = {
+      'recall': 'Test your memory of key concepts',
+      'apply': 'Apply concepts to new scenarios',
+      'analyze': 'Compare and contrast different approaches',
+      'create': 'Design new solutions using learned principles'
+    };
+    return descriptions[type] || '';
+  }
+
+  createDrillElement(drill, diagramId, index) {
+    const completed = this.progress.isDrillComplete(diagramId, drill.id);
+
+    const element = document.createElement('details');
+    element.className = `drill ${completed ? 'completed' : ''}`;
+    element.dataset.drillId = drill.id;
+
+    const summary = document.createElement('summary');
+    summary.innerHTML = `
+      <span class="drill-indicator">${completed ? '✓' : '○'}</span>
+      <span class="drill-prompt">${drill.prompt}</span>
+      <span class="drill-type-badge">${drill.type}</span>
+    `;
+    element.appendChild(summary);
+
+    const content = document.createElement('div');
+    content.className = 'drill-content';
+    content.innerHTML = this.renderDrillInterface(drill);
+    element.appendChild(content);
+
+    // Add event listener for opening
+    element.addEventListener('toggle', () => {
+      if (element.open) {
+        this.currentDrill = drill;
+      }
+    });
+
+    return element;
+  }
+
+  renderDrillInterface(drill) {
+    switch (drill.type) {
+      case 'recall':
+        return this.renderRecallDrill(drill);
+      case 'apply':
+        return this.renderApplyDrill(drill);
+      case 'analyze':
+        return this.renderAnalyzeDrill(drill);
+      case 'create':
+        return this.renderCreateDrill(drill);
+      default:
+        return this.renderRecallDrill(drill);
+    }
+  }
+
+  renderRecallDrill(drill) {
+    return `
+      <div class="drill-recall">
+        <div class="drill-question">
+          ${drill.prompt}
+        </div>
+        <textarea
+          id="answer-${drill.id}"
+          placeholder="Enter your answer here..."
+          rows="3"
+          class="drill-answer"
+        ></textarea>
+        <div class="drill-actions">
+          <button onclick="window.viewer.drillSystem.checkRecall('${drill.id}')">
+            Check Answer
+          </button>
+          <button onclick="window.viewer.drillSystem.revealAnswer('${drill.id}')" class="secondary">
+            Show Answer
+          </button>
+        </div>
+        <div id="feedback-${drill.id}" class="drill-feedback" style="display:none">
+          <div class="correct-answer">
+            <strong>Answer:</strong> ${drill.answer || 'No answer provided'}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  renderApplyDrill(drill) {
+    return `
+      <div class="drill-apply">
+        ${drill.scenario ? `
+          <div class="scenario">
+            <strong>Scenario:</strong> ${drill.scenario}
+          </div>
+        ` : ''}
+        <textarea
+          id="solution-${drill.id}"
+          placeholder="Apply the concept to solve this problem..."
+          rows="5"
+          class="drill-solution"
+        ></textarea>
+        <div class="drill-actions">
+          <button onclick="window.viewer.drillSystem.checkApply('${drill.id}')">
+            Check Approach
+          </button>
+          <button onclick="window.viewer.drillSystem.revealRubric('${drill.id}')" class="secondary">
+            Show Rubric
+          </button>
+        </div>
+        <div id="rubric-${drill.id}" class="drill-rubric" style="display:none">
+          <h4>Key Points to Consider:</h4>
+          <ul>
+            ${(drill.rubric || []).map(point =>
+              `<li>
+                <input type="checkbox" id="rubric-${drill.id}-${point.substring(0, 10)}">
+                <label for="rubric-${drill.id}-${point.substring(0, 10)}">${point}</label>
+              </li>`
+            ).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  renderAnalyzeDrill(drill) {
+    return `
+      <div class="drill-analyze">
+        <div class="analysis-grid">
+          <div class="analysis-section">
+            <h4>Similarities</h4>
+            <textarea
+              id="similarities-${drill.id}"
+              placeholder="What are the similarities?"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="analysis-section">
+            <h4>Differences</h4>
+            <textarea
+              id="differences-${drill.id}"
+              placeholder="What are the differences?"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="analysis-section">
+            <h4>Trade-offs</h4>
+            <textarea
+              id="tradeoffs-${drill.id}"
+              placeholder="What are the trade-offs?"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+        <div class="drill-actions">
+          <button onclick="window.viewer.drillSystem.checkAnalysis('${drill.id}')">
+            Check Analysis
+          </button>
+          <button onclick="window.viewer.drillSystem.revealAnalysis('${drill.id}')" class="secondary">
+            Show Analysis Points
+          </button>
+        </div>
+        <div id="analysis-${drill.id}" class="drill-analysis" style="display:none">
+          <h4>Analysis Framework:</h4>
+          <ul>
+            ${(drill.rubric || []).map(point => `<li>${point}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  renderCreateDrill(drill) {
+    return `
+      <div class="drill-create">
+        <div class="create-prompt">
+          ${drill.prompt}
+        </div>
+        <textarea
+          id="design-${drill.id}"
+          placeholder="Design your solution here..."
+          rows="8"
+          class="drill-design"
+        ></textarea>
+        <div class="drill-actions">
+          <button onclick="window.viewer.drillSystem.evaluateDesign('${drill.id}')">
+            Self-Evaluate
+          </button>
+          <button onclick="window.viewer.drillSystem.showDesignCriteria('${drill.id}')" class="secondary">
+            Show Design Criteria
+          </button>
+        </div>
+        <div id="criteria-${drill.id}" class="drill-criteria" style="display:none">
+          <h4>Design Criteria:</h4>
+          <ul>
+            ${(drill.rubric || []).map(criterion =>
+              `<li>
+                <input type="checkbox" id="criteria-${drill.id}-${criterion.substring(0, 10)}">
+                <label for="criteria-${drill.id}-${criterion.substring(0, 10)}">${criterion}</label>
+              </li>`
+            ).join('')}
+          </ul>
+          <button onclick="window.viewer.drillSystem.markComplete('${drill.id}')" class="primary">
+            Mark as Complete
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Drill interaction methods
+  checkRecall(drillId) {
+    const answer = document.getElementById(`answer-${drillId}`).value;
+    const feedback = document.getElementById(`feedback-${drillId}`);
+
+    if (!answer.trim()) {
+      alert('Please enter an answer');
+      return;
+    }
+
+    feedback.style.display = 'block';
+    this.progress.markDrillComplete(this.currentDiagramId, drillId);
+    this.updateDrillStatus(drillId);
+  }
+
+  revealAnswer(drillId) {
+    const feedback = document.getElementById(`feedback-${drillId}`);
+    feedback.style.display = 'block';
+  }
+
+  checkApply(drillId) {
+    const solution = document.getElementById(`solution-${drillId}`).value;
+
+    if (!solution.trim()) {
+      alert('Please enter your solution');
+      return;
+    }
+
+    this.revealRubric(drillId);
+    this.progress.markDrillComplete(this.currentDiagramId, drillId);
+    this.updateDrillStatus(drillId);
+  }
+
+  revealRubric(drillId) {
+    const rubric = document.getElementById(`rubric-${drillId}`);
+    rubric.style.display = 'block';
+  }
+
+  checkAnalysis(drillId) {
+    const similarities = document.getElementById(`similarities-${drillId}`).value;
+    const differences = document.getElementById(`differences-${drillId}`).value;
+    const tradeoffs = document.getElementById(`tradeoffs-${drillId}`).value;
+
+    if (!similarities.trim() || !differences.trim() || !tradeoffs.trim()) {
+      alert('Please complete all three analysis sections');
+      return;
+    }
+
+    this.revealAnalysis(drillId);
+    this.progress.markDrillComplete(this.currentDiagramId, drillId);
+    this.updateDrillStatus(drillId);
+  }
+
+  revealAnalysis(drillId) {
+    const analysis = document.getElementById(`analysis-${drillId}`);
+    analysis.style.display = 'block';
+  }
+
+  evaluateDesign(drillId) {
+    const design = document.getElementById(`design-${drillId}`).value;
+
+    if (!design.trim()) {
+      alert('Please enter your design');
+      return;
+    }
+
+    this.showDesignCriteria(drillId);
+  }
+
+  showDesignCriteria(drillId) {
+    const criteria = document.getElementById(`criteria-${drillId}`);
+    criteria.style.display = 'block';
+  }
+
+  markComplete(drillId) {
+    this.progress.markDrillComplete(this.currentDiagramId, drillId);
+    this.updateDrillStatus(drillId);
+
+    // Check if all drills for current state are complete and auto-advance
+    if (this.stateManager && this.shouldAdvanceState()) {
+      setTimeout(() => {
+        this.stateManager.next();
+      }, 1500); // Small delay to let user see completion
+    }
+
+    alert('Well done! Design drill marked as complete.');
+  }
+
+  // Check if we should advance to next state based on drill completion
+  shouldAdvanceState() {
+    const currentState = this.stateManager.getCurrentState();
+    if (!currentState) return false;
+
+    // Get all drills associated with current state
+    const stateDrills = document.querySelectorAll(`.drill[data-state-id="${currentState.id}"]`);
+    if (stateDrills.length === 0) return false;
+
+    // Check if all state drills are complete
+    for (const drill of stateDrills) {
+      if (!drill.classList.contains('completed')) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  updateDrillStatus(drillId) {
+    const drillElement = document.querySelector(`[data-drill-id="${drillId}"]`);
+    if (drillElement) {
+      drillElement.classList.add('completed');
+      const indicator = drillElement.querySelector('.drill-indicator');
+      if (indicator) {
+        indicator.textContent = '✓';
+      }
+    }
+
+    // Refresh progress header
+    const spec = { id: this.currentDiagramId, drills: [] };
+    const drillElements = document.querySelectorAll('.drill');
+    spec.drills = Array.from(drillElements).map(el => ({ id: el.dataset.drillId }));
+
+    const container = document.getElementById('drills-container');
+    const oldHeader = container.querySelector('.drills-progress');
+    const newHeader = this.createProgressHeader(this.currentDiagramId, spec.drills.length);
+
+    if (oldHeader) {
+      container.replaceChild(newHeader, oldHeader);
+    }
+  }
+
+  resetDiagramProgress() {
+    if (confirm('Are you sure you want to reset your progress for this diagram?')) {
+      this.progress.resetProgress(this.currentDiagramId);
+      location.reload(); // Simple refresh to reset UI
+    }
+  }
+}
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { DrillSystem, ProgressTracker };
+} else {
+  window.DrillSystem = DrillSystem;
+  window.ProgressTracker = ProgressTracker;
+}
+
+// Module: src/learning/progress.js
+class LearningProgress {
+  constructor() {
+    this.storageKey = 'gfs-learning-overall-progress';
+    this.sessionKey = 'gfs-learning-session';
+    this.data = this.load();
+    this.session = this.loadSession();
+    this.initSession();
+  }
+
+  load() {
+    try {
+      const saved = localStorage.getItem(this.storageKey);
+      return saved ? JSON.parse(saved) : {
+        diagrams: {},
+        achievements: [],
+        totalTime: 0,
+        startDate: Date.now(),
+        lastActive: Date.now()
+      };
+    } catch (error) {
+      console.error('Failed to load progress:', error);
+      return this.getDefaultData();
+    }
+  }
+
+  loadSession() {
+    try {
+      const saved = sessionStorage.getItem(this.sessionKey);
+      return saved ? JSON.parse(saved) : this.getDefaultSession();
+    } catch (error) {
+      return this.getDefaultSession();
+    }
+  }
+
+  getDefaultData() {
+    return {
+      diagrams: {},
+      achievements: [],
+      totalTime: 0,
+      startDate: Date.now(),
+      lastActive: Date.now()
+    };
+  }
+
+  getDefaultSession() {
+    return {
+      startTime: Date.now(),
+      diagramsViewed: [],
+      drillsCompleted: 0,
+      stepsViewed: 0
+    };
+  }
+
+  initSession() {
+    // Track page visibility for accurate time tracking
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.pauseSession();
+      } else {
+        this.resumeSession();
+      }
+    });
+
+    // Save on page unload
+    window.addEventListener('beforeunload', () => {
+      this.saveSession();
+      this.save();
+    });
+
+    // Auto-save every minute
+    setInterval(() => {
+      this.save();
+    }, 60000);
+  }
+
+  save() {
+    try {
+      this.data.lastActive = Date.now();
+      localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+    }
+  }
+
+  saveSession() {
+    try {
+      sessionStorage.setItem(this.sessionKey, JSON.stringify(this.session));
+    } catch (error) {
+      console.error('Failed to save session:', error);
+    }
+  }
+
+  pauseSession() {
+    if (this.session.pauseTime) return;
+    this.session.pauseTime = Date.now();
+  }
+
+  resumeSession() {
+    if (!this.session.pauseTime) return;
+    const pauseDuration = Date.now() - this.session.pauseTime;
+    this.session.startTime += pauseDuration; // Adjust start time to exclude pause
+    delete this.session.pauseTime;
+  }
+
+  // Diagram progress tracking
+  markDiagramViewed(diagramId) {
+    if (!this.data.diagrams[diagramId]) {
+      this.data.diagrams[diagramId] = {
+        firstViewed: Date.now(),
+        lastViewed: Date.now(),
+        viewCount: 0,
+        timeSpent: 0,
+        drillsCompleted: 0,
+        totalDrills: 0,
+        stepsCompleted: 0,
+        totalSteps: 0
+      };
+    }
+
+    this.data.diagrams[diagramId].viewCount++;
+    this.data.diagrams[diagramId].lastViewed = Date.now();
+
+    if (!this.session.diagramsViewed.includes(diagramId)) {
+      this.session.diagramsViewed.push(diagramId);
+    }
+
+    this.save();
+  }
+
+  updateDiagramTime(diagramId, seconds) {
+    if (!this.data.diagrams[diagramId]) {
+      this.markDiagramViewed(diagramId);
+    }
+
+    this.data.diagrams[diagramId].timeSpent += seconds;
+    this.data.totalTime += seconds;
+    this.save();
+  }
+
+  updateDrillProgress(diagramId, completed, total) {
+    if (!this.data.diagrams[diagramId]) {
+      this.markDiagramViewed(diagramId);
+    }
+
+    this.data.diagrams[diagramId].drillsCompleted = completed;
+    this.data.diagrams[diagramId].totalDrills = total;
+
+    // Check for achievements
+    this.checkDrillAchievements(diagramId, completed, total);
+
+    this.save();
+  }
+
+  updateStepProgress(diagramId, currentStep, totalSteps) {
+    if (!this.data.diagrams[diagramId]) {
+      this.markDiagramViewed(diagramId);
+    }
+
+    this.data.diagrams[diagramId].stepsCompleted = Math.max(
+      currentStep,
+      this.data.diagrams[diagramId].stepsCompleted || 0
+    );
+    this.data.diagrams[diagramId].totalSteps = totalSteps;
+
+    this.session.stepsViewed++;
+    this.saveSession();
+    this.save();
+  }
+
+  // Achievement system
+  checkDrillAchievements(diagramId, completed, total) {
+    const achievements = [];
+
+    // First drill completed
+    if (completed === 1 && !this.hasAchievement('first-drill')) {
+      achievements.push({
+        id: 'first-drill',
+        title: 'First Steps',
+        description: 'Completed your first drill',
+        icon: '🎯',
+        timestamp: Date.now()
+      });
+    }
+
+    // Complete all drills for a diagram
+    if (completed === total && total > 0 && !this.hasAchievement(`master-${diagramId}`)) {
+      achievements.push({
+        id: `master-${diagramId}`,
+        title: 'Diagram Master',
+        description: `Completed all drills for ${diagramId}`,
+        icon: '🏆',
+        timestamp: Date.now()
+      });
+    }
+
+    // Speed learner (complete 5 drills in one session)
+    if (this.session.drillsCompleted >= 5 && !this.hasAchievement('speed-learner')) {
+      achievements.push({
+        id: 'speed-learner',
+        title: 'Speed Learner',
+        description: 'Completed 5 drills in one session',
+        icon: '⚡',
+        timestamp: Date.now()
+      });
+    }
+
+    // Add new achievements
+    achievements.forEach(achievement => {
+      this.addAchievement(achievement);
+    });
+
+    return achievements;
+  }
+
+  hasAchievement(id) {
+    return this.data.achievements.some(a => a.id === id);
+  }
+
+  addAchievement(achievement) {
+    if (!this.hasAchievement(achievement.id)) {
+      this.data.achievements.push(achievement);
+      this.save();
+      this.notifyAchievement(achievement);
+    }
+  }
+
+  notifyAchievement(achievement) {
+    // Emit event for UI to handle
+    const event = new CustomEvent('achievement', {
+      detail: achievement
+    });
+    document.dispatchEvent(event);
+  }
+
+  // Statistics and reporting
+  getOverallProgress() {
+    const stats = {
+      totalDiagrams: 0,
+      completedDiagrams: 0,
+      totalDrills: 0,
+      completedDrills: 0,
+      totalTime: this.data.totalTime,
+      achievements: this.data.achievements.length,
+      daysActive: this.getDaysActive()
+    };
+
+    Object.values(this.data.diagrams).forEach(diagram => {
+      stats.totalDiagrams++;
+      stats.totalDrills += diagram.totalDrills || 0;
+      stats.completedDrills += diagram.drillsCompleted || 0;
+
+      if (diagram.totalDrills > 0 && diagram.drillsCompleted === diagram.totalDrills) {
+        stats.completedDiagrams++;
+      }
+    });
+
+    stats.completionPercentage = stats.totalDrills > 0
+      ? Math.round((stats.completedDrills / stats.totalDrills) * 100)
+      : 0;
+
+    return stats;
+  }
+
+  getDiagramStats(diagramId) {
+    const diagram = this.data.diagrams[diagramId] || {
+      viewCount: 0,
+      timeSpent: 0,
+      drillsCompleted: 0,
+      totalDrills: 0,
+      stepsCompleted: 0,
+      totalSteps: 0
+    };
+
+    return {
+      ...diagram,
+      completionPercentage: diagram.totalDrills > 0
+        ? Math.round((diagram.drillsCompleted / diagram.totalDrills) * 100)
+        : 0,
+      formattedTime: this.formatTime(diagram.timeSpent)
+    };
+  }
+
+  getSessionStats() {
+    const duration = Date.now() - this.session.startTime;
+
+    return {
+      duration: this.formatTime(Math.floor(duration / 1000)),
+      diagramsViewed: this.session.diagramsViewed.length,
+      drillsCompleted: this.session.drillsCompleted,
+      stepsViewed: this.session.stepsViewed
+    };
+  }
+
+  getDaysActive() {
+    const daysSinceStart = Math.floor((Date.now() - this.data.startDate) / (1000 * 60 * 60 * 24));
+    return Math.max(1, daysSinceStart);
+  }
+
+  formatTime(seconds) {
+    if (seconds < 60) {
+      return `${seconds}s`;
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}m ${remainingSeconds}s`;
+    } else {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return `${hours}h ${minutes}m`;
+    }
+  }
+
+  // Export/Import functionality
+  exportProgress() {
+    return {
+      version: '1.0',
+      exportDate: Date.now(),
+      data: this.data
+    };
+  }
+
+  importProgress(exportedData) {
+    if (exportedData.version === '1.0' && exportedData.data) {
+      this.data = exportedData.data;
+      this.save();
+      return true;
+    }
+    return false;
+  }
+
+  // Reset functionality
+  resetDiagram(diagramId) {
+    if (this.data.diagrams[diagramId]) {
+      delete this.data.diagrams[diagramId];
+      this.save();
+    }
+  }
+
+  resetAll() {
+    if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+      this.data = this.getDefaultData();
+      this.session = this.getDefaultSession();
+      this.save();
+      this.saveSession();
+      location.reload();
+    }
+  }
+
+  // Learning path recommendations
+  getRecommendations() {
+    const recommendations = [];
+    const stats = this.getOverallProgress();
+
+    // Suggest unviewed diagrams
+    const allDiagramIds = [
+      '00-legend', '01-triangle', '02-scale', '03-chunk-size',
+      '04-architecture', '05-planes', '06-read-path', '07-write-path',
+      '08-lease', '09-consistency', '10-recovery', '11-evolution', '12-dna'
+    ];
+
+    const unviewed = allDiagramIds.filter(id => !this.data.diagrams[id]);
+    if (unviewed.length > 0) {
+      recommendations.push({
+        type: 'explore',
+        title: 'Explore New Diagrams',
+        description: `You have ${unviewed.length} diagrams yet to explore`,
+        action: 'view',
+        target: unviewed[0]
+      });
+    }
+
+    // Suggest incomplete drills
+    const incomplete = Object.entries(this.data.diagrams)
+      .filter(([id, data]) => data.totalDrills > data.drillsCompleted)
+      .map(([id, data]) => ({
+        id,
+        remaining: data.totalDrills - data.drillsCompleted
+      }));
+
+    if (incomplete.length > 0) {
+      const next = incomplete[0];
+      recommendations.push({
+        type: 'practice',
+        title: 'Complete Drills',
+        description: `${next.remaining} drills remaining in ${next.id}`,
+        action: 'drill',
+        target: next.id
+      });
+    }
+
+    // Suggest review based on time
+    const oldestViewed = Object.entries(this.data.diagrams)
+      .sort(([, a], [, b]) => a.lastViewed - b.lastViewed)
+      .slice(0, 3);
+
+    if (oldestViewed.length > 0) {
+      const [id, data] = oldestViewed[0];
+      const daysSince = Math.floor((Date.now() - data.lastViewed) / (1000 * 60 * 60 * 24));
+
+      if (daysSince > 7) {
+        recommendations.push({
+          type: 'review',
+          title: 'Time for Review',
+          description: `Review ${id} (last viewed ${daysSince} days ago)`,
+          action: 'review',
+          target: id
+        });
+      }
+    }
+
+    return recommendations;
+  }
+}
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = LearningProgress;
+} else {
+  window.LearningProgress = LearningProgress;
+}
+
+// Module: src/learning/stepper.js
+class StepThroughEngine {
+  constructor(renderer, composer) {
+    this.renderer = renderer;
+    this.composer = composer;
+    this.currentStep = 0;
+    this.steps = [];
+    this.spec = null;
+    this.isPlaying = false;
+    this.playInterval = null;
+    this.playSpeed = 2000; // milliseconds between steps
+  }
+
+  initialize(spec) {
+    this.spec = spec;
+    this.steps = this.buildSteps(spec);
+    this.currentStep = 0;
+    this.isPlaying = false;
+    this.stopAutoPlay();
+  }
+
+  buildSteps(spec) {
+    const steps = [];
+
+    // Start with empty state if applicable
+    if (spec.layout?.type === 'sequence' || spec.layout?.type === 'flow') {
+      steps.push({
+        type: 'initial',
+        index: -1,
+        caption: 'Initial state - no operations yet',
+        spec: {
+          ...spec,
+          nodes: spec.nodes || [],
+          edges: []
+        }
+      });
+    }
+
+    // For sequence diagrams, each edge is a step
+    if (spec.layout?.type === 'sequence') {
+      (spec.edges || []).forEach((edge, index) => {
+        steps.push({
+          type: 'edge',
+          index,
+          edgeId: edge.id,
+          caption: this.generateStepCaption(edge, spec),
+          focus: [edge.from, edge.to],
+          spec: {
+            ...spec,
+            edges: spec.edges.slice(0, index + 1).map((e, i) => ({
+              ...e,
+              _highlighted: i === index,
+              _current: i === index
+            }))
+          }
+        });
+      });
+    }
+
+    // For flow diagrams with scenes
+    if (spec.scenes && spec.scenes.length > 0) {
+      spec.scenes.forEach((scene, index) => {
+        const composedSpec = this.composer.composeScene(spec, scene.overlays || []);
+        steps.push({
+          type: 'scene',
+          index,
+          sceneId: scene.id,
+          caption: scene.narrative || scene.name,
+          overlays: scene.overlays || [],
+          spec: composedSpec
+        });
+      });
+    }
+
+    // For state diagrams, show state transitions
+    if (spec.layout?.type === 'state') {
+      // Show initial state
+      steps.push({
+        type: 'state',
+        index: 0,
+        caption: 'Initial state',
+        spec: {
+          ...spec,
+          edges: []
+        }
+      });
+
+      // Show each transition
+      (spec.edges || []).forEach((edge, index) => {
+        const edgesSoFar = spec.edges.slice(0, index + 1);
+        steps.push({
+          type: 'transition',
+          index: index + 1,
+          edgeId: edge.id,
+          caption: `Transition: ${edge.label || `${edge.from} → ${edge.to}`}`,
+          spec: {
+            ...spec,
+            edges: edgesSoFar.map((e, i) => ({
+              ...e,
+              _highlighted: i === index
+            }))
+          }
+        });
+      });
+    }
+
+    // Add final step if we have steps
+    if (steps.length > 0) {
+      steps.push({
+        type: 'final',
+        index: steps.length,
+        caption: 'Complete flow',
+        spec: spec
+      });
+    }
+
+    return steps;
+  }
+
+  generateStepCaption(edge, spec) {
+    const fromNode = spec.nodes?.find(n => n.id === edge.from);
+    const toNode = spec.nodes?.find(n => n.id === edge.to);
+
+    const verbMap = {
+      'control': 'requests',
+      'data': 'transfers',
+      'cache': 'caches',
+      'heartbeat': 'heartbeats to'
+    };
+
+    const verb = verbMap[edge.kind] || 'sends to';
+    const fromLabel = fromNode?.label || edge.from;
+    const toLabel = toNode?.label || edge.to;
+
+    let caption = `${fromLabel} ${verb} ${toLabel}`;
+
+    if (edge.label) {
+      caption = `${fromLabel}: ${edge.label}`;
+    }
+
+    // Add metrics if available
+    if (edge.metrics) {
+      const metrics = [];
+      if (edge.metrics.size) metrics.push(edge.metrics.size);
+      if (edge.metrics.latency) metrics.push(edge.metrics.latency);
+      if (metrics.length > 0) {
+        caption += ` (${metrics.join(', ')})`;
+      }
+    }
+
+    return caption;
+  }
+
+  async renderStep(stepIndex) {
+    if (stepIndex < 0 || stepIndex >= this.steps.length) {
+      return;
+    }
+
+    this.currentStep = stepIndex;
+    const step = this.steps[stepIndex];
+
+    // Render the diagram for this step
+    await this.renderer.render(step.spec);
+
+    // Update UI controls
+    this.updateStepUI(step, stepIndex);
+
+    // Emit event for other components
+    this.emitStepChange(step, stepIndex);
+  }
+
+  updateStepUI(step, index) {
+    // Update caption
+    const captionEl = document.getElementById('step-caption');
+    if (captionEl) {
+      captionEl.textContent = step.caption;
+    }
+
+    // Update progress
+    const progressEl = document.getElementById('step-progress');
+    if (progressEl) {
+      progressEl.textContent = `Step ${index + 1} of ${this.steps.length}`;
+    }
+
+    // Update progress bar
+    const progressBar = document.getElementById('step-progress-bar');
+    if (progressBar) {
+      const percentage = ((index + 1) / this.steps.length) * 100;
+      progressBar.style.width = `${percentage}%`;
+    }
+
+    // Update buttons
+    const prevBtn = document.getElementById('step-prev');
+    const nextBtn = document.getElementById('step-next');
+    const playBtn = document.getElementById('step-play');
+
+    if (prevBtn) {
+      prevBtn.disabled = index === 0;
+    }
+
+    if (nextBtn) {
+      nextBtn.disabled = index === this.steps.length - 1;
+    }
+
+    if (playBtn) {
+      playBtn.textContent = this.isPlaying ? '⏸ Pause' : '▶ Play';
+      playBtn.disabled = index === this.steps.length - 1 && !this.isPlaying;
+    }
+
+    // Update step list if present
+    this.updateStepList(index);
+
+    // Highlight focused elements if specified
+    if (step.focus) {
+      this.highlightElements(step.focus);
+    }
+  }
+
+  updateStepList(currentIndex) {
+    const stepList = document.getElementById('step-list');
+    if (!stepList) return;
+
+    stepList.innerHTML = '';
+
+    this.steps.forEach((step, index) => {
+      const li = document.createElement('li');
+      li.className = 'step-item';
+      if (index === currentIndex) {
+        li.classList.add('current');
+      }
+      if (index < currentIndex) {
+        li.classList.add('completed');
+      }
+
+      const button = document.createElement('button');
+      button.className = 'step-button';
+      button.innerHTML = `
+        <span class="step-number">${index + 1}</span>
+        <span class="step-text">${step.caption}</span>
+      `;
+      button.onclick = () => this.goToStep(index);
+
+      li.appendChild(button);
+      stepList.appendChild(li);
+    });
+  }
+
+  highlightElements(elementIds) {
+    // Remove previous highlights
+    document.querySelectorAll('.step-highlight').forEach(el => {
+      el.classList.remove('step-highlight');
+    });
+
+    // Add new highlights
+    elementIds.forEach(id => {
+      const elements = document.querySelectorAll(`[id*="${id}"]`);
+      elements.forEach(el => {
+        el.classList.add('step-highlight');
+      });
+    });
+  }
+
+  emitStepChange(step, index) {
+    const event = new CustomEvent('stepChange', {
+      detail: {
+        step,
+        index,
+        total: this.steps.length,
+        isFirst: index === 0,
+        isLast: index === this.steps.length - 1
+      }
+    });
+    document.dispatchEvent(event);
+  }
+
+  // Navigation methods
+  async next() {
+    if (this.currentStep < this.steps.length - 1) {
+      await this.renderStep(this.currentStep + 1);
+    } else if (this.isPlaying) {
+      this.stopAutoPlay();
+    }
+  }
+
+  async prev() {
+    if (this.currentStep > 0) {
+      await this.renderStep(this.currentStep - 1);
+    }
+  }
+
+  async goToStep(index) {
+    if (index >= 0 && index < this.steps.length) {
+      await this.renderStep(index);
+    }
+  }
+
+  async first() {
+    await this.renderStep(0);
+  }
+
+  async last() {
+    await this.renderStep(this.steps.length - 1);
+  }
+
+  // Auto-play functionality
+  toggleAutoPlay() {
+    if (this.isPlaying) {
+      this.stopAutoPlay();
+    } else {
+      this.startAutoPlay();
+    }
+  }
+
+  startAutoPlay() {
+    if (this.currentStep >= this.steps.length - 1) {
+      // Reset to beginning if at end
+      this.goToStep(0);
+    }
+
+    this.isPlaying = true;
+    this.updatePlayButton();
+
+    this.playInterval = setInterval(async () => {
+      await this.next();
+      if (this.currentStep >= this.steps.length - 1) {
+        this.stopAutoPlay();
+      }
+    }, this.playSpeed);
+  }
+
+  stopAutoPlay() {
+    this.isPlaying = false;
+    if (this.playInterval) {
+      clearInterval(this.playInterval);
+      this.playInterval = null;
+    }
+    this.updatePlayButton();
+  }
+
+  updatePlayButton() {
+    const playBtn = document.getElementById('step-play');
+    if (playBtn) {
+      playBtn.textContent = this.isPlaying ? '⏸ Pause' : '▶ Play';
+    }
+  }
+
+  setPlaySpeed(speed) {
+    this.playSpeed = speed;
+    if (this.isPlaying) {
+      this.stopAutoPlay();
+      this.startAutoPlay();
+    }
+  }
+
+  // Utility methods
+  getCurrentStep() {
+    return this.steps[this.currentStep];
+  }
+
+  getStepCount() {
+    return this.steps.length;
+  }
+
+  getCurrentIndex() {
+    return this.currentStep;
+  }
+
+  // Export steps for external use
+  exportSteps() {
+    return this.steps.map((step, index) => ({
+      index,
+      type: step.type,
+      caption: step.caption,
+      isCurrent: index === this.currentStep
+    }));
+  }
+
+  // Reset to initial state
+  reset() {
+    this.stopAutoPlay();
+    this.currentStep = 0;
+    if (this.steps.length > 0) {
+      this.renderStep(0);
+    }
+  }
+}
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = StepThroughEngine;
+} else {
+  window.StepThroughEngine = StepThroughEngine;
+}
+
+// Module: src/ui/export.js
+class ExportManager {
+  constructor(viewer) {
+    this.viewer = viewer;
+  }
+
+  showExportDialog() {
+    const modal = document.createElement('div');
+    modal.className = 'modal export-modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Export Diagram</h2>
+          <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="export-options">
+            <button class="export-option" onclick="viewer.exportManager.exportSVG()">
+              <span class="export-icon">🖼️</span>
+              <span class="export-label">Export as SVG</span>
+              <span class="export-desc">Vector image for presentations</span>
+            </button>
+            <button class="export-option" onclick="viewer.exportManager.exportPNG()">
+              <span class="export-icon">📷</span>
+              <span class="export-label">Export as PNG</span>
+              <span class="export-desc">Image for documents</span>
+            </button>
+            <button class="export-option" onclick="viewer.exportManager.exportJSON()">
+              <span class="export-icon">📄</span>
+              <span class="export-label">Export as JSON</span>
+              <span class="export-desc">Raw specification data</span>
+            </button>
+            <button class="export-option" onclick="viewer.exportManager.exportMermaid()">
+              <span class="export-icon">📝</span>
+              <span class="export-label">Export Mermaid Code</span>
+              <span class="export-desc">Editable diagram source</span>
+            </button>
+            <button class="export-option" onclick="viewer.exportManager.exportProgress()">
+              <span class="export-icon">📊</span>
+              <span class="export-label">Export Progress</span>
+              <span class="export-desc">Backup learning progress</span>
+            </button>
+            <button class="export-option" onclick="viewer.exportManager.printDiagram()">
+              <span class="export-icon">🖨️</span>
+              <span class="export-label">Print Diagram</span>
+              <span class="export-desc">Send to printer or PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+  }
+
+  exportSVG() {
+    const svg = document.querySelector('#diagram-container svg');
+    if (!svg) {
+      alert('No diagram to export');
+      return;
+    }
+
+    // Clone and prepare SVG
+    const svgClone = svg.cloneNode(true);
+    this.addSVGStyles(svgClone);
+
+    // Add title and metadata
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    title.textContent = this.viewer.currentSpec.title || 'GFS Diagram';
+    svgClone.insertBefore(title, svgClone.firstChild);
+
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgClone);
+
+    // Create blob and download
+    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    this.downloadBlob(blob, `${this.viewer.currentDiagramId}.svg`);
+
+    // Close modal
+    this.closeModal();
+  }
+
+  exportPNG() {
+    const svg = document.querySelector('#diagram-container svg');
+    if (!svg) {
+      alert('No diagram to export');
+      return;
+    }
+
+    // Get SVG dimensions
+    const bbox = svg.getBBox();
+    const width = bbox.width + bbox.x * 2;
+    const height = bbox.height + bbox.y * 2;
+
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    const scale = 2; // Higher resolution
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+
+    // Set white background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, width, height);
+
+    // Convert SVG to data URL
+    const svgClone = svg.cloneNode(true);
+    this.addSVGStyles(svgClone);
+
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgClone);
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+
+    // Create image and draw to canvas
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(svgUrl);
+
+      // Export canvas as PNG
+      canvas.toBlob((blob) => {
+        this.downloadBlob(blob, `${this.viewer.currentDiagramId}.png`);
+        this.closeModal();
+      }, 'image/png');
+    };
+
+    img.src = svgUrl;
+  }
+
+  exportJSON() {
+    if (!this.viewer.currentSpec) {
+      alert('No diagram to export');
+      return;
+    }
+
+    // Include current state
+    const exportData = {
+      ...this.viewer.currentSpec,
+      _export: {
+        timestamp: Date.now(),
+        version: '1.0',
+        activeOverlays: Array.from(this.viewer.currentOverlays)
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json;charset=utf-8'
+    });
+
+    this.downloadBlob(blob, `${this.viewer.currentDiagramId}.json`);
+    this.closeModal();
+  }
+
+  exportMermaid() {
+    if (!this.viewer.currentSpec) {
+      alert('No diagram to export');
+      return;
+    }
+
+    // Generate Mermaid code
+    const composed = this.viewer.composer.composeScene(
+      this.viewer.currentSpec,
+      Array.from(this.viewer.currentOverlays)
+    );
+
+    const mermaidCode = this.viewer.renderer.generateMermaidCode(composed);
+
+    // Add header comment
+    const exportContent = `# ${this.viewer.currentSpec.title}
+# Generated: ${new Date().toISOString()}
+# Overlays: ${Array.from(this.viewer.currentOverlays).join(', ') || 'none'}
+
+${mermaidCode}`;
+
+    const blob = new Blob([exportContent], {
+      type: 'text/plain;charset=utf-8'
+    });
+
+    this.downloadBlob(blob, `${this.viewer.currentDiagramId}.mmd`);
+    this.closeModal();
+  }
+
+  exportProgress() {
+    const progressData = this.viewer.learningProgress.exportProgress();
+    const blob = new Blob([JSON.stringify(progressData, null, 2)], {
+      type: 'application/json;charset=utf-8'
+    });
+
+    const date = new Date().toISOString().split('T')[0];
+    this.downloadBlob(blob, `gfs-progress-${date}.json`);
+    this.closeModal();
+  }
+
+  printDiagram() {
+    // Create print-specific styles
+    const printStyles = `
+      @media print {
+        body > *:not(.print-content) {
+          display: none !important;
+        }
+        .print-content {
+          display: block !important;
+          padding: 20px;
+        }
+        .print-header {
+          margin-bottom: 20px;
+          border-bottom: 2px solid #333;
+          padding-bottom: 10px;
+        }
+        .print-diagram {
+          max-width: 100%;
+          page-break-inside: avoid;
+        }
+        .print-contracts {
+          margin-top: 20px;
+          page-break-inside: avoid;
+        }
+        .print-contracts h3 {
+          margin-top: 15px;
+        }
+        .print-contracts ul {
+          margin-left: 20px;
+        }
+      }
+    `;
+
+    // Add print styles to head
+    const styleEl = document.createElement('style');
+    styleEl.textContent = printStyles;
+    document.head.appendChild(styleEl);
+
+    // Create print content
+    const printContent = document.createElement('div');
+    printContent.className = 'print-content';
+    printContent.style.display = 'none';
+
+    // Add header
+    const header = document.createElement('div');
+    header.className = 'print-header';
+    header.innerHTML = `
+      <h1>${this.viewer.currentSpec.title}</h1>
+      <p>GFS Visual Learning System - ${new Date().toLocaleDateString()}</p>
+    `;
+    printContent.appendChild(header);
+
+    // Add diagram
+    const diagramContainer = document.createElement('div');
+    diagramContainer.className = 'print-diagram';
+    const svg = document.querySelector('#diagram-container svg');
+    if (svg) {
+      diagramContainer.appendChild(svg.cloneNode(true));
+    }
+    printContent.appendChild(diagramContainer);
+
+    // Add contracts if available
+    if (this.viewer.currentSpec.contracts) {
+      const contracts = document.createElement('div');
+      contracts.className = 'print-contracts';
+      contracts.innerHTML = `
+        <h2>System Contracts</h2>
+        ${this.viewer.currentSpec.contracts.invariants?.length > 0 ? `
+          <div>
+            <h3>Invariants</h3>
+            <ul>
+              ${this.viewer.currentSpec.contracts.invariants.map(i => `<li>${i}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        ${this.viewer.currentSpec.contracts.guarantees?.length > 0 ? `
+          <div>
+            <h3>Guarantees</h3>
+            <ul>
+              ${this.viewer.currentSpec.contracts.guarantees.map(g => `<li>${g}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        ${this.viewer.currentSpec.contracts.caveats?.length > 0 ? `
+          <div>
+            <h3>Caveats</h3>
+            <ul>
+              ${this.viewer.currentSpec.contracts.caveats.map(c => `<li>${c}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+      `;
+      printContent.appendChild(contracts);
+    }
+
+    // Add to body
+    document.body.appendChild(printContent);
+
+    // Print
+    window.print();
+
+    // Clean up
+    setTimeout(() => {
+      printContent.remove();
+      styleEl.remove();
+    }, 1000);
+
+    this.closeModal();
+  }
+
+  addSVGStyles(svg) {
+    // Embed styles directly in SVG for standalone export
+    const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.textContent = `
+      text {
+        font-family: 'Trebuchet MS', Arial, sans-serif;
+        font-size: 14px;
+      }
+      .node rect {
+        stroke-width: 2px;
+      }
+      .edgeLabel {
+        background-color: white;
+        padding: 2px 4px;
+      }
+      .highlight {
+        fill: #FFD700 !important;
+        stroke: #B8860B !important;
+        stroke-width: 4px !important;
+      }
+    `;
+    svg.insertBefore(style, svg.firstChild);
+
+    // Set viewBox if not present
+    if (!svg.getAttribute('viewBox')) {
+      const bbox = svg.getBBox();
+      svg.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+    }
+
+    // Set dimensions
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+  }
+
+  downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  closeModal() {
+    const modal = document.querySelector('.export-modal');
+    if (modal) {
+      modal.remove();
+    }
+  }
+
+  // Import functionality
+  showImportDialog() {
+    const modal = document.createElement('div');
+    modal.className = 'modal import-modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Import Data</h2>
+          <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="import-section">
+            <h3>Import Progress Data</h3>
+            <p>Restore your learning progress from a backup file.</p>
+            <input type="file" id="import-progress" accept=".json">
+            <button onclick="viewer.exportManager.importProgressFile()">Import Progress</button>
+          </div>
+          <div class="import-section">
+            <h3>Import Custom Diagram</h3>
+            <p>Load a custom diagram specification.</p>
+            <input type="file" id="import-diagram" accept=".json">
+            <button onclick="viewer.exportManager.importDiagramFile()">Import Diagram</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+  }
+
+  async importProgressFile() {
+    const input = document.getElementById('import-progress');
+    if (!input.files[0]) {
+      alert('Please select a file');
+      return;
+    }
+
+    try {
+      const text = await input.files[0].text();
+      const data = JSON.parse(text);
+
+      if (this.viewer.learningProgress.importProgress(data)) {
+        alert('Progress imported successfully!');
+        location.reload();
+      } else {
+        alert('Invalid progress file');
+      }
+    } catch (error) {
+      alert('Failed to import progress: ' + error.message);
+    }
+  }
+
+  async importDiagramFile() {
+    const input = document.getElementById('import-diagram');
+    if (!input.files[0]) {
+      alert('Please select a file');
+      return;
+    }
+
+    try {
+      const text = await input.files[0].text();
+      const spec = JSON.parse(text);
+
+      // Validate the spec
+      this.viewer.validator.validateSpec(spec);
+
+      // Load the diagram
+      this.viewer.currentSpec = spec;
+      this.viewer.currentDiagramId = spec.id || 'custom';
+
+      // Apply saved overlays if present
+      if (spec._export?.activeOverlays) {
+        this.viewer.currentOverlays = new Set(spec._export.activeOverlays);
+      }
+
+      // Render
+      await this.viewer.renderDiagram();
+      this.viewer.renderNarrative(spec);
+      this.viewer.renderContracts(spec);
+      this.viewer.drillSystem.renderDrills(spec);
+
+      alert('Diagram imported successfully!');
+      this.closeModal();
+    } catch (error) {
+      alert('Failed to import diagram: ' + error.message);
+    }
+  }
+}
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = ExportManager;
+} else {
+  window.ExportManager = ExportManager;
+}
+
+// Module: src/ui/overlays.js
+class OverlayManager {
+  constructor(viewer) {
+    this.viewer = viewer;
+    this.activeOverlays = new Set();
+  }
+
+  renderOverlayChips(spec) {
+    const container = document.getElementById('overlay-chips');
+    if (!container) return;
+
+    const overlays = spec.overlays || [];
+
+    if (overlays.length === 0) {
+      container.innerHTML = '<div class="no-overlays">No overlays available</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+
+    // Add header
+    const header = document.createElement('div');
+    header.className = 'overlays-header';
+    header.innerHTML = `
+      <h3>Overlays</h3>
+      <button class="clear-overlays" onclick="viewer.overlayManager.clearAll()">Clear All</button>
+    `;
+    container.appendChild(header);
+
+    // Add overlay chips
+    const chipsContainer = document.createElement('div');
+    chipsContainer.className = 'chips-container';
+
+    overlays.forEach((overlay, index) => {
+      const chip = this.createOverlayChip(overlay, index);
+      chipsContainer.appendChild(chip);
+    });
+
+    container.appendChild(chipsContainer);
+
+    // Add scenes if available
+    if (spec.scenes && spec.scenes.length > 0) {
+      this.renderSceneButtons(spec.scenes, container);
+    }
+  }
+
+  createOverlayChip(overlay, index) {
+    const chip = document.createElement('button');
+    chip.className = 'overlay-chip';
+    chip.dataset.overlayId = overlay.id;
+    chip.dataset.index = index;
+
+    const isActive = this.activeOverlays.has(overlay.id);
+    if (isActive) {
+      chip.classList.add('active');
+    }
+
+    chip.innerHTML = `
+      <span class="chip-number">${index + 1}</span>
+      <span class="chip-label">${overlay.caption}</span>
+      <span class="chip-indicator">${isActive ? '✓' : '○'}</span>
+    `;
+
+    chip.onclick = () => this.toggleOverlay(overlay.id);
+
+    // Add tooltip
+    chip.title = `Press ${index + 1} to toggle`;
+
+    return chip;
+  }
+
+  renderSceneButtons(scenes, container) {
+    const scenesSection = document.createElement('div');
+    scenesSection.className = 'scenes-section';
+    scenesSection.innerHTML = '<h4>Scenes</h4>';
+
+    const scenesGrid = document.createElement('div');
+    scenesGrid.className = 'scenes-grid';
+
+    scenes.forEach(scene => {
+      const button = document.createElement('button');
+      button.className = 'scene-button';
+      button.innerHTML = `
+        <span class="scene-name">${scene.name}</span>
+        ${scene.overlays?.length > 0 ?
+          `<span class="scene-overlays">${scene.overlays.length} overlays</span>` : ''}
+      `;
+
+      button.onclick = () => this.applyScene(scene);
+      scenesGrid.appendChild(button);
+    });
+
+    scenesSection.appendChild(scenesGrid);
+    container.appendChild(scenesSection);
+  }
+
+  toggleOverlay(overlayId) {
+    if (this.activeOverlays.has(overlayId)) {
+      this.activeOverlays.delete(overlayId);
+    } else {
+      this.activeOverlays.add(overlayId);
+    }
+
+    this.updateUI();
+    this.emitChange();
+  }
+
+  toggleOverlayByIndex(index) {
+    const chip = document.querySelector(`.overlay-chip[data-index="${index}"]`);
+    if (chip) {
+      const overlayId = chip.dataset.overlayId;
+      this.toggleOverlay(overlayId);
+    }
+  }
+
+  applyScene(scene) {
+    // Clear current overlays
+    this.activeOverlays.clear();
+
+    // Apply scene overlays
+    if (scene.overlays) {
+      scene.overlays.forEach(overlayId => {
+        this.activeOverlays.add(overlayId);
+      });
+    }
+
+    this.updateUI();
+    this.emitChange();
+
+    // Show scene narrative if available
+    if (scene.narrative) {
+      this.showSceneNarrative(scene);
+    }
+  }
+
+  showSceneNarrative(scene) {
+    const narrativeEl = document.getElementById('narrative-panel');
+    if (narrativeEl) {
+      narrativeEl.innerHTML = `
+        <div class="scene-narrative">
+          <h4>📖 ${scene.name}</h4>
+          <p>${scene.narrative}</p>
+        </div>
+      `;
+
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        if (narrativeEl.querySelector('.scene-narrative')) {
+          this.viewer.renderNarrative(this.viewer.currentSpec);
+        }
+      }, 5000);
+    }
+  }
+
+  clearAll() {
+    this.activeOverlays.clear();
+    this.updateUI();
+    this.emitChange();
+  }
+
+  updateUI() {
+    // Update all chip states
+    document.querySelectorAll('.overlay-chip').forEach(chip => {
+      const overlayId = chip.dataset.overlayId;
+      const isActive = this.activeOverlays.has(overlayId);
+
+      chip.classList.toggle('active', isActive);
+      chip.querySelector('.chip-indicator').textContent = isActive ? '✓' : '○';
+    });
+
+    // Update clear button
+    const clearBtn = document.querySelector('.clear-overlays');
+    if (clearBtn) {
+      clearBtn.disabled = this.activeOverlays.size === 0;
+    }
+  }
+
+  emitChange() {
+    const event = new CustomEvent('overlayToggle', {
+      detail: {
+        activeOverlays: Array.from(this.activeOverlays)
+      }
+    });
+    document.dispatchEvent(event);
+  }
+
+  // Get current state for export
+  getState() {
+    return {
+      activeOverlays: Array.from(this.activeOverlays)
+    };
+  }
+
+  // Restore state from import
+  setState(state) {
+    if (state && state.activeOverlays) {
+      this.activeOverlays = new Set(state.activeOverlays);
+      this.updateUI();
+      this.emitChange();
+    }
+  }
+}
+
+// Export for module systems, or make global
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = OverlayManager;
+} else {
+  window.OverlayManager = OverlayManager;
+}
+
+// Module: src/ui/viewer.js
+class GFSViewer {
+  constructor() {
+    this.validator = null;
+    this.renderer = null;
+    this.composer = null;
+    this.drillSystem = null;
+    this.stepper = null;
+    this.overlayManager = null;
+    this.exportManager = null;
+    this.learningProgress = null;
+
+    this.currentSpec = null;
+    this.currentDiagramId = null;
+    this.currentOverlays = new Set();
+    this.manifest = null;
+  }
+
+  async initialize() {
+    try {
+      // Show loading indicator
+      this.showLoading(true);
+
+      // Initialize all components
+      this.validator = new DiagramValidator();
+      await this.validator.initialize();
+
+      this.renderer = new MermaidRenderer();
+      await this.renderer.initialize();
+
+      this.composer = new SceneComposer();
+      this.drillSystem = new DrillSystem();
+      this.stepper = new StepThroughEngine(this.renderer, this.composer);
+      this.overlayManager = new OverlayManager(this);
+      this.exportManager = new ExportManager(this);
+      this.learningProgress = new LearningProgress();
+
+      // Load manifest
+      await this.loadManifest();
+
+      // Setup UI components
+      this.setupEventListeners();
+      this.setupKeyboardShortcuts();
+      this.setupTheme();
+
+      // Load initial diagram from URL or default
+      const params = new URLSearchParams(location.search);
+      const diagramId = params.get('d') || '00-legend';
+      await this.loadDiagram(diagramId);
+
+      // Show achievement notifications
+      this.setupAchievementListener();
+
+      this.showLoading(false);
+    } catch (error) {
+      console.error('Failed to initialize viewer:', error);
+      this.handleError(error);
+    }
+  }
+
+  async loadManifest() {
+    try {
+      const response = await fetch('data/manifest.json');
+      if (!response.ok) {
+        throw new Error('Failed to load manifest');
+      }
+      this.manifest = await response.json();
+      this.renderNavigation();
+    } catch (error) {
+      console.warn('Manifest not found, using defaults');
+      this.manifest = {
+        diagrams: [
+          { id: '00-legend', title: 'Master Legend & System Contracts' },
+          { id: '01-triangle', title: 'The Impossible Triangle' },
+          { id: '02-scale', title: 'Scale Reality Dashboard' },
+          { id: '03-chunk-size', title: 'The 64MB Decision Tree' },
+          { id: '04-architecture', title: 'Complete Architecture' },
+          { id: '05-planes', title: 'Control vs Data Plane' },
+          { id: '06-read-path', title: 'Read Path with Cache' },
+          { id: '07-write-path', title: 'Write Path Ballet' },
+          { id: '08-lease', title: 'Lease State Machine' },
+          { id: '09-consistency', title: 'Consistency Reality' },
+          { id: '10-recovery', title: 'Failure Recovery Matrix' },
+          { id: '11-evolution', title: 'Single Master Evolution' },
+          { id: '12-dna', title: 'GFS DNA in Modern Systems' }
+        ]
+      };
+      this.renderNavigation();
+    }
+  }
+
+  async loadDiagram(diagramId) {
+    try {
+      // Track diagram view
+      this.learningProgress.markDiagramViewed(diagramId);
+
+      // Show loading
+      this.showDiagramLoading(true);
+
+      // Load spec
+      const response = await fetch(`data/specs/${diagramId}.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load diagram ${diagramId}`);
+      }
+
+      const spec = await response.json();
+
+      // Validate spec
+      try {
+        this.validator.validateSpec(spec);
+      } catch (validationError) {
+        console.warn('Validation warning:', validationError);
+        // Continue anyway for development
+      }
+
+      // Store current state
+      this.currentSpec = spec;
+      this.currentDiagramId = diagramId;
+      this.currentOverlays.clear();
+
+      // Update UI components
+      this.updateNavigation(diagramId);
+      this.updateTitle(spec.title);
+      this.renderNarrative(spec);
+      this.renderContracts(spec);
+
+      // Render the main diagram
+      await this.renderDiagram();
+
+      // Initialize learning components
+      this.renderFirstPrinciples(spec);
+      this.renderAssessment(spec);
+      this.drillSystem.renderDrills(spec);
+      this.overlayManager.renderOverlayChips(spec);
+      this.stepper.initialize(spec);
+
+      // Update step controls
+      this.renderStepControls();
+
+      // Update URL
+      this.updateURL(diagramId);
+
+      // Update progress stats
+      this.updateProgressDisplay();
+
+      this.showDiagramLoading(false);
+    } catch (error) {
+      console.error('Failed to load diagram:', error);
+      this.handleError(error);
+      this.showDiagramLoading(false);
+    }
+  }
+
+  async renderDiagram() {
+    try {
+      const composed = this.composer.composeScene(
+        this.currentSpec,
+        Array.from(this.currentOverlays)
+      );
+
+      await this.renderer.render(composed);
+    } catch (error) {
+      console.error('Failed to render diagram:', error);
+      this.handleError(error);
+    }
+  }
+
+  renderNavigation() {
+    const nav = document.getElementById('diagram-nav');
+    if (!nav) return;
+
+    nav.innerHTML = '';
+
+    // Add home button
+    const homeBtn = document.createElement('button');
+    homeBtn.className = 'nav-home';
+    homeBtn.innerHTML = '🏠 Home';
+    homeBtn.onclick = () => this.loadDiagram('00-legend');
+    nav.appendChild(homeBtn);
+
+    // Add diagram list
+    const list = document.createElement('div');
+    list.className = 'nav-list';
+
+    this.manifest.diagrams.forEach((diagram, index) => {
+      const item = document.createElement('button');
+      item.className = 'nav-item';
+      item.dataset.diagramId = diagram.id;
+
+      const progress = this.learningProgress.getDiagramStats(diagram.id);
+      const hasProgress = progress.viewCount > 0;
+
+      item.innerHTML = `
+        <span class="nav-number">${index}</span>
+        <span class="nav-title">${diagram.title}</span>
+        ${hasProgress ? `
+          <span class="nav-progress">${progress.completionPercentage}%</span>
+        ` : ''}
+      `;
+
+      item.onclick = () => this.loadDiagram(diagram.id);
+      list.appendChild(item);
+    });
+
+    nav.appendChild(list);
+
+    // Add navigation controls
+    const controls = document.createElement('div');
+    controls.className = 'nav-controls';
+    controls.innerHTML = `
+      <button id="nav-prev" title="Previous Diagram">⬅</button>
+      <span id="nav-current">1 / ${this.manifest.diagrams.length}</span>
+      <button id="nav-next" title="Next Diagram">➡</button>
+    `;
+    nav.appendChild(controls);
+
+    // Setup nav button handlers
+    document.getElementById('nav-prev').onclick = () => this.navigatePrev();
+    document.getElementById('nav-next').onclick = () => this.navigateNext();
+  }
+
+  updateNavigation(diagramId) {
+    // Update active state
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.diagramId === diagramId);
+    });
+
+    // Update nav controls
+    const currentIndex = this.manifest.diagrams.findIndex(d => d.id === diagramId);
+    const total = this.manifest.diagrams.length;
+
+    const prevBtn = document.getElementById('nav-prev');
+    const nextBtn = document.getElementById('nav-next');
+    const current = document.getElementById('nav-current');
+
+    if (prevBtn) prevBtn.disabled = currentIndex === 0;
+    if (nextBtn) nextBtn.disabled = currentIndex === total - 1;
+    if (current) current.textContent = `${currentIndex + 1} / ${total}`;
+  }
+
+  updateTitle(title) {
+    const titleEl = document.getElementById('diagram-title');
+    if (titleEl) {
+      titleEl.textContent = title;
+    }
+
+    // Update page title
+    document.title = `${title} - GFS Learning`;
+  }
+
+  renderNarrative(spec) {
+    const panel = document.getElementById('narrative-panel');
+    if (!panel) return;
+
+    const narrative = spec.narrative || spec.description || '';
+    const keyPoints = spec.keyPoints || [];
+
+    panel.innerHTML = `
+      ${narrative ? `<div class="narrative-text">${narrative}</div>` : ''}
+      ${keyPoints.length > 0 ? `
+        <div class="key-points">
+          <h4>Key Points</h4>
+          <ul>
+            ${keyPoints.map(point => `<li>${point}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+    `;
+  }
+
+  renderContracts(spec) {
+    const panel = document.getElementById('contracts-panel');
+    if (!panel || !spec.contracts) return;
+
+    panel.innerHTML = `
+      <div class="contracts">
+        ${spec.contracts.invariants?.length > 0 ? `
+          <section class="invariants">
+            <h4>🔒 System Invariants</h4>
+            <ul>
+              ${spec.contracts.invariants.map(i =>
+                `<li>${i}</li>`
+              ).join('')}
+            </ul>
+          </section>
+        ` : ''}
+
+        ${spec.contracts.guarantees?.length > 0 ? `
+          <section class="guarantees">
+            <h4>✅ Guarantees</h4>
+            <ul>
+              ${spec.contracts.guarantees.map(g =>
+                `<li class="guarantee">${g}</li>`
+              ).join('')}
+            </ul>
+          </section>
+        ` : ''}
+
+        ${spec.contracts.caveats?.length > 0 ? `
+          <section class="caveats">
+            <h4>⚠️ Caveats</h4>
+            <ul>
+              ${spec.contracts.caveats.map(c =>
+                `<li class="caveat">${c}</li>`
+              ).join('')}
+            </ul>
+          </section>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  renderFirstPrinciples(spec) {
+    const container = document.getElementById('principles-container');
+    if (!container || !spec.firstPrinciples) return;
+
+    const fp = spec.firstPrinciples;
+
+    container.innerHTML = `
+      <div class="principles-content">
+        ${fp.theoreticalFoundation ? `
+          <section class="principle-section">
+            <h3>🔬 Theoretical Foundation</h3>
+            <p>${fp.theoreticalFoundation}</p>
+          </section>
+        ` : ''}
+
+        ${fp.quantitativeAnalysis ? `
+          <section class="principle-section">
+            <h3>📊 Quantitative Analysis</h3>
+            <p>${fp.quantitativeAnalysis}</p>
+          </section>
+        ` : ''}
+
+        ${fp.derivedInvariants?.length > 0 ? `
+          <section class="principle-section">
+            <h3>🔒 Derived Invariants</h3>
+            <ul>
+              ${fp.derivedInvariants.map(inv => `<li>${inv}</li>`).join('')}
+            </ul>
+          </section>
+        ` : ''}
+
+        ${fp.keyInsights?.length > 0 ? `
+          <section class="principle-section">
+            <h3>💡 Key Insights</h3>
+            <ul>
+              ${fp.keyInsights.map(insight => `<li>${insight}</li>`).join('')}
+            </ul>
+          </section>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  renderAssessment(spec) {
+    const container = document.getElementById('assessment-container');
+    if (!container) return;
+
+    // For now, check if there are assessment questions in the spec
+    const hasAssessment = spec.assessment || spec.checkpoints || spec.questions;
+
+    if (!hasAssessment) {
+      container.innerHTML = '<div class="no-assessment">No assessment available for this diagram</div>';
+      return;
+    }
+
+    // Render assessment content
+    const assessment = spec.assessment || spec.checkpoints || spec.questions || [];
+
+    container.innerHTML = `
+      <div class="assessment-content">
+        ${Array.isArray(assessment) ?
+          assessment.map((item, index) => `
+            <div class="assessment-item">
+              <h4>Question ${index + 1}</h4>
+              <p>${item.question || item.text || item}</p>
+              ${item.answer ? `
+                <details class="answer-reveal">
+                  <summary>Show Answer</summary>
+                  <p>${item.answer}</p>
+                </details>
+              ` : ''}
+            </div>
+          `).join('')
+          :
+          `<div class="assessment-text">${assessment}</div>`
+        }
+      </div>
+    `;
+  }
+
+  renderStepControls() {
+    const controls = document.getElementById('step-controls');
+    if (!controls) return;
+
+    const stepCount = this.stepper.getStepCount();
+    const hasSteps = stepCount > 0;
+
+    controls.innerHTML = `
+      <div class="step-header">
+        <h3>Step-Through Mode</h3>
+        ${hasSteps ? `<span class="step-count">${stepCount} steps</span>` : ''}
+      </div>
+      ${hasSteps ? `
+        <div class="step-progress">
+          <div class="step-progress-bar-container">
+            <div id="step-progress-bar" class="step-progress-bar" style="width: 0%"></div>
+          </div>
+          <div id="step-progress" class="step-progress-text">Step 1 of ${stepCount}</div>
+        </div>
+        <div class="step-caption" id="step-caption">Click Play to start</div>
+        <div class="step-buttons">
+          <button id="step-first" onclick="viewer.stepper.first()" title="First">⏮</button>
+          <button id="step-prev" onclick="viewer.stepper.prev()" title="Previous">⏪</button>
+          <button id="step-play" onclick="viewer.stepper.toggleAutoPlay()" title="Play/Pause">▶</button>
+          <button id="step-next" onclick="viewer.stepper.next()" title="Next">⏩</button>
+          <button id="step-last" onclick="viewer.stepper.last()" title="Last">⏭</button>
+        </div>
+        <div class="step-speed">
+          <label>Speed:</label>
+          <input type="range" id="step-speed" min="500" max="5000" value="2000" step="500"
+                 onchange="viewer.stepper.setPlaySpeed(5500 - this.value)">
+          <span id="step-speed-label">2s</span>
+        </div>
+      ` : `
+        <div class="no-steps">No steps available for this diagram</div>
+      `}
+    `;
+
+    // Update speed label
+    const speedSlider = document.getElementById('step-speed');
+    const speedLabel = document.getElementById('step-speed-label');
+    if (speedSlider && speedLabel) {
+      speedSlider.addEventListener('input', (e) => {
+        const seconds = (5500 - e.target.value) / 1000;
+        speedLabel.textContent = `${seconds}s`;
+      });
+    }
+  }
+
+  updateProgressDisplay() {
+    const stats = this.learningProgress.getOverallProgress();
+    const diagramStats = this.learningProgress.getDiagramStats(this.currentDiagramId);
+
+    const progressEl = document.getElementById('progress-summary');
+    if (progressEl) {
+      progressEl.innerHTML = `
+        <div class="progress-item">
+          <span class="progress-label">Overall:</span>
+          <span class="progress-value">${stats.completionPercentage}%</span>
+        </div>
+        <div class="progress-item">
+          <span class="progress-label">This Diagram:</span>
+          <span class="progress-value">${diagramStats.completionPercentage}%</span>
+        </div>
+        <div class="progress-item">
+          <span class="progress-label">Time Spent:</span>
+          <span class="progress-value">${diagramStats.formattedTime}</span>
+        </div>
+      `;
+    }
   }
 
   setupEventListeners() {
-    // Navigation
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        const diagramId = item.dataset.diagram;
-        if (diagramId) {
-          this.loadDiagram(diagramId);
+    // Setup tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Remove active class from all tabs and content
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        // Add active class to clicked tab and corresponding content
+        e.target.classList.add('active');
+        const tabName = e.target.dataset.tab;
+
+        if (tabName === 'principles') {
+          document.getElementById('principles-container')?.classList.add('active');
+        } else if (tabName === 'practice') {
+          document.getElementById('practice-container')?.classList.add('active');
         }
       });
+    });
+
+    // Listen for overlay changes
+    document.addEventListener('overlayToggle', (e) => {
+      this.currentOverlays = new Set(e.detail.activeOverlays);
+      this.renderDiagram();
+    });
+
+    // Listen for step changes
+    document.addEventListener('stepChange', (e) => {
+      this.learningProgress.updateStepProgress(
+        this.currentDiagramId,
+        e.detail.index,
+        e.detail.total
+      );
+    });
+
+    // Listen for drill completion
+    document.addEventListener('drillComplete', (e) => {
+      const drills = this.currentSpec.drills || [];
+      const completed = drills.filter(d =>
+        this.drillSystem.progress.isDrillComplete(this.currentDiagramId, d.id)
+      ).length;
+
+      this.learningProgress.updateDrillProgress(
+        this.currentDiagramId,
+        completed,
+        drills.length
+      );
     });
 
     // Theme toggle
@@ -80,519 +5326,281 @@ class GFSViewer {
       themeToggle.addEventListener('click', () => this.toggleTheme());
     }
 
+    // Export button
+    const exportBtn = document.getElementById('export-btn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => this.exportManager.showExportDialog());
+    }
+
     // Help button
     const helpBtn = document.getElementById('help-btn');
     if (helpBtn) {
       helpBtn.addEventListener('click', () => this.showHelp());
     }
+  }
 
-    // Export button
-    const exportBtn = document.getElementById('export-btn');
-    if (exportBtn) {
-      exportBtn.addEventListener('click', () => this.exportManager.showExportModal());
-    }
-
-    // Tab switching
-    document.querySelectorAll('[data-tab]').forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        const tabName = e.target.dataset.tab;
-        this.switchTab(tabName);
-      });
-    });
-
-    // Keyboard shortcuts
+  setupKeyboardShortcuts() {
     document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        switch (e.key) {
-          case 'e':
-            e.preventDefault();
-            this.exportManager.showExportModal();
-            break;
-          case 'h':
-            e.preventDefault();
-            this.showHelp();
-            break;
-          case 'd':
-            e.preventDefault();
-            this.toggleTheme();
-            break;
+      // Prevent shortcuts when typing in inputs
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      // Number keys toggle overlays
+      if (e.key >= '1' && e.key <= '9' && !e.ctrlKey && !e.altKey) {
+        const index = parseInt(e.key) - 1;
+        this.overlayManager.toggleOverlayByIndex(index);
+      }
+
+      // Navigation
+      if (e.key === 'ArrowLeft' && !e.shiftKey) {
+        if (e.ctrlKey) {
+          this.navigatePrev();
+        } else {
+          this.stepper.prev();
+        }
+      } else if (e.key === 'ArrowRight' && !e.shiftKey) {
+        if (e.ctrlKey) {
+          this.navigateNext();
+        } else {
+          this.stepper.next();
         }
       }
-    });
-  }
 
-  async loadDiagram(diagramId, spec = null) {
-    try {
-      console.log(`📊 Loading diagram: ${diagramId}`);
-
-      // Check cache first
-      if (!spec && this.diagramCache.has(diagramId)) {
-        spec = this.diagramCache.get(diagramId);
+      // Space for play/pause
+      if (e.key === ' ' && !e.shiftKey && !e.ctrlKey) {
+        e.preventDefault();
+        this.stepper.toggleAutoPlay();
       }
 
-      // Load spec if not provided
-      if (!spec) {
-        const response = await fetch(`/data/specs/${diagramId}.json`);
-        if (!response.ok) {
-          throw new Error(`Failed to load diagram: ${response.statusText}`);
-        }
-        spec = await response.json();
-        this.diagramCache.set(diagramId, spec);
+      // L for legend
+      if (e.key === 'l' && !e.ctrlKey) {
+        this.loadDiagram('00-legend');
       }
 
-      // Validate spec
-      const validationResult = this.validator.validate(spec);
-      if (!validationResult.valid) {
-        console.warn('Validation warnings:', validationResult.warnings);
+      // ? for help
+      if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
+        this.showHelp();
       }
 
-      // Store current diagram info
-      this.currentDiagramId = diagramId;
-      this.currentSpec = spec;
-
-      // Update URL without reload
-      const url = new URL(window.location);
-      url.searchParams.set('d', diagramId);
-      window.history.pushState({}, '', url);
-
-      // Update UI
-      this.updateNavigation(diagramId);
-      await this.renderDiagram(spec);
-      this.renderNarrative(spec);
-      this.renderContracts(spec);
-      this.renderFirstPrinciples(spec);
-      this.renderPrerequisites(spec);
-      this.renderAssessments(spec);
-      this.renderCrystallizedInsight(spec);
-
-      // Initialize interactive components
-      if (spec.drills) {
-        this.drillSystem.renderDrills(spec);
+      // T for theme toggle
+      if (e.key === 't' && !e.ctrlKey) {
+        this.toggleTheme();
       }
 
-      if (spec.stepThrough && this.stepThrough) {
-        this.stepThrough.initialize(spec);
-        this.renderStepControls();
-      }
-
-      if (this.stateManager && spec.stateDescription) {
-        this.stateManager.initialize(spec.stateDescription);
-        this.renderStateControls();
-      }
-
-      console.log(`✅ Diagram loaded: ${diagramId}`);
-    } catch (error) {
-      console.error('❌ Failed to load diagram:', error);
-      this.showError(`Failed to load diagram: ${error.message}`);
-    }
-  }
-
-  async renderDiagram(spec) {
-    const container = document.getElementById('diagram-container');
-    if (!container) {
-      console.warn('Diagram container not found');
-      return;
-    }
-
-    container.innerHTML = '<div class="loading">Rendering diagram...</div>';
-
-    try {
-      if (spec.mermaid && typeof mermaid !== 'undefined') {
-        const { svg } = await mermaid.render('mermaid-diagram', spec.mermaid);
-        container.innerHTML = svg;
-      } else {
-        container.innerHTML = '<div class="no-diagram">No diagram available</div>';
-      }
-    } catch (error) {
-      console.error('Mermaid rendering error:', error);
-      container.innerHTML = `<div class="error">Failed to render diagram: ${error.message}</div>`;
-    }
-  }
-
-  renderNarrative(spec) {
-    const container = document.getElementById('narrative-container');
-    if (!container || !spec.narrative) return;
-
-    let html = '';
-    if (typeof spec.narrative === 'string') {
-      html = `<p>${spec.narrative}</p>`;
-    } else if (typeof spec.narrative === 'object') {
-      html = `
-        <div class="narrative-section">
-          <h3>Introduction</h3>
-          <p>${spec.narrative.introduction || ''}</p>
-        </div>
-        <div class="narrative-section">
-          <h3>What It Solves</h3>
-          <p>${spec.narrative.whatItSolves || ''}</p>
-        </div>
-        <div class="narrative-section">
-          <h3>How It Works</h3>
-          <p>${spec.narrative.howItWorks || ''}</p>
-        </div>
-      `;
-    }
-
-    container.innerHTML = html;
-  }
-
-  renderContracts(spec) {
-    const container = document.getElementById('contracts-container');
-    if (!container || !spec.contracts) return;
-
-    const contracts = spec.contracts;
-    let html = `
-      <div class="contract-section">
-        <p class="contract-description">${contracts.description || ''}</p>
-      </div>
-    `;
-
-    if (contracts.assumptions?.length > 0) {
-      html += `
-        <div class="contract-section">
-          <h4>Assumptions</h4>
-          <ul class="contract-list">
-            ${contracts.assumptions.map(a => `<li>${a}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-    }
-
-    if (contracts.invariants?.length > 0) {
-      html += `
-        <div class="contract-section">
-          <h4>Invariants</h4>
-          <ul class="contract-list">
-            ${contracts.invariants.map(i => `<li>${i}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-    }
-
-    if (contracts.postconditions?.length > 0) {
-      html += `
-        <div class="contract-section">
-          <h4>Postconditions</h4>
-          <ul class="contract-list">
-            ${contracts.postconditions.map(p => `<li>${p}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-    }
-
-    container.innerHTML = html;
-  }
-
-  renderFirstPrinciples(spec) {
-    const container = document.getElementById('principles-container');
-    if (!container || !spec.firstPrinciples) return;
-
-    let html = '';
-
-    // Render thinking steps
-    if (spec.firstPrinciples.thinking?.length > 0) {
-      html += '<div class="principles-section">';
-      spec.firstPrinciples.thinking.forEach(item => {
-        html += `
-          <div class="accordion-item">
-            <button class="accordion-header" onclick="this.classList.toggle('active'); this.nextElementSibling.classList.toggle('show')">
-              <span class="step-number">Step ${item.step}</span>
-              <span class="principle-title">${item.principle}</span>
-              <span class="accordion-icon">▼</span>
-            </button>
-            <div class="accordion-content">
-              <p>${item.explanation}</p>
-              ${item.details ? `<div class="principle-details">${item.details}</div>` : ''}
-            </div>
-          </div>
-        `;
-      });
-      html += '</div>';
-    }
-
-    // Render advanced concepts if present
-    if (spec.firstPrinciples.advanced?.length > 0) {
-      html += `
-        <div class="advanced-concepts">
-          <h4>Advanced Concepts</h4>
-          <div class="concepts-grid">
-            ${spec.firstPrinciples.advanced.map(concept => `
-              <div class="concept-card">
-                <h5>${concept.concept}</h5>
-                <p>${concept.explanation}</p>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    container.innerHTML = html;
-  }
-
-  renderPrerequisites(spec) {
-    const container = document.getElementById('prerequisites-container');
-    if (!container || !spec.prerequisites) return;
-
-    let html = '<ul class="prerequisites-list">';
-    spec.prerequisites.forEach(prereq => {
-      html += `<li>${prereq}</li>`;
-    });
-    html += '</ul>';
-
-    container.innerHTML = html;
-  }
-
-  renderAssessments(spec) {
-    const container = document.getElementById('assessment-container');
-    if (!container || !spec.assessments) return;
-
-    let html = '';
-
-    // Render conceptual questions
-    if (spec.assessments.conceptual?.length > 0) {
-      html += '<div class="assessment-section">';
-      html += '<h4>Conceptual Questions</h4>';
-      spec.assessments.conceptual.forEach((q, i) => {
-        html += `
-          <div class="assessment-item">
-            <div class="question">
-              <strong>Q${i + 1}:</strong> ${q.question}
-            </div>
-            <div class="answer hidden" id="answer-${i}">
-              <strong>A:</strong> ${q.answer}
-            </div>
-            <button class="reveal-btn" onclick="document.getElementById('answer-${i}').classList.toggle('hidden')">
-              Toggle Answer
-            </button>
-          </div>
-        `;
-      });
-      html += '</div>';
-    }
-
-    // Render practical scenarios
-    if (spec.assessments.practical?.length > 0) {
-      html += '<div class="assessment-section">';
-      html += '<h4>Practical Scenarios</h4>';
-      spec.assessments.practical.forEach((scenario, i) => {
-        html += `
-          <div class="scenario-item">
-            <h5>Scenario ${i + 1}: ${scenario.scenario}</h5>
-            <p class="task"><strong>Task:</strong> ${scenario.task}</p>
-            <div class="solution hidden" id="solution-${i}">
-              <strong>Solution:</strong> ${scenario.solution}
-            </div>
-            <button class="reveal-btn" onclick="document.getElementById('solution-${i}').classList.toggle('hidden')">
-              Toggle Solution
-            </button>
-          </div>
-        `;
-      });
-      html += '</div>';
-    }
-
-    container.innerHTML = html;
-  }
-
-  renderCrystallizedInsight(spec) {
-    const container = document.getElementById('insight-container');
-    if (!container || !spec.crystallizedInsight) return;
-
-    container.innerHTML = `
-      <div class="insight-box">
-        <div class="insight-icon">💎</div>
-        <div class="insight-content">
-          <p>${spec.crystallizedInsight}</p>
-        </div>
-      </div>
-    `;
-  }
-
-  renderStepControls() {
-    const container = document.getElementById('step-controls');
-    if (!container || !this.stepThrough) return;
-
-    const totalSteps = this.stepThrough.getTotalSteps();
-    if (totalSteps === 0) return;
-
-    container.innerHTML = `
-      <div class="step-controls-wrapper">
-        <div class="step-info">
-          <span id="step-counter">Step 1 of ${totalSteps}</span>
-          <span id="step-caption"></span>
-        </div>
-        <div class="step-buttons">
-          <button id="step-prev" onclick="viewer.stepThrough.previousStep()">Previous</button>
-          <button id="step-play" onclick="viewer.stepThrough.toggleAutoPlay()">Play</button>
-          <button id="step-next" onclick="viewer.stepThrough.nextStep()">Next</button>
-        </div>
-        <div class="step-progress-bar">
-          <div id="step-progress" class="step-progress-fill"></div>
-        </div>
-      </div>
-    `;
-
-    this.stepThrough.renderCurrentStep();
-  }
-
-  renderStateControls() {
-    const container = document.getElementById('state-controls');
-    if (!container || !this.stateManager) return;
-
-    const states = this.stateManager.getStates();
-    if (states.length === 0) return;
-
-    container.innerHTML = `
-      <div class="state-controls-wrapper">
-        <h4>System States</h4>
-        <div class="state-buttons">
-          ${states.map(state => `
-            <button class="state-btn" data-state="${state.id}"
-                    onclick="viewer.stateManager.setState('${state.id}')">
-              ${state.name}
-            </button>
-          `).join('')}
-        </div>
-        <div class="state-description" id="state-description"></div>
-      </div>
-    `;
-
-    // Set initial state
-    if (states.length > 0) {
-      this.stateManager.setState(states[0].id);
-    }
-  }
-
-  updateNavigation(activeId) {
-    document.querySelectorAll('.nav-item').forEach(item => {
-      if (item.dataset.diagram === activeId) {
-        item.classList.add('active');
-      } else {
-        item.classList.remove('active');
+      // E for export
+      if (e.key === 'e' && !e.ctrlKey) {
+        this.exportManager.showExportDialog();
       }
     });
   }
 
-  switchTab(tabName) {
-    // Update tab buttons
-    document.querySelectorAll('[data-tab]').forEach(tab => {
-      if (tab.dataset.tab === tabName) {
-        tab.classList.add('active');
-      } else {
-        tab.classList.remove('active');
-      }
-    });
-
-    // Update tab contents
-    document.querySelectorAll('.tab-content').forEach(content => {
-      if (content.id === `${tabName}-container`) {
-        content.classList.add('active');
-        content.style.display = 'block';
-      } else {
-        content.classList.remove('active');
-        content.style.display = 'none';
-      }
-    });
+  setupTheme() {
+    const savedTheme = localStorage.getItem('gfs-theme') || 'light';
+    document.body.className = `theme-${savedTheme}`;
+    this.updateThemeToggle(savedTheme);
   }
 
   toggleTheme() {
-    const currentTheme = localStorage.getItem('theme') || 'light';
+    const currentTheme = document.body.className.includes('dark') ? 'dark' : 'light';
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
-    document.body.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
+    document.body.className = `theme-${newTheme}`;
+    localStorage.setItem('gfs-theme', newTheme);
+    this.updateThemeToggle(newTheme);
 
-    // Update theme toggle button
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-      themeToggle.textContent = newTheme === 'light' ? '🌙' : '☀️';
+    // Re-render diagram with new theme
+    this.renderDiagram();
+  }
+
+  updateThemeToggle(theme) {
+    const toggle = document.getElementById('theme-toggle');
+    if (toggle) {
+      toggle.textContent = theme === 'light' ? '🌙' : '☀️';
+      toggle.title = theme === 'light' ? 'Dark Mode' : 'Light Mode';
     }
+  }
 
-    // Re-initialize Mermaid with new theme
-    if (typeof mermaid !== 'undefined') {
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: newTheme === 'dark' ? 'dark' : 'default'
-      });
-      // Re-render current diagram
-      if (this.currentSpec) {
-        this.renderDiagram(this.currentSpec);
-      }
+  setupAchievementListener() {
+    document.addEventListener('achievement', (e) => {
+      this.showAchievement(e.detail);
+    });
+  }
+
+  showAchievement(achievement) {
+    const notification = document.createElement('div');
+    notification.className = 'achievement-notification';
+    notification.innerHTML = `
+      <div class="achievement-icon">${achievement.icon}</div>
+      <div class="achievement-content">
+        <div class="achievement-title">${achievement.title}</div>
+        <div class="achievement-description">${achievement.description}</div>
+      </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => notification.classList.add('show'), 100);
+
+    // Remove after delay
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  navigatePrev() {
+    const currentIndex = this.manifest.diagrams.findIndex(d => d.id === this.currentDiagramId);
+    if (currentIndex > 0) {
+      const prevDiagram = this.manifest.diagrams[currentIndex - 1];
+      this.loadDiagram(prevDiagram.id);
+    }
+  }
+
+  navigateNext() {
+    const currentIndex = this.manifest.diagrams.findIndex(d => d.id === this.currentDiagramId);
+    if (currentIndex < this.manifest.diagrams.length - 1) {
+      const nextDiagram = this.manifest.diagrams[currentIndex + 1];
+      this.loadDiagram(nextDiagram.id);
     }
   }
 
   showHelp() {
     const modal = document.createElement('div');
-    modal.className = 'modal help-modal';
+    modal.className = 'modal';
     modal.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Help & Shortcuts</h2>
+          <h2>Keyboard Shortcuts</h2>
           <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
         </div>
         <div class="modal-body">
-          <h3>Keyboard Shortcuts</h3>
-          <ul class="shortcuts-list">
-            <li><kbd>Ctrl</kbd> + <kbd>E</kbd> - Export diagram</li>
-            <li><kbd>Ctrl</kbd> + <kbd>H</kbd> - Show this help</li>
-            <li><kbd>Ctrl</kbd> + <kbd>D</kbd> - Toggle dark mode</li>
-            <li><kbd>←</kbd> / <kbd>→</kbd> - Navigate diagrams</li>
-            <li><kbd>Space</kbd> - Play/pause step-through</li>
-          </ul>
-
-          <h3>Features</h3>
-          <ul>
-            <li>📊 Interactive diagrams with step-through animations</li>
-            <li>🎯 Practice drills with progress tracking</li>
-            <li>💡 First principles breakdown</li>
-            <li>📝 Self-assessments with solutions</li>
-            <li>🎨 Export diagrams in multiple formats</li>
-          </ul>
-
-          <h3>Getting Started</h3>
-          <p>Navigate through different GFS concepts using the left sidebar.
-             Each diagram includes narrative explanations, contracts, and interactive elements.</p>
-
-          <div class="help-links">
-            <a href="intro.html?from=app" target="_blank">📺 Watch Introduction Video</a>
-            <a href="https://github.com/yourusername/gfs-visual" target="_blank">📚 Documentation</a>
+          <div class="shortcuts-grid">
+            <div class="shortcut">
+              <kbd>1-9</kbd>
+              <span>Toggle overlays</span>
+            </div>
+            <div class="shortcut">
+              <kbd>←/→</kbd>
+              <span>Step navigation</span>
+            </div>
+            <div class="shortcut">
+              <kbd>Ctrl+←/→</kbd>
+              <span>Diagram navigation</span>
+            </div>
+            <div class="shortcut">
+              <kbd>Space</kbd>
+              <span>Play/Pause steps</span>
+            </div>
+            <div class="shortcut">
+              <kbd>L</kbd>
+              <span>Go to Legend</span>
+            </div>
+            <div class="shortcut">
+              <kbd>T</kbd>
+              <span>Toggle theme</span>
+            </div>
+            <div class="shortcut">
+              <kbd>E</kbd>
+              <span>Export diagram</span>
+            </div>
+            <div class="shortcut">
+              <kbd>?</kbd>
+              <span>Show this help</span>
+            </div>
           </div>
         </div>
       </div>
     `;
 
     document.body.appendChild(modal);
-    modal.style.display = 'flex';
-
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.remove();
     });
   }
 
-  showError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-notification';
-    errorDiv.textContent = message;
-    document.body.appendChild(errorDiv);
+  updateURL(diagramId) {
+    const url = new URL(window.location);
+    url.searchParams.set('d', diagramId);
+    history.pushState({}, '', url);
+  }
 
-    setTimeout(() => errorDiv.remove(), 5000);
+  showLoading(show) {
+    const loader = document.getElementById('loading');
+    if (loader) {
+      loader.style.display = show ? 'flex' : 'none';
+    }
+  }
+
+  showDiagramLoading(show) {
+    const container = document.getElementById('diagram-container');
+    if (container) {
+      if (show) {
+        container.innerHTML = '<div class="diagram-loading">Loading diagram...</div>';
+      }
+    }
+  }
+
+  handleError(error) {
+    console.error('Viewer error:', error);
+
+    const container = document.getElementById('diagram-container');
+    if (container) {
+      container.innerHTML = `
+        <div class="error-message">
+          <h3>⚠️ Error Loading Diagram</h3>
+          <p>${error.message}</p>
+          <button onclick="location.reload()">Reload Page</button>
+        </div>
+      `;
+    }
   }
 }
 
-// Initialize application when DOM is ready
-document.addEventListener('DOMContentLoaded', async () => {
-  // Set initial theme
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  document.body.setAttribute('data-theme', savedTheme);
-
-  // Create and initialize viewer
+// Initialize on load
+window.addEventListener('DOMContentLoaded', () => {
   window.viewer = new GFSViewer();
-  await window.viewer.initialize();
-
-  // Expose drill system for onclick handlers
-  window.drillSystem = window.viewer.drillSystem;
+  window.viewer.initialize();
+  window.drillSystem = window.viewer.drillSystem; // For drill onclick handlers
 });
 
-// Export for testing
-export { GFSViewer };
+// Export for module systems
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = GFSViewer;
+}
+
+
+  // Initialize application when DOM is ready
+  window.addEventListener('DOMContentLoaded', async () => {
+    console.log('Initializing GFS Visual Learning System (Modular)...');
+
+    try {
+      // Check if we should use new modular system
+      const useModular = localStorage.getItem('gfs-use-modular') === 'true';
+
+      if (useModular && window.app) {
+        // Use new modular system
+        console.log('Using new modular architecture');
+        await window.app.init();
+      } else {
+        // Fall back to existing viewer
+        console.log('Using existing architecture');
+        window.viewer = new GFSViewer();
+        await window.viewer.initialize();
+        window.drillSystem = window.viewer.drillSystem;
+      }
+    } catch (error) {
+      console.error('Initialization failed:', error);
+
+      // Try fallback initialization
+      if (window.GFSViewer) {
+        window.viewer = new GFSViewer();
+        window.viewer.initialize().catch(console.error);
+      }
+    }
+  });
+
+})();
+
+// Bundle created: 2025-10-12T14:17:10.179Z

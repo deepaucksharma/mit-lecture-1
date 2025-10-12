@@ -1254,11 +1254,6 @@ if (typeof module !== 'undefined' && module.exports) {
       timestamp: Date.now()
     };
     this.saveProgress();
-
-    // Dispatch event so LearningProgress can sync
-    document.dispatchEvent(new CustomEvent('drillComplete', {
-      detail: { diagramId, drillId }
-    }));
   }
 
   getDiagramProgress(diagramId) {
@@ -3430,7 +3425,7 @@ if (typeof module !== 'undefined' && module.exports) {
       item.dataset.diagramId = diagram.id;
 
       const progress = this.learningProgress.getDiagramStats(diagram.id);
-      const hasProgress = progress.completionPercentage > 0;
+      const hasProgress = progress.viewCount > 0;
 
       item.innerHTML = `
         <span class="nav-number">${index}</span>
@@ -3478,31 +3473,6 @@ if (typeof module !== 'undefined' && module.exports) {
     if (prevBtn) prevBtn.disabled = currentIndex === 0;
     if (nextBtn) nextBtn.disabled = currentIndex === total - 1;
     if (current) current.textContent = `${currentIndex + 1} / ${total}`;
-  }
-
-  updateNavigationProgress() {
-    // Update progress badges in navigation items without full re-render
-    document.querySelectorAll('.nav-item').forEach(item => {
-      const diagramId = item.dataset.diagramId;
-      if (!diagramId) return;
-
-      const progress = this.learningProgress.getDiagramStats(diagramId);
-      const hasProgress = progress.completionPercentage > 0;
-
-      // Remove existing progress badge if any
-      const existingBadge = item.querySelector('.nav-progress');
-      if (existingBadge) {
-        existingBadge.remove();
-      }
-
-      // Add new progress badge if there's progress
-      if (hasProgress) {
-        const badge = document.createElement('span');
-        badge.className = 'nav-progress';
-        badge.textContent = `${progress.completionPercentage}%`;
-        item.appendChild(badge);
-      }
-    });
   }
 
   updateTitle(title) {
@@ -3664,30 +3634,35 @@ if (typeof module !== 'undefined' && module.exports) {
     const stepCount = this.stepper.getStepCount();
     const hasSteps = stepCount > 0;
 
-    if (!hasSteps) {
-      controls.style.display = 'none';
-      return;
-    }
-
-    controls.style.display = 'flex';
-
-    // Create horizontal floating bar structure
     controls.innerHTML = `
-      <div class="state-nav-buttons">
-        <button id="step-first" onclick="viewer.stepper.first()" title="First">⏮</button>
-        <button id="step-prev" onclick="viewer.stepper.prev()" title="Previous">⏪</button>
-        <button id="step-play" onclick="viewer.stepper.toggleAutoPlay()" title="Play/Pause">▶</button>
-        <button id="step-next" onclick="viewer.stepper.next()" title="Next">⏩</button>
-        <button id="step-last" onclick="viewer.stepper.last()" title="Last">⏭</button>
+      <div class="step-header">
+        <h3>Step-Through Mode</h3>
+        ${hasSteps ? `<span class="step-count">${stepCount} steps</span>` : ''}
       </div>
-      <div class="state-info">
-        <span id="step-progress" style="font-size: 0.75rem; color: var(--text-secondary); font-family: var(--font-mono);">Step 1 of ${stepCount}</span>
-      </div>
-      <div class="speed-control">
-        <input type="range" id="step-speed" min="500" max="5000" value="2000" step="500"
-               onchange="viewer.stepper.setPlaySpeed(5500 - this.value)">
-        <span id="step-speed-label">2s</span>
-      </div>
+      ${hasSteps ? `
+        <div class="step-progress">
+          <div class="step-progress-bar-container">
+            <div id="step-progress-bar" class="step-progress-bar" style="width: 0%"></div>
+          </div>
+          <div id="step-progress" class="step-progress-text">Step 1 of ${stepCount}</div>
+        </div>
+        <div class="step-caption" id="step-caption">Click Play to start</div>
+        <div class="step-buttons">
+          <button id="step-first" onclick="viewer.stepper.first()" title="First">⏮</button>
+          <button id="step-prev" onclick="viewer.stepper.prev()" title="Previous">⏪</button>
+          <button id="step-play" onclick="viewer.stepper.toggleAutoPlay()" title="Play/Pause">▶</button>
+          <button id="step-next" onclick="viewer.stepper.next()" title="Next">⏩</button>
+          <button id="step-last" onclick="viewer.stepper.last()" title="Last">⏭</button>
+        </div>
+        <div class="step-speed">
+          <label>Speed:</label>
+          <input type="range" id="step-speed" min="500" max="5000" value="2000" step="500"
+                 onchange="viewer.stepper.setPlaySpeed(5500 - this.value)">
+          <span id="step-speed-label">2s</span>
+        </div>
+      ` : `
+        <div class="no-steps">No steps available for this diagram</div>
+      `}
     `;
 
     // Update speed label
@@ -3771,10 +3746,6 @@ if (typeof module !== 'undefined' && module.exports) {
         completed,
         drills.length
       );
-
-      // Update navigation to reflect new progress
-      this.updateNavigationProgress();
-      this.updateProgressDisplay();
     });
 
     // Theme toggle
@@ -4025,4 +3996,4 @@ window.addEventListener('DOMContentLoaded', () => {
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = GFSViewer;
-}// Bundle created: Sun Oct 12 19:34:29 IST 2025
+}// Bundle created: Sun Oct 12 19:47:44 IST 2025
