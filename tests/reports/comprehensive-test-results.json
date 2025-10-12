@@ -1,0 +1,446 @@
+{
+  "timestamp": "2025-10-12T14:47:28.755Z",
+  "summary": {
+    "total": 57,
+    "passed": 57,
+    "failed": 0,
+    "warnings": 0,
+    "successRate": "100.00%"
+  },
+  "tests": [
+    {
+      "name": "Bundle syntax is valid",
+      "category": "Bundle",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Application loads without errors",
+      "category": "Loading",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Loading screen disappears",
+      "category": "Loading",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Main app container is visible",
+      "category": "Loading",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "DOMPurify is loaded",
+      "category": "Security",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Mermaid is loaded",
+      "category": "Dependencies",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "AppState is available",
+      "category": "State Management",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "appState singleton exists",
+      "category": "State Management",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "HTMLSanitizer is available",
+      "category": "Security",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "sanitizer singleton exists",
+      "category": "Security",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "AppState can set and get values",
+      "category": "State Management",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "AppState subscriptions work",
+      "category": "State Management",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "AppState tracks history",
+      "category": "State Management",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Sanitizer escapes HTML",
+      "category": "Security",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Sanitizer detects suspicious content",
+      "category": "Security",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram content is sanitized",
+      "category": "Security",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "First diagram loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram has content",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Navigation loads",
+      "category": "UI",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram title is displayed",
+      "category": "UI",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Can navigate to next diagram",
+      "category": "Navigation",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Can navigate to previous diagram",
+      "category": "Navigation",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Can click navigation item",
+      "category": "Navigation",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Step controls use event listeners",
+      "category": "Event Listeners",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Step controls have data-action",
+      "category": "Event Listeners",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Modal close uses event listener",
+      "category": "Event Listeners",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Step controls are visible",
+      "category": "UI",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Step buttons exist",
+      "category": "UI",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Step controls respond to clicks",
+      "category": "Interaction",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "LearningProgress exists",
+      "category": "Progress",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Progress tracks diagram views",
+      "category": "Progress",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "ProgressTracker is integrated",
+      "category": "Progress",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Stepper has destroy method",
+      "category": "Memory",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Stepper cleans up intervals",
+      "category": "Memory",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "No memory leaks on navigation",
+      "category": "Memory",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Theme toggle exists",
+      "category": "UI",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Theme can be toggled",
+      "category": "Interaction",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Export manager exists",
+      "category": "Export",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Export manager has methods",
+      "category": "Export",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Arrow keys navigate steps",
+      "category": "Keyboard",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Theme toggle shortcut works",
+      "category": "Keyboard",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Help shortcut works",
+      "category": "Keyboard",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 00-legend loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 01-triangle loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 02-scale loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 03-chunk-size loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 04-architecture loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 05-planes loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 06-read-path loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 07-write-path loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 08-lease loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 09-consistency loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 10-recovery loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 11-evolution loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Diagram 12-dna loads",
+      "category": "Diagrams",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Step controls have no onclick",
+      "category": "CSP Compliance",
+      "status": "passed",
+      "message": "Test passed"
+    },
+    {
+      "name": "Navigation buttons have no onclick in critical areas",
+      "category": "CSP Compliance",
+      "status": "passed",
+      "message": "Test passed"
+    }
+  ],
+  "categories": {
+    "Bundle": {
+      "passed": 1,
+      "failed": 0,
+      "warnings": 0,
+      "total": 1
+    },
+    "Loading": {
+      "passed": 3,
+      "failed": 0,
+      "warnings": 0,
+      "total": 3
+    },
+    "Security": {
+      "passed": 6,
+      "failed": 0,
+      "warnings": 0,
+      "total": 6
+    },
+    "Dependencies": {
+      "passed": 1,
+      "failed": 0,
+      "warnings": 0,
+      "total": 1
+    },
+    "State Management": {
+      "passed": 5,
+      "failed": 0,
+      "warnings": 0,
+      "total": 5
+    },
+    "Diagrams": {
+      "passed": 15,
+      "failed": 0,
+      "warnings": 0,
+      "total": 15
+    },
+    "UI": {
+      "passed": 5,
+      "failed": 0,
+      "warnings": 0,
+      "total": 5
+    },
+    "Navigation": {
+      "passed": 3,
+      "failed": 0,
+      "warnings": 0,
+      "total": 3
+    },
+    "Event Listeners": {
+      "passed": 3,
+      "failed": 0,
+      "warnings": 0,
+      "total": 3
+    },
+    "Interaction": {
+      "passed": 2,
+      "failed": 0,
+      "warnings": 0,
+      "total": 2
+    },
+    "Progress": {
+      "passed": 3,
+      "failed": 0,
+      "warnings": 0,
+      "total": 3
+    },
+    "Memory": {
+      "passed": 3,
+      "failed": 0,
+      "warnings": 0,
+      "total": 3
+    },
+    "Export": {
+      "passed": 2,
+      "failed": 0,
+      "warnings": 0,
+      "total": 2
+    },
+    "Keyboard": {
+      "passed": 3,
+      "failed": 0,
+      "warnings": 0,
+      "total": 3
+    },
+    "CSP Compliance": {
+      "passed": 2,
+      "failed": 0,
+      "warnings": 0,
+      "total": 2
+    }
+  }
+}

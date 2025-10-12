@@ -11,7 +11,7 @@
     ],
     "checkYourself": "Do you understand how writes flow through Primary to replicas? Can you explain what happens when a write partially succeeds? Do you recall the CAP triangle trade-offs?"
   },
-  "narrative": "Three replicas. Same chunk. Read from any one. Different data. This isn't corruption—it's consistency, GFS-style. Where database designers see chaos, Google saw opportunity. Accept imperfection. Push recovery to applications. Gain speed, scale, and simplicity. This is the bargain: Your application deals with disorder, and in return, the system never stops moving.",
+  "narrative": "Three replicas. Same chunk. Read from any one. Different data. This isn't corruption—it's consistency, GFS-style. Where database designers see chaos, Google saw opportunity. Accept imperfection. Push recovery to applications. Gain speed, scale, and simplicity. This is the bargain: Your application deals with disorder, and in return, the system never stops moving. In production: overwrite rate <0.05% of mutations, append-to-write ratio 3.7:1, duplicates and padding handled via 32-byte record headers (length+checksum+UUID+timestamp).",
   "crystallizedInsight": "Perfection is expensive. Strategic imperfection is liberating.",
   "firstPrinciples": {
     "consistencySpectrum": {
@@ -174,19 +174,19 @@
   ],
   "contracts": {
     "invariants": [
-      "All successful records exist somewhere",
-      "Record boundaries preserved (atomic append)",
-      "Checksums detect corruption"
+      "All successful records exist on at least one replica (data durability guarantee through replication)",
+      "Record boundaries preserved via atomic append (record written atomically at GFS-chosen offset, offset returned to client)",
+      "Checksums detect corruption (64KB blocks with 32-bit CRC32, verified on read, triggers re-replication if mismatch)"
     ],
     "guarantees": [
-      "Defined: All replicas have same data eventually",
-      "Atomic: Each record succeeds/fails completely",
-      "Consistent: Successful appends visible on all replicas"
+      "Defined regions: All replicas have same mutation sequence (primary enforces serial order, replicas apply in order)",
+      "Atomic append: Each record succeeds completely or fails completely (all-or-nothing at record granularity)",
+      "Consistent ordering: All replicas apply mutations in same serial number order (may have padding/gaps but ordering preserved)"
     ],
     "caveats": [
-      "NOT Ordered: Different replica orders possible",
-      "NOT Immediate: Stale reads possible",
-      "NOT Identical: Byte-level differences exist"
+      "NOT Ordered across records: Concurrent appends may appear in different orders on different replicas (undefined but consistent regions)",
+      "NOT Immediate: Stale reads possible until cache expires or replica catches up (bounded by lease duration ~60s worst case)",
+      "NOT Identical bytes: Padding and duplicates from retries (at-least-once delivery, client must deduplicate using record IDs)"
     ]
   },
   "drills": [

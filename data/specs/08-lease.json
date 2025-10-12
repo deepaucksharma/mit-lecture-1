@@ -10,7 +10,7 @@
     ],
     "checkYourself": "Do you understand what a 'Primary' is and why we need one? Can you explain what happens if two servers both think they're in charge of the same chunk?"
   },
-  "narrative": "Time is a weapon against chaos. In a world where clocks lie and networks vanish, how do you prevent two servers from both believing they're in charge? You give one server temporary authority—60 seconds of absolute power. Then you take it back. This lease mechanism isn't just clever engineering. It's a peace treaty between distributed nodes, enforced by the relentless march of time.",
+  "narrative": "Time is a weapon against chaos. In a world where clocks lie and networks vanish, how do you prevent two servers from both believing they're in charge? You give one server temporary authority—60 seconds of absolute power. Then you take it back. This lease mechanism isn't just clever engineering. It's a peace treaty between distributed nodes, enforced by the relentless march of time. In production: lease extensions piggybacked on 10-second HeartBeat messages, renewal at 50s provides 10s safety margin against network hiccups. Clock drift bounded to ~100ms over 60s with NTP.",
   "crystallizedInsight": "Authority must expire. Time is the only arbiter that never lies—eventually.",
   "firstPrinciples": {
     "distributedConsensus": {
@@ -240,19 +240,19 @@
   ],
   "contracts": {
     "invariants": [
-      "At most one primary per chunk at any time",
-      "Lease duration > 2 × max clock drift",
-      "Grace period after expiration before new grant"
+      "At most one primary per chunk at any time (lease protocol ensures single writer, prevents split-brain)",
+      "Lease duration (60s) > 2 × max clock drift (~100ms) + network delays (safety margin = 10s)",
+      "Grace period after expiration before new grant (Master waits for old lease to expire before granting new)"
     ],
     "guarantees": [
-      "No split-brain possible",
-      "Primary authority is time-bounded",
-      "Clean handoff on planned transitions"
+      "No split-brain possible (time-based expiry ensures old primary stops before new one starts)",
+      "Primary authority is time-bounded (60s initial grant, renewed via HeartBeat at 50s)",
+      "Clean handoff on planned transitions (revocation message for immediate handoff, otherwise wait for expiry)"
     ],
     "caveats": [
-      "Network delays can cause lease loss",
-      "Clock skew affects safety margins",
-      "In-flight operations during transition"
+      "Network delays can cause premature lease loss (if renewal packet delayed >10s, lease expires)",
+      "Clock skew affects safety margins (50ppm drift = 4.3s/day, requires NTP synchronization)",
+      "In-flight operations during transition may fail (client retries with new primary after lease transfer)"
     ]
   },
   "drills": [
