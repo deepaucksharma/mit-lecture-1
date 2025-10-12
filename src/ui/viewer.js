@@ -331,69 +331,32 @@ class GFSViewer {
 
     const fp = spec.firstPrinciples;
 
-    // Helper to render any nested object structure
-    const renderPrincipleField = (key, value, depth = 0) => {
-      const icons = {
-        theoreticalFoundation: '🔬',
-        quantitativeAnalysis: '📊',
-        derivedInvariants: '🔒',
-        keyInsights: '💡',
-        timeBasedCoordination: '⏰',
-        formalModel: '📐',
-        probabilisticAnalysis: '🎲',
-        failureModels: '⚠️',
-        reliabilityMath: '📈',
-        scaleLaws: '📏',
-        cachingTheory: '💾',
-        littlesLawApplication: '⚖️',
-        coordinationCost: '💸',
-        dataflowPrinciples: '🌊',
-        coreTradeoffs: '⚖️'
-      };
-
-      const icon = icons[key] || '📌';
-      const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-
+    // Helper to render content without redundant labels
+    const renderContent = (value) => {
       if (typeof value === 'string') {
-        return `
-          <details class="principle-section">
-            <summary><h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}></summary>
-            <div class="principle-content">
-              <p>${value}</p>
-            </div>
-          </details>
-        `;
+        return `<p>${value}</p>`;
       } else if (Array.isArray(value)) {
-        return `
-          <details class="principle-section">
-            <summary><h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}></summary>
-            <div class="principle-content">
-              <ul>
-                ${value.map(item => `<li>${item}</li>`).join('')}
-              </ul>
-            </div>
-          </details>
-        `;
+        return `<ul>${value.map(item => `<li>${item}</li>`).join('')}</ul>`;
       } else if (typeof value === 'object' && value !== null) {
-        // Nested object - render recursively
-        const nested = Object.entries(value)
-          .map(([k, v]) => renderPrincipleField(k, v, depth + 1))
+        // Nested object - render as subsections
+        return Object.entries(value)
+          .map(([k, v]) => {
+            const label = k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            if (typeof v === 'string') {
+              return `<div class="nested-item"><strong>${label}:</strong> ${v}</div>`;
+            } else if (Array.isArray(v)) {
+              return `<div class="nested-item"><strong>${label}:</strong><ul>${v.map(item => `<li>${item}</li>`).join('')}</ul></div>`;
+            }
+            return '';
+          })
           .join('');
-        return `
-          <details class="principle-section nested-section">
-            <summary><h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}></summary>
-            <div class="nested-content">
-              ${nested}
-            </div>
-          </details>
-        `;
       }
       return '';
     };
 
     const content = Object.entries(fp)
       .map(([key, value], index) => {
-        const icon = {
+        const icons = {
           theoreticalFoundation: '🔬',
           quantitativeAnalysis: '📊',
           derivedInvariants: '🔒',
@@ -409,8 +372,9 @@ class GFSViewer {
           coordinationCost: '💸',
           dataflowPrinciples: '🌊',
           coreTradeoffs: '⚖️'
-        }[key] || '📌';
+        };
 
+        const icon = icons[key] || '📌';
         const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
 
         return `
@@ -421,7 +385,7 @@ class GFSViewer {
                 <span class="accordion-title">${icon} ${label}</span>
               </summary>
               <div class="accordion-content">
-                ${renderPrincipleField(key, value)}
+                ${renderContent(value)}
               </div>
             </details>
           </div>
