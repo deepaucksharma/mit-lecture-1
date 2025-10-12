@@ -127,6 +127,8 @@ class GFSViewer {
       await this.renderDiagram();
 
       // Initialize learning components
+      this.renderFirstPrinciples(spec);
+      this.renderAssessment(spec);
       this.drillSystem.renderDrills(spec);
       this.overlayManager.renderOverlayChips(spec);
       this.stepper.initialize(spec);
@@ -307,6 +309,86 @@ class GFSViewer {
     `;
   }
 
+  renderFirstPrinciples(spec) {
+    const container = document.getElementById('principles-container');
+    if (!container || !spec.firstPrinciples) return;
+
+    const fp = spec.firstPrinciples;
+
+    container.innerHTML = `
+      <div class="principles-content">
+        ${fp.theoreticalFoundation ? `
+          <section class="principle-section">
+            <h3>🔬 Theoretical Foundation</h3>
+            <p>${fp.theoreticalFoundation}</p>
+          </section>
+        ` : ''}
+
+        ${fp.quantitativeAnalysis ? `
+          <section class="principle-section">
+            <h3>📊 Quantitative Analysis</h3>
+            <p>${fp.quantitativeAnalysis}</p>
+          </section>
+        ` : ''}
+
+        ${fp.derivedInvariants?.length > 0 ? `
+          <section class="principle-section">
+            <h3>🔒 Derived Invariants</h3>
+            <ul>
+              ${fp.derivedInvariants.map(inv => `<li>${inv}</li>`).join('')}
+            </ul>
+          </section>
+        ` : ''}
+
+        ${fp.keyInsights?.length > 0 ? `
+          <section class="principle-section">
+            <h3>💡 Key Insights</h3>
+            <ul>
+              ${fp.keyInsights.map(insight => `<li>${insight}</li>`).join('')}
+            </ul>
+          </section>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  renderAssessment(spec) {
+    const container = document.getElementById('assessment-container');
+    if (!container) return;
+
+    // For now, check if there are assessment questions in the spec
+    const hasAssessment = spec.assessment || spec.checkpoints || spec.questions;
+
+    if (!hasAssessment) {
+      container.innerHTML = '<div class="no-assessment">No assessment available for this diagram</div>';
+      return;
+    }
+
+    // Render assessment content
+    const assessment = spec.assessment || spec.checkpoints || spec.questions || [];
+
+    container.innerHTML = `
+      <div class="assessment-content">
+        ${Array.isArray(assessment) ?
+          assessment.map((item, index) => `
+            <div class="assessment-item">
+              <h4>Question ${index + 1}</h4>
+              <p>${item.question || item.text || item}</p>
+              ${item.answer ? `
+                <details class="answer-reveal">
+                  <summary>Show Answer</summary>
+                  <p>${item.answer}</p>
+                </details>
+              ` : ''}
+            </div>
+          `).join('')
+          :
+          `<div class="assessment-text">${assessment}</div>`
+        }
+      </div>
+    `;
+  }
+
   renderStepControls() {
     const controls = document.getElementById('step-controls');
     if (!controls) return;
@@ -380,6 +462,25 @@ class GFSViewer {
   }
 
   setupEventListeners() {
+    // Setup tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Remove active class from all tabs and content
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        // Add active class to clicked tab and corresponding content
+        e.target.classList.add('active');
+        const tabName = e.target.dataset.tab;
+
+        if (tabName === 'principles') {
+          document.getElementById('principles-container')?.classList.add('active');
+        } else if (tabName === 'practice') {
+          document.getElementById('practice-container')?.classList.add('active');
+        }
+      });
+    });
+
     // Listen for overlay changes
     document.addEventListener('overlayToggle', (e) => {
       this.currentOverlays = new Set(e.detail.activeOverlays);
