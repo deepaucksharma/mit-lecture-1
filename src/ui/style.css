@@ -343,7 +343,7 @@ body {
 }
 
 .sidebar-contracts {
-  width: 340px;
+  width: 260px;
   background: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
   padding: var(--spacing-md);
@@ -2351,7 +2351,7 @@ details[open] > summary .sub-accordion-icon {
 /* Responsive Design */
 @media (max-width: 1400px) {
   .sidebar-contracts {
-    width: 320px;
+    width: 280px;
   }
 
   .sidebar-right {
@@ -2361,7 +2361,7 @@ details[open] > summary .sub-accordion-icon {
 
 @media (max-width: 1200px) {
   .sidebar-contracts {
-    width: 280px;
+    width: 250px;
   }
 
   .sidebar-right {
