@@ -10,7 +10,7 @@
     ],
     "checkYourself": "Do you understand the difference between metadata operations (control) and data operations? Can you explain why we have multiple replicas per chunk?"
   },
-  "narrative": "Witness the choreography: Data flows like water—pipelined through replicas in a chain, each server forwarding to the next at full network speed. But commitment flows like law—serialized through one Primary who decides order. This separation—pipeline data flow, serialize commitment—is not a compromise. It's the only way to be both fast and consistent. This is chain replication, a fundamental pattern in distributed storage.",
+  "narrative": "Witness the choreography: Data flows like water—pipelined through replicas in a chain, each server forwarding to the next at full network speed. But commitment flows like law—serialized through one Primary who decides order. This separation—pipeline data flow, serialize commitment—is not a compromise. It's the only way to be both fast and consistent. This is chain replication, a fundamental pattern in distributed storage. In production: write rates of 35 MB/s aggregate for 16 concurrent clients, with each link running at full 100 Mbps simultaneously through pipelining.",
   "crystallizedInsight": "Decouple what can be parallel from what must be serial. Speed lives in the separation—this is the essence of chain replication",
   "firstPrinciples": {
     "chainReplication": {
@@ -269,19 +269,19 @@
   ],
   "contracts": {
     "invariants": [
-      "Primary orders all concurrent writes",
-      "Data must be staged before commit",
-      "All replicas apply mutations in same order"
+      "Primary orders all concurrent writes (serial numbers assigned, enforces total order)",
+      "Data must be staged at all replicas before commit (two-phase protocol: push then commit)",
+      "All replicas apply mutations in same serial number order (consistency through ordered application)"
     ],
     "guarantees": [
-      "Write atomicity at record level",
-      "Defined append region on success",
-      "Consistent ordering via primary"
+      "Write atomicity at record level (record append completes atomically at chosen offset)",
+      "Defined append region on success (offset returned to client marks defined region boundary)",
+      "Consistent ordering via primary (all replicas see same mutation sequence, may have gaps/padding)"
     ],
     "caveats": [
-      "Replicas may have different bytes for same region",
-      "Failed writes may leave garbage",
-      "Application must handle padding and duplicates"
+      "Replicas may have different bytes for same region (concurrent writes interleave, undefined but consistent regions)",
+      "Failed writes may leave garbage (retry on failure creates duplicates, padding at chunk boundaries)",
+      "Application must handle padding and duplicates (use unique IDs for deduplication, checksums for validation)"
     ]
   },
   "drills": [

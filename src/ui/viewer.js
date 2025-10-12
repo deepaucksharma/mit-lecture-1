@@ -122,6 +122,7 @@ class GFSViewer {
       // Update UI components
       this.updateNavigation(diagramId);
       this.updateTitle(spec.title);
+      this.renderCrystallizedInsight(spec);
       this.renderNarrative(spec);
       this.renderContracts(spec);
 
@@ -130,6 +131,7 @@ class GFSViewer {
 
       // Initialize learning components
       this.renderFirstPrinciples(spec);
+      this.renderAdvancedConcepts(spec);
       this.renderAssessment(spec);
       this.drillSystem.renderDrills(spec);
       this.overlayManager.renderOverlayChips(spec);
@@ -249,6 +251,18 @@ class GFSViewer {
     document.title = `${title} - GFS Learning`;
   }
 
+  renderCrystallizedInsight(spec) {
+    const container = document.getElementById('crystallized-insight');
+    if (!container) return;
+
+    if (spec.crystallizedInsight) {
+      container.textContent = spec.crystallizedInsight;
+      container.style.display = 'block';
+    } else {
+      container.style.display = 'none';
+    }
+  }
+
   renderNarrative(spec) {
     const panel = document.getElementById('narrative-panel');
     if (!panel) return;
@@ -317,57 +331,166 @@ class GFSViewer {
 
     const fp = spec.firstPrinciples;
 
-    container.innerHTML = `
-      <div class="principles-content">
-        ${fp.theoreticalFoundation ? `
-          <section class="principle-section">
-            <h3>🔬 Theoretical Foundation</h3>
-            <p>${fp.theoreticalFoundation}</p>
-          </section>
-        ` : ''}
+    // Helper to render any nested object structure
+    const renderPrincipleField = (key, value, depth = 0) => {
+      const icons = {
+        theoreticalFoundation: '🔬',
+        quantitativeAnalysis: '📊',
+        derivedInvariants: '🔒',
+        keyInsights: '💡',
+        timeBasedCoordination: '⏰',
+        formalModel: '📐',
+        probabilisticAnalysis: '🎲',
+        failureModels: '⚠️',
+        reliabilityMath: '📈',
+        scaleLaws: '📏',
+        cachingTheory: '💾',
+        littlesLawApplication: '⚖️',
+        coordinationCost: '💸',
+        dataflowPrinciples: '🌊',
+        coreTradeoffs: '⚖️'
+      };
 
-        ${fp.quantitativeAnalysis ? `
-          <section class="principle-section">
-            <h3>📊 Quantitative Analysis</h3>
-            <p>${fp.quantitativeAnalysis}</p>
-          </section>
-        ` : ''}
+      const icon = icons[key] || '📌';
+      const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
 
-        ${fp.derivedInvariants?.length > 0 ? `
+      if (typeof value === 'string') {
+        return `
           <section class="principle-section">
-            <h3>🔒 Derived Invariants</h3>
+            <h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}>
+            <p>${value}</p>
+          </section>
+        `;
+      } else if (Array.isArray(value)) {
+        return `
+          <section class="principle-section">
+            <h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}>
             <ul>
-              ${fp.derivedInvariants.map(inv => `<li>${inv}</li>`).join('')}
+              ${value.map(item => `<li>${item}</li>`).join('')}
             </ul>
           </section>
-        ` : ''}
+        `;
+      } else if (typeof value === 'object' && value !== null) {
+        // Nested object - render recursively
+        const nested = Object.entries(value)
+          .map(([k, v]) => renderPrincipleField(k, v, depth + 1))
+          .join('');
+        return `
+          <details class="principle-section nested-section" open>
+            <summary><h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}></summary>
+            <div class="nested-content">
+              ${nested}
+            </div>
+          </details>
+        `;
+      }
+      return '';
+    };
 
-        ${fp.keyInsights?.length > 0 ? `
-          <section class="principle-section">
-            <h3>💡 Key Insights</h3>
-            <ul>
-              ${fp.keyInsights.map(insight => `<li>${insight}</li>`).join('')}
-            </ul>
-          </section>
-        ` : ''}
-      </div>
-    `;
+    const content = Object.entries(fp)
+      .map(([key, value]) => renderPrincipleField(key, value))
+      .join('');
+
+    container.innerHTML = `<div class="principles-content">${content}</div>`;
+  }
+
+  renderAdvancedConcepts(spec) {
+    const container = document.getElementById('principles-container');
+    if (!container || !spec.advancedConcepts) return;
+
+    const ac = spec.advancedConcepts;
+
+    // Helper to render advanced concept sections
+    const renderAdvancedSection = (title, content, icon = '🎓') => {
+      if (!content) return '';
+
+      if (typeof content === 'string') {
+        return `
+          <details class="advanced-section">
+            <summary><h4>${icon} ${title}</h4></summary>
+            <div class="advanced-content">
+              <p>${content}</p>
+            </div>
+          </details>
+        `;
+      } else if (Array.isArray(content)) {
+        return `
+          <details class="advanced-section">
+            <summary><h4>${icon} ${title}</h4></summary>
+            <div class="advanced-content">
+              <ul>
+                ${content.map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+          </details>
+        `;
+      } else if (typeof content === 'object' && content !== null) {
+        // Render nested structure
+        const nested = Object.entries(content)
+          .map(([key, value]) => {
+            const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            if (typeof value === 'string') {
+              return `<div class="nested-item"><strong>${label}:</strong> ${value}</div>`;
+            } else if (Array.isArray(value)) {
+              return `
+                <div class="nested-item">
+                  <strong>${label}:</strong>
+                  <ul>${value.map(v => `<li>${v}</li>`).join('')}</ul>
+                </div>
+              `;
+            }
+            return '';
+          })
+          .join('');
+
+        return `
+          <details class="advanced-section">
+            <summary><h4>${icon} ${title}</h4></summary>
+            <div class="advanced-content">
+              ${nested}
+            </div>
+          </details>
+        `;
+      }
+      return '';
+    };
+
+    const advancedSections = [
+      renderAdvancedSection('Mathematical Models', ac.mathematicalModels, '📐'),
+      renderAdvancedSection('Modern System Comparisons', ac.modernSystemComparisons, '🔄'),
+      renderAdvancedSection('Theoretical Extensions', ac.theoreticalExtensions, '🧪'),
+      renderAdvancedSection('Production Considerations', ac.productionConsiderations, '🏭'),
+      renderAdvancedSection('Research Directions', ac.researchDirections, '🔬'),
+      renderAdvancedSection('Implementation Challenges', ac.implementationChallenges, '⚠️'),
+      renderAdvancedSection('Performance Analysis', ac.performanceAnalysis, '📊'),
+      renderAdvancedSection('Edge Cases', ac.edgeCases, '🎯')
+    ].filter(Boolean).join('');
+
+    if (advancedSections) {
+      // Append to principles container as a separate collapsible section
+      container.innerHTML += `
+        <div class="advanced-concepts-separator"></div>
+        <details class="advanced-concepts-container" open>
+          <summary><h3>🎓 Advanced Concepts</h3></summary>
+          <div class="advanced-concepts-content">
+            ${advancedSections}
+          </div>
+        </details>
+      `;
+    }
   }
 
   renderAssessment(spec) {
     const container = document.getElementById('assessment-container');
     if (!container) return;
 
-    // For now, check if there are assessment questions in the spec
-    const hasAssessment = spec.assessment || spec.checkpoints || spec.questions;
+    // Check for assessment checkpoints (using correct field name)
+    const assessment = spec.assessmentCheckpoints || spec.assessment || spec.checkpoints || spec.questions;
 
-    if (!hasAssessment) {
+    if (!assessment || (Array.isArray(assessment) && assessment.length === 0)) {
       container.innerHTML = '<div class="no-assessment">No assessment available for this diagram</div>';
       return;
     }
-
-    // Render assessment content
-    const assessment = spec.assessment || spec.checkpoints || spec.questions || [];
 
     container.innerHTML = `
       <div class="assessment-content">

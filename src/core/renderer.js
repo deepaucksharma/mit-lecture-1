@@ -340,12 +340,15 @@ class MermaidRenderer {
 
     parts.push(edge.label || '');
 
-    // Add metrics if available
+    // Add metrics if available (including enhanced fields)
     if (edge.metrics) {
       const metrics = [];
       if (edge.metrics.size) metrics.push(edge.metrics.size);
       if (edge.metrics.latency) metrics.push(edge.metrics.latency);
       if (edge.metrics.throughput) metrics.push(`@${edge.metrics.throughput}`);
+      // Enhanced metrics
+      if (edge.metrics.frequency) metrics.push(`⏰${edge.metrics.frequency}`);
+      if (edge.metrics.payload) metrics.push(`📦${edge.metrics.payload}`);
 
       if (metrics.length > 0) {
         parts.push(`[${metrics.join(', ')}]`);
@@ -434,7 +437,11 @@ class MermaidRenderer {
           `Type: ${edge.kind}`,
           edge.metrics?.size && `Size: ${edge.metrics.size}`,
           edge.metrics?.latency && `Latency: ${edge.metrics.latency}`,
-          edge.metrics?.throughput && `Throughput: ${edge.metrics.throughput}`
+          edge.metrics?.throughput && `Throughput: ${edge.metrics.throughput}`,
+          // Enhanced metrics
+          edge.metrics?.frequency && `Frequency: ${edge.metrics.frequency}`,
+          edge.metrics?.payload && `Payload: ${edge.metrics.payload}`,
+          edge.metrics?.purpose && `Purpose: ${edge.metrics.purpose}`
         ].filter(Boolean).join('\n');
 
         title.textContent = details;

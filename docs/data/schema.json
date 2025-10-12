@@ -111,6 +111,18 @@
               },
               "throughput": {
                 "type": "string"
+              },
+              "frequency": {
+                "type": "string",
+                "description": "How often this operation occurs"
+              },
+              "payload": {
+                "type": "string",
+                "description": "Size of data payload"
+              },
+              "purpose": {
+                "type": "string",
+                "description": "Purpose of this interaction"
               }
             }
           }
