@@ -1,6 +1,6 @@
 /**
  * GFS Visual Learning System - Modular Bundle
- * Generated: 2025-10-12T14:17:10.176Z
+ * Generated: 2025-10-12T14:33:10.384Z
  */
 
 (function() {
@@ -27,7 +27,7 @@
  * Provides decoupled communication between modules
  */
 
-window.EventBus {
+window.EventBus = class EventBus {
   constructor() {
     this.events = new Map();
     this.debug = false;
@@ -125,10 +125,10 @@ window.EventBus {
 }
 
 // Create singleton instance
-window.eventBus = new EventBus();
+const eventBus = new EventBus();
 
 // Event constants for type safety
-window.Events = {
+const Events = {
   // Application lifecycle
   APP_INIT: 'app:init',
   APP_READY: 'app:ready',
@@ -169,7 +169,7 @@ window.Events = {
   EXPORT_ERROR: 'export:error'
 };
 
-window.eventBus;
+window.eventBus = eventBus;
 
 })();
 
@@ -181,7 +181,7 @@ window.eventBus;
  * Central Configuration Management
  */
 
-window.Config = {
+const Config = {
   // Application
   app: {
     name: 'GFS Visual Learning System',
@@ -270,7 +270,7 @@ window.Config = {
 /**
  * Configuration manager with validation and override support
  */
-window.ConfigManager {
+window.ConfigManager = class ConfigManager {
   constructor() {
     this.config = { ...Config };
     this.overrides = {};
@@ -383,8 +383,8 @@ window.ConfigManager {
 }
 
 // Export singleton instance
-window.configManager = new ConfigManager();
-window.configManager;
+const configManager = new ConfigManager();
+window.configManager = configManager;
 
 })();
 
@@ -398,7 +398,7 @@ window.configManager;
  */
 
 
-window.AppState {
+window.AppState = class AppState {
   constructor() {
     this.state = {
       // Application state
@@ -738,8 +738,8 @@ window.AppState {
 }
 
 // Create singleton instance
-window.appState = new AppState();
-window.appState;
+const appState = new AppState();
+window.appState = appState;
 
 })();
 
@@ -754,7 +754,7 @@ window.appState;
 
 
 
-window.SpecLoader {
+window.SpecLoader = class SpecLoader {
   constructor() {
     this.cache = new Map();
     this.manifest = null;
@@ -1096,7 +1096,7 @@ window.SpecLoader {
   }
 }
 
-window.SpecLoader;
+window.SpecLoader = SpecLoader;
 
 })();
 
@@ -1112,7 +1112,7 @@ window.SpecLoader;
 
 
 
-window.DiagramRenderer {
+window.DiagramRenderer = class DiagramRenderer {
   constructor() {
     this.mermaidAPI = null;
     this.initialized = false;
@@ -1538,7 +1538,7 @@ window.DiagramRenderer {
   }
 }
 
-window.DiagramRenderer;
+window.DiagramRenderer = DiagramRenderer;
 
 })();
 
@@ -2777,46 +2777,60 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Module: src/learning/drills.js
+// Progress tracking adapter - uses unified LearningProgress system
 class ProgressTracker {
-  constructor() {
-    this.storageKey = 'gfs-learning-progress';
-    this.progress = this.loadProgress();
+  constructor(learningProgress = null) {
+    // Will be set by DrillSystem after it gets reference to viewer.learningProgress
+    this.learningProgress = learningProgress;
+    this.completedDrills = new Set();
+    this.migrateOldProgress();
   }
 
-  loadProgress() {
-    try {
-      const saved = localStorage.getItem(this.storageKey);
-      return saved ? JSON.parse(saved) : {};
-    } catch (error) {
-      console.error('Failed to load progress:', error);
-      return {};
-    }
+  setLearningProgress(learningProgress) {
+    this.learningProgress = learningProgress;
   }
 
-  saveProgress() {
+  migrateOldProgress() {
+    // Migrate from old storage format to new unified system
+    const oldKey = 'gfs-learning-progress';
     try {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
+      const oldData = localStorage.getItem(oldKey);
+      if (oldData) {
+        const oldProgress = JSON.parse(oldData);
+        // Store for later migration when learningProgress is available
+        this.pendingMigration = oldProgress;
+        localStorage.removeItem(oldKey);
+        console.log('Found old progress data, will migrate to new system');
+      }
     } catch (error) {
-      console.error('Failed to save progress:', error);
+      console.error('Failed to read old progress:', error);
     }
   }
 
   isDrillComplete(diagramId, drillId) {
-    return this.progress[`${diagramId}-${drillId}`]?.completed || false;
+    const key = `${diagramId}-${drillId}`;
+    return this.completedDrills.has(key);
   }
 
   markDrillComplete(diagramId, drillId) {
-    this.progress[`${diagramId}-${drillId}`] = {
-      completed: true,
-      timestamp: Date.now()
-    };
-    this.saveProgress();
+    const key = `${diagramId}-${drillId}`;
+    if (!this.completedDrills.has(key)) {
+      this.completedDrills.add(key);
+
+      // Update unified progress if available
+      if (this.learningProgress) {
+        const stats = this.learningProgress.getDiagramStats(diagramId);
+        const completed = this.completedDrills.size;
+        const total = stats.totalDrills || 10;
+        this.learningProgress.updateDrillProgress(diagramId, completed, total);
+      }
+    }
   }
 
   getDiagramProgress(diagramId) {
     const prefix = `${diagramId}-`;
-    const completed = Object.keys(this.progress).filter(key =>
-      key.startsWith(prefix) && this.progress[key].completed
+    const completed = Array.from(this.completedDrills).filter(key =>
+      key.startsWith(prefix)
     ).length;
 
     return { completed };
@@ -2825,15 +2839,19 @@ class ProgressTracker {
   resetProgress(diagramId = null) {
     if (diagramId) {
       const prefix = `${diagramId}-`;
-      Object.keys(this.progress).forEach(key => {
+      Array.from(this.completedDrills).forEach(key => {
         if (key.startsWith(prefix)) {
-          delete this.progress[key];
+          this.completedDrills.delete(key);
         }
       });
     } else {
-      this.progress = {};
+      this.completedDrills.clear();
     }
-    this.saveProgress();
+
+    // Reset in unified system too
+    if (this.learningProgress && diagramId) {
+      this.learningProgress.updateDrillProgress(diagramId, 0, 10);
+    }
   }
 }
 
@@ -4838,11 +4856,13 @@ class GFSViewer {
       await this.renderer.initialize();
 
       this.composer = new SceneComposer();
+      this.learningProgress = new LearningProgress();
       this.drillSystem = new DrillSystem();
+      // Connect drill system to unified learning progress
+      this.drillSystem.progress.setLearningProgress(this.learningProgress);
       this.stepper = new StepThroughEngine(this.renderer, this.composer);
       this.overlayManager = new OverlayManager(this);
       this.exportManager = new ExportManager(this);
-      this.learningProgress = new LearningProgress();
 
       // Load manifest
       await this.loadManifest();
@@ -5220,16 +5240,15 @@ class GFSViewer {
         </div>
         <div class="step-caption" id="step-caption">Click Play to start</div>
         <div class="step-buttons">
-          <button id="step-first" onclick="viewer.stepper.first()" title="First">⏮</button>
-          <button id="step-prev" onclick="viewer.stepper.prev()" title="Previous">⏪</button>
-          <button id="step-play" onclick="viewer.stepper.toggleAutoPlay()" title="Play/Pause">▶</button>
-          <button id="step-next" onclick="viewer.stepper.next()" title="Next">⏩</button>
-          <button id="step-last" onclick="viewer.stepper.last()" title="Last">⏭</button>
+          <button id="step-first" data-action="first" title="First">⏮</button>
+          <button id="step-prev" data-action="prev" title="Previous">⏪</button>
+          <button id="step-play" data-action="toggleAutoPlay" title="Play/Pause">▶</button>
+          <button id="step-next" data-action="next" title="Next">⏩</button>
+          <button id="step-last" data-action="last" title="Last">⏭</button>
         </div>
         <div class="step-speed">
           <label>Speed:</label>
-          <input type="range" id="step-speed" min="500" max="5000" value="2000" step="500"
-                 onchange="viewer.stepper.setPlaySpeed(5500 - this.value)">
+          <input type="range" id="step-speed" min="500" max="5000" value="2000" step="500">
           <span id="step-speed-label">2s</span>
         </div>
       ` : `
@@ -5237,13 +5256,25 @@ class GFSViewer {
       `}
     `;
 
-    // Update speed label
+    // Add event listeners for step control buttons
+    const stepButtons = controls.querySelectorAll('.step-buttons button');
+    stepButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.action;
+        if (action && this.stepper[action]) {
+          this.stepper[action]();
+        }
+      });
+    });
+
+    // Update speed control
     const speedSlider = document.getElementById('step-speed');
     const speedLabel = document.getElementById('step-speed-label');
     if (speedSlider && speedLabel) {
       speedSlider.addEventListener('input', (e) => {
         const seconds = (5500 - e.target.value) / 1000;
         speedLabel.textContent = `${seconds}s`;
+        this.stepper.setPlaySpeed(5500 - e.target.value);
       });
     }
   }
@@ -5473,7 +5504,7 @@ class GFSViewer {
       <div class="modal-content">
         <div class="modal-header">
           <h2>Keyboard Shortcuts</h2>
-          <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+          <button class="modal-close">×</button>
         </div>
         <div class="modal-body">
           <div class="shortcuts-grid">
@@ -5515,6 +5546,14 @@ class GFSViewer {
     `;
 
     document.body.appendChild(modal);
+
+    // Add close button listener
+    const closeBtn = modal.querySelector('.modal-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => modal.remove());
+    }
+
+    // Click outside to close
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.remove();
     });
@@ -5551,9 +5590,15 @@ class GFSViewer {
         <div class="error-message">
           <h3>⚠️ Error Loading Diagram</h3>
           <p>${error.message}</p>
-          <button onclick="location.reload()">Reload Page</button>
+          <button id="error-reload">Reload Page</button>
         </div>
       `;
+
+      // Add reload button listener
+      const reloadBtn = document.getElementById('error-reload');
+      if (reloadBtn) {
+        reloadBtn.addEventListener('click', () => location.reload());
+      }
     }
   }
 }
@@ -5603,4 +5648,4 @@ if (typeof module !== 'undefined' && module.exports) {
 
 })();
 
-// Bundle created: 2025-10-12T14:17:10.179Z
+// Bundle created: 2025-10-12T14:33:10.387Z

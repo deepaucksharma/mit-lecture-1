@@ -28,11 +28,13 @@ class GFSViewer {
       await this.renderer.initialize();
 
       this.composer = new SceneComposer();
+      this.learningProgress = new LearningProgress();
       this.drillSystem = new DrillSystem();
+      // Connect drill system to unified learning progress
+      this.drillSystem.progress.setLearningProgress(this.learningProgress);
       this.stepper = new StepThroughEngine(this.renderer, this.composer);
       this.overlayManager = new OverlayManager(this);
       this.exportManager = new ExportManager(this);
-      this.learningProgress = new LearningProgress();
 
       // Load manifest
       await this.loadManifest();
@@ -410,16 +412,15 @@ class GFSViewer {
         </div>
         <div class="step-caption" id="step-caption">Click Play to start</div>
         <div class="step-buttons">
-          <button id="step-first" onclick="viewer.stepper.first()" title="First">⏮</button>
-          <button id="step-prev" onclick="viewer.stepper.prev()" title="Previous">⏪</button>
-          <button id="step-play" onclick="viewer.stepper.toggleAutoPlay()" title="Play/Pause">▶</button>
-          <button id="step-next" onclick="viewer.stepper.next()" title="Next">⏩</button>
-          <button id="step-last" onclick="viewer.stepper.last()" title="Last">⏭</button>
+          <button id="step-first" data-action="first" title="First">⏮</button>
+          <button id="step-prev" data-action="prev" title="Previous">⏪</button>
+          <button id="step-play" data-action="toggleAutoPlay" title="Play/Pause">▶</button>
+          <button id="step-next" data-action="next" title="Next">⏩</button>
+          <button id="step-last" data-action="last" title="Last">⏭</button>
         </div>
         <div class="step-speed">
           <label>Speed:</label>
-          <input type="range" id="step-speed" min="500" max="5000" value="2000" step="500"
-                 onchange="viewer.stepper.setPlaySpeed(5500 - this.value)">
+          <input type="range" id="step-speed" min="500" max="5000" value="2000" step="500">
           <span id="step-speed-label">2s</span>
         </div>
       ` : `
@@ -427,13 +428,25 @@ class GFSViewer {
       `}
     `;
 
-    // Update speed label
+    // Add event listeners for step control buttons
+    const stepButtons = controls.querySelectorAll('.step-buttons button');
+    stepButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.action;
+        if (action && this.stepper[action]) {
+          this.stepper[action]();
+        }
+      });
+    });
+
+    // Update speed control
     const speedSlider = document.getElementById('step-speed');
     const speedLabel = document.getElementById('step-speed-label');
     if (speedSlider && speedLabel) {
       speedSlider.addEventListener('input', (e) => {
         const seconds = (5500 - e.target.value) / 1000;
         speedLabel.textContent = `${seconds}s`;
+        this.stepper.setPlaySpeed(5500 - e.target.value);
       });
     }
   }
@@ -663,7 +676,7 @@ class GFSViewer {
       <div class="modal-content">
         <div class="modal-header">
           <h2>Keyboard Shortcuts</h2>
-          <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+          <button class="modal-close">×</button>
         </div>
         <div class="modal-body">
           <div class="shortcuts-grid">
@@ -705,6 +718,14 @@ class GFSViewer {
     `;
 
     document.body.appendChild(modal);
+
+    // Add close button listener
+    const closeBtn = modal.querySelector('.modal-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => modal.remove());
+    }
+
+    // Click outside to close
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.remove();
     });
@@ -741,9 +762,15 @@ class GFSViewer {
         <div class="error-message">
           <h3>⚠️ Error Loading Diagram</h3>
           <p>${error.message}</p>
-          <button onclick="location.reload()">Reload Page</button>
+          <button id="error-reload">Reload Page</button>
         </div>
       `;
+
+      // Add reload button listener
+      const reloadBtn = document.getElementById('error-reload');
+      if (reloadBtn) {
+        reloadBtn.addEventListener('click', () => location.reload());
+      }
     }
   }
 }

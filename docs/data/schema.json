@@ -10,6 +10,34 @@
     "title": {
       "type": "string"
     },
+    "narrative": {
+      "type": "string",
+      "description": "Extended narrative explaining the concept with storytelling"
+    },
+    "crystallizedInsight": {
+      "type": "string",
+      "description": "One-line distillation of the key insight"
+    },
+    "prerequisites": {
+      "type": "object",
+      "description": "Prerequisites for understanding this spec",
+      "properties": {
+        "concepts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checkYourself": {
+          "type": "string"
+        }
+      }
+    },
+    "firstPrinciples": {
+      "type": "object",
+      "description": "Deep theoretical foundations and mathematical analysis",
+      "additionalProperties": true
+    },
     "nodes": {
       "type": "array",
       "items": {
@@ -20,7 +48,7 @@
             "type": "string"
           },
           "type": {
-            "enum": ["master", "chunkserver", "client", "rack", "switch", "note"]
+            "enum": ["master", "chunkserver", "client", "rack", "switch", "note", "state"]
           },
           "label": {
             "type": "string"
@@ -245,6 +273,17 @@
           "scenario": {
             "type": "string"
           },
+          "thoughtProcess": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Step-by-step thought process for working through the drill"
+          },
+          "insight": {
+            "type": "string",
+            "description": "Key insight from the drill"
+          },
           "rubric": {
             "type": "array",
             "items": {
@@ -253,6 +292,33 @@
           }
         }
       }
+    },
+    "assessmentCheckpoints": {
+      "type": "array",
+      "description": "Learning assessment and mastery checkpoints",
+      "items": {
+        "type": "object",
+        "required": ["id", "competency", "checkYourself", "mastery"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "competency": {
+            "type": "string"
+          },
+          "checkYourself": {
+            "type": "string"
+          },
+          "mastery": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "advancedConcepts": {
+      "type": "object",
+      "description": "Advanced and alternative concepts beyond core foundations",
+      "additionalProperties": true
     }
   }
 }

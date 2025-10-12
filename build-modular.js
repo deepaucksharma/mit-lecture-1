@@ -41,12 +41,13 @@ function convertModule(content, filePath) {
   converted = converted.replace(/^import\s+.*?from\s+['"].*?['"];?\s*$/gm, '');
   converted = converted.replace(/^import\s+{.*?}\s+from\s+['"].*?['"];?\s*$/gm, '');
 
-  // Remove ES6 export statements
-  converted = converted.replace(/^export\s+default\s+/gm, 'window.');
+  // Remove ES6 export statements - PROPERLY FIXED
+  converted = converted.replace(/^export\s+default\s+(\w+);?\s*$/gm, 'window.$1 = $1;');
+  converted = converted.replace(/^export\s+default\s+class\s+(\w+)/gm, 'window.$1 = class $1');
   converted = converted.replace(/^export\s+{.*?};?\s*$/gm, '');
-  converted = converted.replace(/^export\s+const\s+/gm, 'window.');
-  converted = converted.replace(/^export\s+class\s+/gm, 'window.');
-  converted = converted.replace(/^export\s+/gm, 'window.');
+  converted = converted.replace(/^export\s+const\s+(\w+)/gm, 'const $1');  // Just remove 'export'
+  converted = converted.replace(/^export\s+class\s+(\w+)/gm, 'window.$1 = class $1');
+  converted = converted.replace(/^export\s+function\s+(\w+)/gm, 'window.$1 = function $1');
 
   // Wrap in IIFE to avoid polluting global scope
   return `

@@ -1,43 +1,57 @@
+// Progress tracking adapter - uses unified LearningProgress system
 class ProgressTracker {
-  constructor() {
-    this.storageKey = 'gfs-learning-progress';
-    this.progress = this.loadProgress();
+  constructor(learningProgress = null) {
+    // Will be set by DrillSystem after it gets reference to viewer.learningProgress
+    this.learningProgress = learningProgress;
+    this.completedDrills = new Set();
+    this.migrateOldProgress();
   }
 
-  loadProgress() {
-    try {
-      const saved = localStorage.getItem(this.storageKey);
-      return saved ? JSON.parse(saved) : {};
-    } catch (error) {
-      console.error('Failed to load progress:', error);
-      return {};
-    }
+  setLearningProgress(learningProgress) {
+    this.learningProgress = learningProgress;
   }
 
-  saveProgress() {
+  migrateOldProgress() {
+    // Migrate from old storage format to new unified system
+    const oldKey = 'gfs-learning-progress';
     try {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
+      const oldData = localStorage.getItem(oldKey);
+      if (oldData) {
+        const oldProgress = JSON.parse(oldData);
+        // Store for later migration when learningProgress is available
+        this.pendingMigration = oldProgress;
+        localStorage.removeItem(oldKey);
+        console.log('Found old progress data, will migrate to new system');
+      }
     } catch (error) {
-      console.error('Failed to save progress:', error);
+      console.error('Failed to read old progress:', error);
     }
   }
 
   isDrillComplete(diagramId, drillId) {
-    return this.progress[`${diagramId}-${drillId}`]?.completed || false;
+    const key = `${diagramId}-${drillId}`;
+    return this.completedDrills.has(key);
   }
 
   markDrillComplete(diagramId, drillId) {
-    this.progress[`${diagramId}-${drillId}`] = {
-      completed: true,
-      timestamp: Date.now()
-    };
-    this.saveProgress();
+    const key = `${diagramId}-${drillId}`;
+    if (!this.completedDrills.has(key)) {
+      this.completedDrills.add(key);
+
+      // Update unified progress if available
+      if (this.learningProgress) {
+        const stats = this.learningProgress.getDiagramStats(diagramId);
+        const completed = this.completedDrills.size;
+        const total = stats.totalDrills || 10;
+        this.learningProgress.updateDrillProgress(diagramId, completed, total);
+      }
+    }
   }
 
   getDiagramProgress(diagramId) {
     const prefix = `${diagramId}-`;
-    const completed = Object.keys(this.progress).filter(key =>
-      key.startsWith(prefix) && this.progress[key].completed
+    const completed = Array.from(this.completedDrills).filter(key =>
+      key.startsWith(prefix)
     ).length;
 
     return { completed };
@@ -46,15 +60,19 @@ class ProgressTracker {
   resetProgress(diagramId = null) {
     if (diagramId) {
       const prefix = `${diagramId}-`;
-      Object.keys(this.progress).forEach(key => {
+      Array.from(this.completedDrills).forEach(key => {
         if (key.startsWith(prefix)) {
-          delete this.progress[key];
+          this.completedDrills.delete(key);
         }
       });
     } else {
-      this.progress = {};
+      this.completedDrills.clear();
     }
-    this.saveProgress();
+
+    // Reset in unified system too
+    if (this.learningProgress && diagramId) {
+      this.learningProgress.updateDrillProgress(diagramId, 0, 10);
+    }
   }
 }
 
