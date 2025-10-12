@@ -331,46 +331,24 @@ class DrillSystem {
   renderAnalyzeDrill(drill) {
     return `
       <div class="drill-analyze">
-        <div class="analysis-grid">
-          <div class="analysis-section">
-            <h4>Similarities</h4>
-            <textarea
-              id="similarities-${drill.id}"
-              placeholder="What are the similarities?"
-              rows="3"
-            ></textarea>
+        ${drill.scenario ? `
+          <div class="scenario">
+            <strong>Scenario:</strong> ${drill.scenario}
           </div>
-          <div class="analysis-section">
-            <h4>Differences</h4>
-            <textarea
-              id="differences-${drill.id}"
-              placeholder="What are the differences?"
-              rows="3"
-            ></textarea>
+        ` : ''}
+        ${drill.thoughtProcess && drill.thoughtProcess.length > 0 ? `
+          <div class="thought-process">
+            <strong>💭 Thought Process:</strong>
+            <ol class="thought-steps">
+              ${drill.thoughtProcess.map(step => `<li>${step}</li>`).join('')}
+            </ol>
           </div>
-          <div class="analysis-section">
-            <h4>Trade-offs</h4>
-            <textarea
-              id="tradeoffs-${drill.id}"
-              placeholder="What are the trade-offs?"
-              rows="3"
-            ></textarea>
+        ` : ''}
+        ${drill.insight ? `
+          <div class="drill-insight">
+            <strong>💡 Key Insight:</strong> ${drill.insight}
           </div>
-        </div>
-        <div class="drill-actions">
-          <button onclick="window.viewer.drillSystem.checkAnalysis('${drill.id}')">
-            Check Analysis
-          </button>
-          <button onclick="window.viewer.drillSystem.revealAnalysis('${drill.id}')" class="secondary">
-            Show Analysis Points
-          </button>
-        </div>
-        <div id="analysis-${drill.id}" class="drill-analysis" style="display:none">
-          <h4>Analysis Framework:</h4>
-          <ul>
-            ${(drill.rubric || []).map(point => `<li>${point}</li>`).join('')}
-          </ul>
-        </div>
+        ` : ''}
       </div>
     `;
   }
@@ -451,25 +429,7 @@ class DrillSystem {
     rubric.style.display = 'block';
   }
 
-  checkAnalysis(drillId) {
-    const similarities = document.getElementById(`similarities-${drillId}`).value;
-    const differences = document.getElementById(`differences-${drillId}`).value;
-    const tradeoffs = document.getElementById(`tradeoffs-${drillId}`).value;
-
-    if (!similarities.trim() || !differences.trim() || !tradeoffs.trim()) {
-      alert('Please complete all three analysis sections');
-      return;
-    }
-
-    this.revealAnalysis(drillId);
-    this.progress.markDrillComplete(this.currentDiagramId, drillId);
-    this.updateDrillStatus(drillId);
-  }
-
-  revealAnalysis(drillId) {
-    const analysis = document.getElementById(`analysis-${drillId}`);
-    analysis.style.display = 'block';
-  }
+  // Analysis drills are now read-only - no interaction needed
 
   evaluateDesign(drillId) {
     const design = document.getElementById(`design-${drillId}`).value;

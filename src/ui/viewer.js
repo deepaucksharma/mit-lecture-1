@@ -356,19 +356,23 @@ class GFSViewer {
 
       if (typeof value === 'string') {
         return `
-          <section class="principle-section">
-            <h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}>
-            <p>${value}</p>
-          </section>
+          <details class="principle-section">
+            <summary><h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}></summary>
+            <div class="principle-content">
+              <p>${value}</p>
+            </div>
+          </details>
         `;
       } else if (Array.isArray(value)) {
         return `
-          <section class="principle-section">
-            <h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}>
-            <ul>
-              ${value.map(item => `<li>${item}</li>`).join('')}
-            </ul>
-          </section>
+          <details class="principle-section">
+            <summary><h${Math.min(3 + depth, 6)}>${icon} ${label}</h${Math.min(3 + depth, 6)}></summary>
+            <div class="principle-content">
+              <ul>
+                ${value.map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+          </details>
         `;
       } else if (typeof value === 'object' && value !== null) {
         // Nested object - render recursively
