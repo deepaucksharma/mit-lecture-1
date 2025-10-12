@@ -59,7 +59,7 @@ class GFSViewer {
 
   async loadManifest() {
     try {
-      const response = await fetch('/data/manifest.json');
+      const response = await fetch('data/manifest.json');
       if (!response.ok) {
         throw new Error('Failed to load manifest');
       }
@@ -97,7 +97,7 @@ class GFSViewer {
       this.showDiagramLoading(true);
 
       // Load spec
-      const response = await fetch(`/data/specs/${diagramId}.json`);
+      const response = await fetch(`data/specs/${diagramId}.json`);
       if (!response.ok) {
         throw new Error(`Failed to load diagram ${diagramId}`);
       }

@@ -3297,7 +3297,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
   async loadManifest() {
     try {
-      const response = await fetch('/data/manifest.json');
+      const response = await fetch('data/manifest.json');
       if (!response.ok) {
         throw new Error('Failed to load manifest');
       }
@@ -3335,7 +3335,7 @@ if (typeof module !== 'undefined' && module.exports) {
       this.showDiagramLoading(true);
 
       // Load spec
-      const response = await fetch(`/data/specs/${diagramId}.json`);
+      const response = await fetch(`data/specs/${diagramId}.json`);
       if (!response.ok) {
         throw new Error(`Failed to load diagram ${diagramId}`);
       }
@@ -3895,4 +3895,4 @@ window.addEventListener('DOMContentLoaded', () => {
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = GFSViewer;
-}// Bundle created: Sun Oct 12 19:26:34 IST 2025
+}// Bundle created: Sun Oct 12 19:30:14 IST 2025
