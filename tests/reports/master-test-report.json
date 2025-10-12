@@ -1,0 +1,67 @@
+{
+  "timestamp": "2025-10-12T13:53:49.186Z",
+  "suites": [
+    {
+      "name": "Enhancement Verification",
+      "category": "Static Validation",
+      "filePath": "/home/deepak/mit-lecture-1/tests/verify-enhancements.js",
+      "passed": false,
+      "exitCode": 1,
+      "duration": "0.04s"
+    },
+    {
+      "name": "Navigation Smoke Test",
+      "category": "Quick Smoke Tests",
+      "filePath": "/home/deepak/mit-lecture-1/tests/test-quick-smoke.js",
+      "passed": true,
+      "exitCode": 0,
+      "duration": "12.80s"
+    },
+    {
+      "name": "Error Detection Suite",
+      "category": "Error Detection",
+      "filePath": "/home/deepak/mit-lecture-1/tests/test-errors.js",
+      "passed": false,
+      "exitCode": 1,
+      "duration": "23.33s"
+    },
+    {
+      "name": "Diagram Validation",
+      "category": "Diagram Validation",
+      "filePath": "/home/deepak/mit-lecture-1/tests/test-diagram-validation.js",
+      "passed": false,
+      "exitCode": 1,
+      "duration": "34.51s"
+    },
+    {
+      "name": "Enhanced Features",
+      "category": "Integration Tests",
+      "filePath": "/home/deepak/mit-lecture-1/tests/test-enhanced-features.js",
+      "passed": false,
+      "exitCode": 1,
+      "duration": "62.51s"
+    },
+    {
+      "name": "In-Depth Visual",
+      "category": "Integration Tests",
+      "filePath": "/home/deepak/mit-lecture-1/tests/test-in-depth-visual.js",
+      "passed": true,
+      "exitCode": 0,
+      "duration": "8.29s"
+    },
+    {
+      "name": "Full Test Suite",
+      "category": "Comprehensive E2E",
+      "filePath": "/home/deepak/mit-lecture-1/tests/test-suite.js",
+      "passed": false,
+      "exitCode": 1,
+      "duration": "9.42s"
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "passed": 2,
+    "failed": 5,
+    "skipped": 0
+  }
+}

@@ -1,12 +1,6 @@
 {
-  "totalTests": 1,
-  "passed": 0,
-  "failed": 1,
-  "details": [
-    {
-      "test": "Overall",
-      "status": "error",
-      "error": "window.viewer?.getCurrentGlobalPosition is not a function"
-    }
-  ]
+  "totalTests": 6,
+  "passed": 6,
+  "failed": 0,
+  "details": []
 }

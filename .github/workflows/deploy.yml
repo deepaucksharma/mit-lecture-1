@@ -19,6 +19,7 @@ jobs:
 
       - name: Bundle application
         run: |
+          # Create bundle from source files only (docs files are duplicates)
           cat src/core/*.js src/learning/*.js src/ui/*.js > docs/app.js
           echo "// Bundle created: $(date)" >> docs/app.js
 
