@@ -1,0 +1,102 @@
+{
+  "summary": {
+    "totalErrors": 17,
+    "totalWarnings": 0,
+    "networkFailures": 0,
+    "consoleErrors": 2,
+    "pageErrors": 0,
+    "componentErrors": 8,
+    "functionErrors": 0,
+    "diagramErrors": 7,
+    "validationErrors": 0
+  },
+  "errors": [
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "url": "http://localhost:8000/intro.html"
+    },
+    {
+      "type": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "url": "http://localhost:8000/intro.html"
+    },
+    {
+      "type": "component",
+      "message": "Component check failed: hasViewer",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "component",
+      "message": "Component check failed: hasMermaid",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "component",
+      "message": "Component check failed: hasStateManager",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "component",
+      "message": "Component check failed: hasDiagramContainer",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "component",
+      "message": "Component check failed: hasPrinciplesContainer",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "component",
+      "message": "Component check failed: hasAssessmentContainer",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "component",
+      "message": "Component check failed: hasDrillsContainer",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "component",
+      "message": "Component check failed: hasStateControls",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "diagram",
+      "message": "Failed to load diagram: 00-legend",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "diagram",
+      "message": "Failed to load diagram: 01-triangle",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "diagram",
+      "message": "Failed to load diagram: 02-scale",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "diagram",
+      "message": "Failed to load diagram: 03-chunk-size",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "diagram",
+      "message": "Failed to load diagram: 04-architecture",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "diagram",
+      "message": "Failed to load diagram: 05-planes",
+      "url": "http://localhost:8000/docs/intro.html"
+    },
+    {
+      "type": "diagram",
+      "message": "Failed to load diagram: 06-read-path",
+      "url": "http://localhost:8000/docs/intro.html"
+    }
+  ],
+  "warnings": [],
+  "passed": false
+}

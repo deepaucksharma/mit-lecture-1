@@ -7,7 +7,7 @@
     "start": "npx http-server docs -p 8000",
     "start:test": "npx http-server docs -p 8888",
     "build": "npm run bundle && npm run copy-data",
-    "bundle": "cat src/utils/sanitizer.js src/core/app-state.js src/core/composer.js src/core/renderer.js src/core/validator.js src/learning/*.js src/ui/*.js > docs/app.js",
+    "bundle": "echo '// GFS Visual Learning System - Bundled Application' > docs/app.js && for file in src/utils/sanitizer.js src/core/app-state.js src/core/composer.js src/core/renderer.js src/core/validator.js src/learning/*.js src/ui/*.js; do echo '' >> docs/app.js && echo \"// === $file ===\" >> docs/app.js && cat \"$file\" >> docs/app.js && echo '' >> docs/app.js; done",
     "copy-data": "cp -r data/specs docs/data/ && cp data/manifest.json docs/data/ && cp data/schema.json docs/data/",
     "validate": "node scripts/validate-all.js",
     "test": "node tests/run-all-tests.js",

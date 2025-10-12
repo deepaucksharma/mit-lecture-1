@@ -18,7 +18,7 @@ const { execSync } = require('child_process');
 
 // Configuration
 const CONFIG = {
-  baseUrl: 'http://localhost:8000',
+  baseUrl: 'http://localhost:8000/docs/index.html',
   screenshotDir: path.join(__dirname, 'screenshots/comprehensive'),
   reportDir: path.join(__dirname, 'reports'),
   viewport: { width: 1920, height: 1080 },

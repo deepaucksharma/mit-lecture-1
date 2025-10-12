@@ -11,7 +11,7 @@
 
 const puppeteer = require('puppeteer');
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'http://localhost:8000/docs/index.html';
 const DIAGRAM_IDS = [
   '00-legend',
   '01-triangle',

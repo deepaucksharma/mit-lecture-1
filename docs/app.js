@@ -1,3 +1,6 @@
+// GFS Visual Learning System - Bundled Application
+
+// === src/utils/sanitizer.js ===
 /**
  * HTML Sanitization Utility
  * Provides safe HTML rendering to prevent XSS attacks
@@ -147,6 +150,9 @@ if (typeof module !== 'undefined' && module.exports) {
   window.HTMLSanitizer = HTMLSanitizer;
   window.sanitizer = sanitizer;
 }
+
+
+// === src/core/app-state.js ===
 /**
  * Unified Application State Manager
  * Single source of truth for all application state
@@ -377,7 +383,10 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
   window.AppState = AppState;
   window.appState = appState;
-}class SceneComposer {
+}
+
+// === src/core/composer.js ===
+class SceneComposer {
   constructor() {
     this.debug = false;
   }
@@ -568,7 +577,10 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = SceneComposer;
 } else {
   window.SceneComposer = SceneComposer;
-}class MermaidRenderer {
+}
+
+// === src/core/renderer.js ===
+class MermaidRenderer {
   constructor() {
     this.config = {
       theme: 'base',
@@ -599,6 +611,8 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 
     this.initialized = false;
+    this.cache = new Map(); // SVG cache for performance
+    this.cacheEnabled = true;
   }
 
   async initialize() {
@@ -623,13 +637,24 @@ if (typeof module !== 'undefined' && module.exports) {
       await this.initialize();
     }
 
-    const code = this.generateMermaidCode(spec);
     const container = document.getElementById(containerId);
-
     if (!container) {
       console.error(`Container ${containerId} not found`);
       return null;
     }
+
+    // Generate cache key from spec
+    const cacheKey = this.generateCacheKey(spec);
+
+    // Check cache first
+    if (this.cacheEnabled && this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey);
+      container.innerHTML = cached;
+      this.postProcess(container, spec);
+      return cached;
+    }
+
+    const code = this.generateMermaidCode(spec);
 
     // Clear container
     container.innerHTML = '';
@@ -646,6 +671,16 @@ if (typeof module !== 'undefined' && module.exports) {
       const { svg } = await mermaid.render(id, code);
       container.innerHTML = svg;
 
+      // Cache the rendered SVG
+      if (this.cacheEnabled) {
+        this.cache.set(cacheKey, svg);
+        // Limit cache size to 20 diagrams
+        if (this.cache.size > 20) {
+          const firstKey = this.cache.keys().next().value;
+          this.cache.delete(firstKey);
+        }
+      }
+
       // Post-process the SVG
       this.postProcess(container, spec);
 
@@ -655,6 +690,15 @@ if (typeof module !== 'undefined' && module.exports) {
       container.innerHTML = `<div class="error">Failed to render diagram: ${error.message}</div>`;
       return null;
     }
+  }
+
+  generateCacheKey(spec) {
+    // Create a cache key from spec structure
+    return `${spec.id || 'unknown'}-${spec.nodes?.length || 0}-${spec.edges?.length || 0}-${spec.layout?.type || 'flow'}`;
+  }
+
+  clearCache() {
+    this.cache.clear();
   }
 
   generateMermaidCode(spec) {
@@ -1073,7 +1117,10 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = MermaidRenderer;
 } else {
   window.MermaidRenderer = MermaidRenderer;
-}class ValidationError extends Error {
+}
+
+// === src/core/validator.js ===
+class ValidationError extends Error {
   constructor(rule, errors) {
     super(`Validation failed for ${rule}: ${errors.join(', ')}`);
     this.rule = rule;
@@ -1261,7 +1308,10 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
   window.DiagramValidator = DiagramValidator;
   window.ValidationError = ValidationError;
-}// Progress tracking adapter - uses unified LearningProgress system
+}
+
+// === src/learning/drills.js ===
+// Progress tracking adapter - uses unified LearningProgress system
 class ProgressTracker {
   constructor(learningProgress = null) {
     // Will be set by DrillSystem after it gets reference to viewer.learningProgress
@@ -1821,7 +1871,10 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
   window.DrillSystem = DrillSystem;
   window.ProgressTracker = ProgressTracker;
-}class LearningProgress {
+}
+
+// === src/learning/progress.js ===
+class LearningProgress {
   constructor() {
     this.storageKey = 'gfs-learning-overall-progress';
     this.sessionKey = 'gfs-learning-session';
@@ -2240,7 +2293,10 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = LearningProgress;
 } else {
   window.LearningProgress = LearningProgress;
-}class StepThroughEngine {
+}
+
+// === src/learning/stepper.js ===
+class StepThroughEngine {
   constructor(renderer, composer) {
     this.renderer = renderer;
     this.composer = composer;
@@ -2641,7 +2697,10 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = StepThroughEngine;
 } else {
   window.StepThroughEngine = StepThroughEngine;
-}class ExportManager {
+}
+
+// === src/ui/export.js ===
+class ExportManager {
   constructor(viewer) {
     this.viewer = viewer;
   }
@@ -3098,7 +3157,10 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = ExportManager;
 } else {
   window.ExportManager = ExportManager;
-}class OverlayManager {
+}
+
+// === src/ui/overlays.js ===
+class OverlayManager {
   constructor(viewer) {
     this.viewer = viewer;
     this.activeOverlays = new Set();
@@ -3305,7 +3367,10 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = OverlayManager;
 } else {
   window.OverlayManager = OverlayManager;
-}class GFSViewer {
+}
+
+// === src/ui/viewer.js ===
+class GFSViewer {
   constructor() {
     this.validator = null;
     this.renderer = null;

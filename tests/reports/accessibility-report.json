@@ -1,0 +1,143 @@
+{
+  "summary": {
+    "critical": 0,
+    "serious": 20,
+    "moderate": 1,
+    "minor": 0,
+    "total": 21,
+    "passed": false
+  },
+  "issues": {
+    "critical": [],
+    "serious": [
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.00/4.5",
+        "element": "DIV",
+        "text": "\n      \n        🎯 GFS Visual Learning System\n    "
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.43/3",
+        "element": "H1",
+        "text": "\n        🎯 GFS Visual Learning System\n      "
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 4.34/4.5",
+        "element": "P",
+        "text": "Master Google File System Architecture Through Int"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.00/4.5",
+        "element": "DIV",
+        "text": "\n      \n        This interactive learning system h"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 4.34/4.5",
+        "element": "P",
+        "text": "\n        This interactive learning system helps yo"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.00/4.5",
+        "element": "DIV",
+        "text": "\n      \n        📊\n        Interactive Diagrams\n  "
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.00/3",
+        "element": "DIV",
+        "text": "📊"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.43/4.5",
+        "element": "DIV",
+        "text": "Interactive Diagrams"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 4.34/4.5",
+        "element": "DIV",
+        "text": "Explore GFS architecture with dynamic visualizatio"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.00/3",
+        "element": "DIV",
+        "text": "🎯"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.43/4.5",
+        "element": "DIV",
+        "text": "Guided Learning"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 4.34/4.5",
+        "element": "DIV",
+        "text": "Step-by-step progression through core concepts"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.00/3",
+        "element": "DIV",
+        "text": "🧩"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.43/4.5",
+        "element": "DIV",
+        "text": "Practice Drills"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 4.34/4.5",
+        "element": "DIV",
+        "text": "Reinforce understanding with hands-on exercises"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.00/3",
+        "element": "DIV",
+        "text": "💡"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.43/4.5",
+        "element": "DIV",
+        "text": "First Principles"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 4.34/4.5",
+        "element": "DIV",
+        "text": "Deep dive into fundamental concepts"
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 1.00/4.5",
+        "element": "DIV",
+        "text": "\n      \n        🚀 Start Learning\n      \n      \n  "
+      },
+      {
+        "type": "contrast",
+        "message": "Insufficient contrast ratio 3.66/4.5",
+        "element": "A",
+        "text": "\n        📖 View Legend\n      "
+      }
+    ],
+    "moderate": [
+      {
+        "type": "aria",
+        "message": "4 instances of missing-landmark",
+        "severity": "moderate"
+      }
+    ],
+    "minor": []
+  }
+}

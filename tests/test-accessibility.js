@@ -6,7 +6,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'http://localhost:8000/docs/index.html';
 
 class AccessibilityTestSuite {
   constructor() {

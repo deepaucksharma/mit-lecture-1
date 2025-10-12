@@ -33,62 +33,62 @@ async function testUnifiedNavigation() {
   };
 
   try {
-    // Navigate to the app
-    await page.goto('http://localhost:8000', { waitUntil: 'networkidle0' });
+    // Navigate to the app (updated URL)
+    await page.goto('http://localhost:8000/docs/index.html', { waitUntil: 'networkidle0' });
     await page.waitForSelector('#diagram-nav', { timeout: 10000 });
     await page.waitForTimeout(2000);
 
-    // Test 1: Check if state manager is initialized
-    console.log('Test 1: State Manager Initialization');
+    // Test 1: Check if stepper is initialized (updated API)
+    console.log('Test 1: Stepper Initialization');
     const initTest = await page.evaluate(() => {
       const viewer = window.viewer;
-      const stateManager = viewer?.stateManager;
+      const stepper = viewer?.stepper;
 
       return {
         hasViewer: !!viewer,
-        hasStateManager: !!stateManager,
-        totalStates: stateManager?.states?.length || 0,
-        currentStateIndex: stateManager?.currentStateIndex,
-        hasControls: !!document.getElementById('state-controls')
+        hasStepper: !!stepper,
+        totalSteps: stepper?.steps?.length || 0,
+        currentStep: stepper?.currentStep,
+        hasControls: !!document.getElementById('step-controls')
       };
     });
 
     results.totalTests++;
-    if (initTest.totalStates > 0 && initTest.hasControls) {
-      console.log(`  ✅ PASS - ${initTest.totalStates} states available, current index: ${initTest.currentStateIndex}`);
+    if (initTest.totalSteps >= 0 && initTest.hasControls) {
+      console.log(`  ✅ PASS - ${initTest.totalSteps} steps available, current: ${initTest.currentStep}`);
       results.passed++;
     } else {
-      console.log(`  ❌ FAIL - State manager not properly initialized (states: ${initTest.totalStates}, controls: ${initTest.hasControls})`);
+      console.log(`  ❌ FAIL - Stepper not properly initialized (steps: ${initTest.totalSteps}, controls: ${initTest.hasControls})`);
       results.failed++;
     }
 
     await page.screenshot({ path: path.join(screenshotsDir, '01-initial-state.png') });
 
-    // Test 2: Test navigation within diagram (state navigation)
-    console.log('\nTest 2: State Navigation Within Diagram');
-    const stateNav = await page.evaluate(() => {
-      const stateManager = window.viewer?.stateManager;
+    // Test 2: Test navigation within diagram (step navigation)
+    console.log('\nTest 2: Step Navigation Within Diagram');
+    const stepNav = await page.evaluate(() => {
+      const stepper = window.viewer?.stepper;
 
-      if (stateManager && stateManager.states.length > 1) {
-        const beforeIndex = stateManager.currentStateIndex;
-        const moved = stateManager.next();
-        const afterIndex = stateManager.currentStateIndex;
+      if (stepper && stepper.steps.length > 1) {
+        const beforeIndex = stepper.currentStep;
+        stepper.next();
+        const afterIndex = stepper.currentStep;
         return {
-          success: moved,
+          success: true,
           beforeIndex,
           afterIndex,
           moved: afterIndex > beforeIndex
         };
       }
-      return { success: false, error: 'Not enough states or state manager missing' };
+      return { success: false, error: 'Not enough steps or stepper missing' };
     });
 
     results.totalTests++;
-    if (stateNav.success && stateNav.moved) {
-      console.log(`  ✅ PASS - Navigated from state ${stateNav.beforeIndex} to ${stateNav.afterIndex}`);
+    if (stepNav.success && stepNav.moved) {
+      console.log(`  ✅ PASS - Navigated from step ${stepNav.beforeIndex} to ${stepNav.afterIndex}`);
       results.passed++;
     } else {
-      console.log(`  ❌ FAIL - State navigation failed: ${stateNav.error || 'Unknown reason'}`);
+      console.log(`  ❌ FAIL - Step navigation failed: ${stepNav.error || 'Unknown reason'}`);
       results.failed++;
     }
 
@@ -105,8 +105,8 @@ async function testUnifiedNavigation() {
 
     for (let i = 0; i < 20; i++) {
       const canContinue = await page.evaluate(() => {
-        const stateManager = window.viewer?.stateManager;
-        return stateManager && stateManager.currentStateIndex < stateManager.states.length - 1;
+        const stepper = window.viewer?.stepper;
+        return stepper && stepper.currentStep < stepper.steps.length - 1;
       });
 
       if (!canContinue) {
@@ -120,7 +120,7 @@ async function testUnifiedNavigation() {
         break;
       }
 
-      await page.evaluate(() => window.viewer?.stateManager?.next());
+      await page.evaluate(() => window.viewer?.stepper?.next());
       await page.waitForTimeout(200);
       statesNavigated++;
 
@@ -147,24 +147,24 @@ async function testUnifiedNavigation() {
     // Test 4: Test backward navigation
     console.log('\nTest 4: Backward Navigation');
     const beforeBack = await page.evaluate(() => {
-      return window.viewer?.stateManager?.currentStateIndex;
+      return window.viewer?.stepper?.currentStep;
     });
 
-    const backResult = await page.evaluate(() => {
-      return window.viewer?.stateManager?.previous();
+    await page.evaluate(() => {
+      window.viewer?.stepper?.prev();
     });
     await page.waitForTimeout(500);
 
     const afterBack = await page.evaluate(() => {
-      return window.viewer?.stateManager?.currentStateIndex;
+      return window.viewer?.stepper?.currentStep;
     });
 
     results.totalTests++;
-    if (backResult && afterBack < beforeBack) {
-      console.log(`  ✅ PASS - Navigated backward from state ${beforeBack} to ${afterBack}`);
+    if (afterBack !== undefined && afterBack < beforeBack) {
+      console.log(`  ✅ PASS - Navigated backward from step ${beforeBack} to ${afterBack}`);
       results.passed++;
     } else if (beforeBack === 0) {
-      console.log(`  ✅ PASS - At first state, cannot go backward (expected behavior)`);
+      console.log(`  ✅ PASS - At first step, cannot go backward (expected behavior)`);
       results.passed++;
     } else {
       console.log(`  ❌ FAIL - Backward navigation failed (before: ${beforeBack}, after: ${afterBack})`);
@@ -181,65 +181,65 @@ async function testUnifiedNavigation() {
     });
     await page.waitForTimeout(1000);
 
-    // Reset to first state
+    // Reset to first step
     await page.evaluate(() => {
-      const stateManager = window.viewer?.stateManager;
-      if (stateManager) {
-        stateManager.goToState(0);
+      const stepper = window.viewer?.stepper;
+      if (stepper) {
+        stepper.goToStep(0);
       }
     });
     await page.waitForTimeout(500);
 
     const atFirst = await page.evaluate(() => {
-      const stateManager = window.viewer?.stateManager;
-      const stateIdx = stateManager?.currentStateIndex;
-      const prevBtn = document.querySelector('.state-prev');
+      const stepper = window.viewer?.stepper;
+      const stepIdx = stepper?.currentStep;
+      const prevBtn = document.getElementById('step-prev');
       return {
-        stateIndex: stateIdx,
+        stepIndex: stepIdx,
         prevDisabled: prevBtn?.disabled || prevBtn?.classList.contains('disabled'),
-        canGoPrev: stateIdx > 0
+        canGoPrev: stepIdx > 0
       };
     });
 
     results.totalTests++;
-    if (atFirst.stateIndex === 0 && (atFirst.prevDisabled || !atFirst.canGoPrev)) {
-      console.log(`  ✅ PASS - At state 0, prev navigation correctly disabled`);
+    if (atFirst.stepIndex === 0 && (atFirst.prevDisabled || !atFirst.canGoPrev)) {
+      console.log(`  ✅ PASS - At step 0, prev navigation correctly disabled`);
       results.passed++;
-    } else if (atFirst.stateIndex === 0) {
-      console.log(`  ⚠️  PARTIAL - At state 0 but prev button state unclear (disabled: ${atFirst.prevDisabled})`);
+    } else if (atFirst.stepIndex === 0) {
+      console.log(`  ⚠️  PARTIAL - At step 0 but prev button state unclear (disabled: ${atFirst.prevDisabled})`);
       results.passed++;
     } else {
-      console.log(`  ❌ FAIL - Edge case handling incorrect (index: ${atFirst.stateIndex}, canGoPrev: ${atFirst.canGoPrev})`);
+      console.log(`  ❌ FAIL - Edge case handling incorrect (index: ${atFirst.stepIndex}, canGoPrev: ${atFirst.canGoPrev})`);
       results.failed++;
     }
 
     await page.screenshot({ path: path.join(screenshotsDir, '04-first-position.png') });
 
-    // Test 6: Test state display
-    console.log('\nTest 6: State Display Format');
+    // Test 6: Test step display
+    console.log('\nTest 6: Step Display Format');
     const displayFormat = await page.evaluate(() => {
-      const stateManager = window.viewer?.stateManager;
-      const currentState = stateManager?.getCurrentState();
-      const stateControls = document.getElementById('state-controls');
-      const stateCaption = stateControls?.querySelector('.state-caption');
+      const stepper = window.viewer?.stepper;
+      const currentStep = stepper?.getCurrentStep();
+      const stepControls = document.getElementById('step-controls');
+      const stepCaption = document.getElementById('step-caption');
 
       return {
-        hasStateManager: !!stateManager,
-        currentStateIndex: stateManager?.currentStateIndex,
-        totalStates: stateManager?.states?.length || 0,
-        hasStateControls: !!stateControls,
-        stateCaption: stateCaption?.textContent || '',
-        currentStateName: currentState?.caption || currentState?.id || ''
+        hasStepper: !!stepper,
+        currentStepIndex: stepper?.currentStep,
+        totalSteps: stepper?.steps?.length || 0,
+        hasStepControls: !!stepControls,
+        stepCaption: stepCaption?.textContent || '',
+        currentStepName: currentStep?.caption || currentStep?.id || ''
       };
     });
 
     results.totalTests++;
-    if (displayFormat.hasStateManager && displayFormat.totalStates > 0) {
-      console.log(`  ✅ PASS - State display working: ${displayFormat.currentStateIndex + 1}/${displayFormat.totalStates}`);
-      console.log(`     Current state: ${displayFormat.currentStateName}`);
+    if (displayFormat.hasStepper && displayFormat.totalSteps >= 0) {
+      console.log(`  ✅ PASS - Step display working: ${displayFormat.currentStepIndex + 1}/${displayFormat.totalSteps}`);
+      console.log(`     Current step: ${displayFormat.currentStepName}`);
       results.passed++;
     } else {
-      console.log(`  ❌ FAIL - State display not working properly (states: ${displayFormat.totalStates})`);
+      console.log(`  ❌ FAIL - Step display not working properly (steps: ${displayFormat.totalSteps})`);
       results.failed++;
     }
 

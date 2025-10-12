@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SCREENSHOTS_DIR = path.join(__dirname, 'screenshots/enhanced');
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'http://localhost:8000/docs/index.html';
 const VIEWPORT = { width: 1920, height: 1080 };
 
 // All specs to test

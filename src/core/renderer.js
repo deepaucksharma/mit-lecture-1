@@ -29,6 +29,8 @@ class MermaidRenderer {
     };
 
     this.initialized = false;
+    this.cache = new Map(); // SVG cache for performance
+    this.cacheEnabled = true;
   }
 
   async initialize() {
@@ -53,13 +55,24 @@ class MermaidRenderer {
       await this.initialize();
     }
 
-    const code = this.generateMermaidCode(spec);
     const container = document.getElementById(containerId);
-
     if (!container) {
       console.error(`Container ${containerId} not found`);
       return null;
     }
+
+    // Generate cache key from spec
+    const cacheKey = this.generateCacheKey(spec);
+
+    // Check cache first
+    if (this.cacheEnabled && this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey);
+      container.innerHTML = cached;
+      this.postProcess(container, spec);
+      return cached;
+    }
+
+    const code = this.generateMermaidCode(spec);
 
     // Clear container
     container.innerHTML = '';
@@ -76,6 +89,16 @@ class MermaidRenderer {
       const { svg } = await mermaid.render(id, code);
       container.innerHTML = svg;
 
+      // Cache the rendered SVG
+      if (this.cacheEnabled) {
+        this.cache.set(cacheKey, svg);
+        // Limit cache size to 20 diagrams
+        if (this.cache.size > 20) {
+          const firstKey = this.cache.keys().next().value;
+          this.cache.delete(firstKey);
+        }
+      }
+
       // Post-process the SVG
       this.postProcess(container, spec);
 
@@ -85,6 +108,15 @@ class MermaidRenderer {
       container.innerHTML = `<div class="error">Failed to render diagram: ${error.message}</div>`;
       return null;
     }
+  }
+
+  generateCacheKey(spec) {
+    // Create a cache key from spec structure
+    return `${spec.id || 'unknown'}-${spec.nodes?.length || 0}-${spec.edges?.length || 0}-${spec.layout?.type || 'flow'}`;
+  }
+
+  clearCache() {
+    this.cache.clear();
   }
 
   generateMermaidCode(spec) {
